@@ -362,8 +362,8 @@ MeanVIP_active <- T  ## 1. Mean value of irradiance during the time period
 
 MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
-                  # CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  # CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
+                  CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
+                  CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
                   CS_ref_rm_VIP_RelLow =  0.1,        ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   CS_ref_rm_VIP_RelUpp =  0.1,        ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
@@ -659,19 +659,24 @@ for (ay in unique(year(dayslist))) {
             }
         }
 
-stop("TEST")
+
 
         #---- 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
             ## create some modeled values
             CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            CS_ref_rm_VIP_low <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
+            ## first implementation
+            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
+            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
+            ## newer implementaion
+            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow
+            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp
 
-
-            CS_ref_rm_VIP_low <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
+            plot(CS_ref_rm_VIP_upp, type = "l",col= 1)
+            lines(CS_ref_rm_VIP_low,col= 2)
+            lines(CS_ref_rm_VIP_low_0,col= 3)
+            lines(CS_ref_rm_VIP_upp_0,col= 4)
 
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
@@ -724,8 +729,8 @@ stop("TEST")
 
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
-                    subday$CSflag[w_sta:w_end][ (! subday$CSflag[w_sta:w_end] == 0 ) &
-                                                (  subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
+                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -768,9 +773,9 @@ stop("TEST")
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
+                                                ( subday$CSflag[w_sta:w_end] == 99) &
+                                                  pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -999,16 +1004,14 @@ stop("TEST")
         lines(subday$Date, subday$CS_ref_HOR, lty = 3, col = "red", lwd = 2 )
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
-
-
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 3, lwd = 2 )
+            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2)
+            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 2)
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2 )
+            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 2)
+            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2)
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
