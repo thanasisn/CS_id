@@ -112,8 +112,8 @@ MONTHLY     <- FALSE
 TEST        <- TRUE
 TEST        <- FALSE
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
-START_DAY   <- "2022-01-01"
-# START_DAY   <- "1993-01-01"
+# START_DAY   <- "2022-01-01"
+START_DAY   <- "1993-01-01"
 
 ## load previous state have to override it for alpha to be used
 if (MONTHLY) {
@@ -364,10 +364,10 @@ MS <- data.frame( nt                   = 11,          ##     Window size prefer 
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
                   CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
                   CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_RelLow =  0.1,        ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_RelUpp =  0.1,        ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_LowOff = 10,        ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_UppOff = 10,        ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_RelUpp =  0.09,       ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_UppOff = 20,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
