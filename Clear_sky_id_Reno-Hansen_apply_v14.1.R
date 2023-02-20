@@ -366,6 +366,8 @@ MS <- data.frame( nt                   = 11,          ##     Window size prefer 
                   CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
                   CS_ref_rm_VIP_RelLow =  0.1,        ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   CS_ref_rm_VIP_RelUpp =  0.1,        ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_LowOff = 10,        ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_UppOff = 10,        ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
@@ -669,14 +671,15 @@ for (ay in unique(year(dayslist))) {
             ## first implementation
             CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
             CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
-            ## newer implementaion
-            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow
-            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp
+            ## newer implementation ?
+            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
+            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
 
             plot(CS_ref_rm_VIP_upp, type = "l",col= 1)
             lines(CS_ref_rm_VIP_low,col= 2)
             lines(CS_ref_rm_VIP_low_0,col= 3)
             lines(CS_ref_rm_VIP_upp_0,col= 4)
+            lines(CS_ref_rm_base,col= 6)
 
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
@@ -1005,13 +1008,13 @@ for (ay in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2)
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 2)
+            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 2)
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2)
+            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
+            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -1132,6 +1135,8 @@ for (ay in unique(year(dayslist))) {
             plot( subday$Date, GLB_rm - CS_ref_rm_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
             abline( h = - MS$CS_ref_rm_VIP_low, lty = 2, col = kcols[1], lwd = 2)
             abline( h =   MS$CS_ref_rm_VIP_upp, lty = 3, col = kcols[1], lwd = 2)
+            # lines(subday$Date, GLB_rm - CS_ref_rm_VIP_low)
+
             abline( h = 0 , lty = 1, col = kcols[1], lwd = 2)
             text(x = subday$Date[20], y = - MS$CS_ref_rm_VIP_low, labels = - MS$CS_ref_rm_VIP_low, pos = 1)
             text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
