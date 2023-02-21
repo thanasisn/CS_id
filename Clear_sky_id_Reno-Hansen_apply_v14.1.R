@@ -127,9 +127,10 @@ if (MONTHLY) {
 model_selection <- "HAU"
 monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 
-## daily plots
+## daily plots file name
 plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
+plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14.1_"
 
 
 par(mar = c(2,4,2,1))
@@ -364,10 +365,10 @@ MS <- data.frame( nt                   = 11,          ##     Window size prefer 
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
                   CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
                   CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
+                  CS_ref_rm_VIP_RelUpp =  0.095,      ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_RelUpp =  0.09,       ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+                  CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_UppOff = 20,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
