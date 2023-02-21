@@ -341,20 +341,20 @@ FAST_SKIP      <- F
 
 ## Reno-Hansen filters
 MeanVIP_active <- T  ## 1. Mean value of irradiance during the time period
-# MaxVIP_active  <- T
-# VIL_active     <- T
-# VCT_active     <- T
-# VSM_active     <- T
-#
-# ## My filters
-# LDI_active     <- T   ## Low __Direct__ Irradiance limit (LDI)
-#                       ## careful this also excludes points due to pole shade at
-#                       ## afternoon and building in the morning
-# LGI_active     <- T   ## Low Global Irradiance limit (LGI)
-#                       ## Global irradiance below this level can not be identified
-# FCS_active     <- T   ## Skip with few cs
-# FDP_active     <- T   ## Skip with few data in a day
-# FAST_SKIP      <- F   ## allow faster skip of filters also reduce data kept
+MaxVIP_active  <- T
+VIL_active     <- T
+VCT_active     <- T
+VSM_active     <- T
+
+## My filters
+LDI_active     <- T   ## Low __Direct__ Irradiance limit (LDI)
+                      ## careful this also excludes points due to pole shade at
+                      ## afternoon and building in the morning
+LGI_active     <- T   ## Low Global Irradiance limit (LGI)
+                      ## Global irradiance below this level can not be identified
+FCS_active     <- T   ## Skip with few cs
+FDP_active     <- T   ## Skip with few data in a day
+FAST_SKIP      <- F   ## allow faster skip of filters also reduce data kept
 
 
 
