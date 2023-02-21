@@ -15,7 +15,7 @@ otheropt=" --checkers=20 --delete-before --stats=300s"
 bwlimit="  --bwlimit=${bwlim}k"
 
 
-"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/CS_id/**/*.pdf" "lapauththanasis:/CS_id_test"
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" --include "**/*.pdf"  sync "$HOME/CS_id/" "lapauththanasis:/CS_id_test"
 
 
 
