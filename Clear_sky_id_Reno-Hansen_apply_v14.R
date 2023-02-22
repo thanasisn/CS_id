@@ -66,12 +66,13 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Clear_sky_id_application_14") })
+                            return("Clear_sky_id_Reno-Hansen_apply_v14") })
 if(!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
     filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
+
 
 options("width" = 130)
 
