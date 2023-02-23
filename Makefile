@@ -5,11 +5,11 @@
 # all:       clean_all pdf html rtim
 render:    pdf  
 pdf:       p1 p2 upload 
-# html:      h1 h2 h3 Ah
-# rtim:      r1 r2 r3
+html:      h1 h2 
+rtim:      r1 r2 
 # clean_all: clean_cache clean_data clean_pdfs
 
-
+## use a script to upload all pdfs
 upload:
 	./upload.sh
 
