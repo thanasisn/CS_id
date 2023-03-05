@@ -1,5 +1,5 @@
 # /* !/usr/bin/env Rscript */
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
+# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title: "*Identification of Periods of Clear Sky Irradiance in
 #'  Time Series of GHI Measurements* Matthew J. Reno and Clifford W. Hansen."
