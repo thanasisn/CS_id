@@ -64,7 +64,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Clear_sky_id_application_13") })
+                            return("Clear_sky_id_application_13.1") })
 if(!interactive()) {
     pdf(  file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink( file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
