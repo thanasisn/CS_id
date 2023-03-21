@@ -1,50 +1,50 @@
-# /* !/usr/bin/env Rscript */
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title: "*Identification of Periods of Clear Sky Irradiance in
-#'  Time Series of GHI Measurements* Matthew J. Reno and Clifford W. Hansen."
-#' author: "Natsis Athanasios"
-#' institute: "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' date: "`r format(Sys.time(), '%F')`"
-#' abstract: "Construction of and examples of clear sky models"
-#'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#' - \usepackage{multicol}
-#' - \setlength{\columnsep}{1cm}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     toc_depth:        4
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        7
-#'     fig_height:       4.5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#' ---
-#'
-#+ include=FALSE, echo=FALSE
+---
+title: "*Identification of Periods of Clear Sky Irradiance in
+ Time Series of GHI Measurements* Matthew J. Reno and Clifford W. Hansen."
+author: "Natsis Athanasios"
+institute: "AUTH"
+affiliation: "Laboratory of Atmospheric Physics"
+date: "`r format(Sys.time(), '%F')`"
+abstract: "Construction of and examples of clear sky models"
+
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+- \usepackage{multicol}
+- \setlength{\columnsep}{1cm}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    toc_depth:        4
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        7
+    fig_height:       4.5
+  html_document:
+    toc:        true
+    fig_width:  7.5
+    fig_height: 5
+---
+
+
+```{r include=FALSE, echo=FALSE}
 
 ####_  Document options _####
 
-#+ echo=F, include=F
+```
+```{r echo=F, include=F}
 knitr::opts_chunk$set(comment    = ""      )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -72,6 +72,7 @@ if(!interactive()) {
     sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
     filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
+
 
 options("width" = 130)
 
@@ -130,28 +131,29 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 ## daily plots
 plotsbase <- paste0("~/Aerosols/DATA/Graphs/Level_2/CS_id/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
-plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14_"
+
 
 
 par(mar = c(2,4,2,1))
 
 
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 source("/home/athan/Aerosols/source_R/THEORY/Extraterrestrial_radiation_models.R")
 source("/home/athan/Aerosols/source_R/THEORY/Air_mass_models.R")
 source("/home/athan/Aerosols/source_R/THEORY/Clear_sky_irradiance_models.R")
 source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
-#'
+```
 
 
 
-#'
-#' \newpage
-#'
-#' ## DETECTION OF CLEAR PERIODS IN GHI AND DNI MEASUREMENTS ##
-#'
-#+ include=T, echo=FALSE
+\newpage
+
+## DETECTION OF CLEAR PERIODS IN GHI AND DNI MEASUREMENTS ##
+
+
+```{r include=T, echo=FALSE}
 
 
 ####   Load data from QCRad procedure   ########################################
@@ -282,29 +284,31 @@ dayslist      <- unique( strong$Day )
 strong$CSflag <- 99
 
 inverted      <- strong$wattGLB < strong$wattHOR
+```
 
 
-#'
-#' ### Data set input.
-#'
-#' First day:      `r min(dayslist)`
-#'
-#' Last day:       `r max(dayslist)`
-#'
-#' Days available: `r length(dayslist)`
-#'
+### Data set input.
 
+First day:      `r min(dayslist)`
+
+Last day:       `r max(dayslist)`
+
+Days available: `r length(dayslist)`
+
+
+```{r }
 #### Exclude inversions ####
+```
 
-#'
-#' ### There are instances where global irradiance is less than direct.
-#'
-#' This happens for `r sum(inverted, na.rm = T)`
-#' minutes (records), near sunset and sunrise due to obstacles,
-#' or due to different sunrise/sunset time due to small spatial differences.
-#' We will exclude all this data both for global and direct.
-#'
-#+ include=T, echo=FALSE
+
+### There are instances where global irradiance is less than direct.
+
+This happens for `r sum(inverted, na.rm = T)`
+minutes (records), near sunset and sunrise due to obstacles.
+We will exclude all this data both for global and direct.
+
+
+```{r include=T, echo=FALSE}
 strong[inverted , QCF_DIR := FALSE ]
 strong[inverted , QCF_GLB := FALSE ]
 
@@ -328,7 +332,7 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 
 
 #### Model status ####
-MeanVIP_active <- F  ## 1. Mean value of irradiance during the time period
+MeanVIP_active <- F
 MaxVIP_active  <- F
 VIL_active     <- F
 VCT_active     <- F
@@ -340,7 +344,7 @@ FDP_active     <- F
 FAST_SKIP      <- F
 
 ## Reno-Hansen filters
-MeanVIP_active <- T  ## 1. Mean value of irradiance during the time period
+MeanVIP_active <- T
 MaxVIP_active  <- T
 VIL_active     <- T
 VCT_active     <- T
@@ -396,17 +400,18 @@ CS_flags <- c( "MeanVIP",   #1
                "DsT",       #11
                NULL
              )
+```
 
 
-#'
-#' ### Threshold Values for Criteria
-#'
-#' For mean and max Most evaluations of clear sky models find that the average
-#' bias error of the model is less than 10%, often around 7% [1, 83]. Therefore,
-#' a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model
-#' was chosen.
-#'
+### Threshold Values for Criteria
 
+For mean and max Most evaluations of clear sky models find that the average
+bias error of the model is less than 10%, often around 7% [1, 83]. Therefore,
+a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model
+was chosen.
+
+
+```{r }
 # alpha_models <- data.frame(
 #     DPP      = c( 0.9  , 1.25 , 1.054567  ),
 #     KC       = c( 1    , 1.25 , 1.15983   ),
@@ -429,15 +434,14 @@ CS_models_list <- c(
                     "KASTEN",
                     "INEICHEN"
                   )
+```
+
+
+### Clear Sky detection Algorithm values
 
 
 
-
-#'
-#' ### Clear Sky detection Algorithm values
-#'
-#'
-#+ include=T, echo=F
+```{r include=T, echo=F}
 # panderOptions('table.emphasize.rownames', F)
 panderOptions('table.alignment.default',  "right")
 panderOptions('table.alignment.rownames', "right")
@@ -445,93 +449,109 @@ panderOptions('table.split.cells',        c(50,10))
 pander(t(MS))
 pander(alpha_models)
 pander(combinations)
-#'
-#+ include=T, echo=F
+```
+
+
+
+```{r include=T, echo=F}
 
 #### Model selection ####
+```
 
-#'
-#' ### Reference clear sky irradiance model and air mass model (AM)
-#'
-#' We select the clear sky model, the air mass calculation
-#' and the period of `r MS$nt`
-#' minutes to use.
-#'
 
+### Reference clear sky irradiance model and air mass model (AM)
+
+We select the clear sky model, the air mass calculation
+and the period of `r MS$nt`
+minutes to use.
+
+
+```{r }
 AM       <- AM_simple
 CS_model <- get(model_selection)
 # alpha    = alpha_models["best",model_selection]
-#+ include=T, echo=F
+```
+```{r include=T, echo=F}
 
 
 
 #### 6. LDI ###
 MS$LDIlim <- 5
+```
 
-#'
-#' ### 6. Low Direct Irradiance limit (LDI)
-#'
-#' Ignore Direct irradiance when it is bellow `r MS$LDIlim` $Watt/m^2$.
-#' This limit is biased due to the slight location difference of the two Instruments.
-#' The difference in shadow especially the afternoon "pole shadow" of some periods of the year.
-#' May limit the implementation by time of day or/and period of the year
-#'
-#' Also this can not characterize all global measurements due to gaps on direct measurements.
-#'
-#+ include=T, echo=F
+
+### 6. Low Direct Irradiance limit (LDI)
+
+Ignore Direct irradiance when it is bellow `r MS$LDIlim` $Watt/m^2$.
+This limit is biased due to the slight location difference of the two Instruments.
+The difference in shadow especially the afternoon "pole shadow" of some periods of the year.
+May limit the implementation by time of day or/and period of the year
+
+Also this can not characterize all global measurements due to gaps on direct measurements.
+
+
+```{r include=T, echo=F}
 
 
 #### 7. LGI ####
 MS$VGIlim <- 5
+```
 
-#'
-#' ### 7. Low Global Irradiance limit (LGI)
-#'
-#' Global irradiance below `r MS$VGIlim` level can not be identified
-#'
-#+ include=T, echo=F
+
+### 7. Low Global Irradiance limit (LGI)
+
+Global irradiance below `r MS$VGIlim` level can not be identified
+
+
+```{r include=T, echo=F}
 
 #### 8. FCS ####
 FCSlim <- MS$nt
+```
 
-#'
-#' ### 8. Too Few CS point for the day (FCS)
-#'
-#'
-#' If in a day there less than `r FCSlim` clear sky points will exclude them from optimizing
-#'
-#+ include=T, echo=F
+
+### 8. Too Few CS point for the day (FCS)
+
+
+If in a day there less than `r FCSlim` clear sky points will exclude them from optimizing
+
+
+```{r include=T, echo=F}
 
 
 #### 9. FDP ####
 FDPlim <- MS$nt * 3
+```
 
-#'
-#' ### 9. Too Few data points for the day (FDP)
-#'
-#'
-#' If in a day there are less than `r FDPlim` data points will be excluded from optimizing.
-#'
-#+ include=T, echo=F
+
+### 9. Too Few data points for the day (FDP)
+
+
+If in a day there are less than `r FDPlim` data points will be excluded from optimizing.
+
+
+```{r include=T, echo=F}
 
 
 
 #### 11. DsT ####
+```
 
-#'
-#' ### 11. Too low Direct signal (DsT)
-#'
-#' This is a simple hard limit on the lower possible Direct radiation with clear sky.
-#'
-#' The threshold is `r MS$DIR_s_T_fact`% lower than a reference value.
-#'
-#' $$ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) $$
-#'
-#' Where ${AM}$ is the selected air-mass model.
-#'
-#' "Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf"
-#'
-#+ include=T, echo=F
+
+### 11. Too low Direct signal (DsT)
+
+This is a simple hard limit on the lower possible Direct radiation with clear sky.
+
+The threshold is `r MS$DIR_s_T_fact`% lower than a reference value.
+
+$$ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) $$
+
+Where ${AM}$ is the selected air-mass model.
+
+"Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf"
+
+
+```{r include=T, echo=F}
 
 
 ## create a list of days to use
@@ -545,22 +565,30 @@ if (TEST) {
     dayslist <- dayslist
 }
 dayslist <- sort( dayslist, decreasing = T )
+```
 
 
-#'
-#' ### Day range
-#'
+### Day range
+
+
+```{r }
 range(dayslist)
-#'
-#+ include=T, echo=F
+```
 
 
-#'
-#' ### Baseline value for direct irradiance
-#'
-#' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
+
+```{r include=T, echo=F}
+```
+
+
+### Baseline value for direct irradiance
+
+See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
+
+```{r }
 strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
-#+ include=T, echo=F
+```
+```{r include=T, echo=F}
 
 
 
@@ -578,8 +606,9 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 
 # daily_stats <- data.frame()
 
-#+ include=T, echo=F
-##  Iterate all years
+```
+```{r include=T, echo=F}
+#### iterate all days by year ####
 for (ay in unique(year(dayslist))) {
 # foreach(ay = unique(year(dayslist))) %dopar% {
 
@@ -590,7 +619,6 @@ for (ay in unique(year(dayslist))) {
 
     pdf(file = paste0(plotsbase, ay, ".pdf"), onefile = T, width = 10 )
 
-    ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
         aday  <- as.Date( aa , origin = "1970-01-01")
@@ -660,7 +688,6 @@ for (ay in unique(year(dayslist))) {
         }
 
 
-
         #---- 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
@@ -670,6 +697,7 @@ for (ay in unique(year(dayslist))) {
             CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
+            ## TEST feature
             ## don't allow negative values on models
             CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
             CS_ref_rm_VIP_low[ CS_ref_rm_VIP_low < 0 ] <- NA
@@ -718,8 +746,8 @@ for (ay in unique(year(dayslist))) {
 
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
-                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
-                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                    subday$CSflag[w_sta:w_end][ (! subday$CSflag[w_sta:w_end] == 0 ) &
+                                                (  subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -762,9 +790,9 @@ for (ay in unique(year(dayslist))) {
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
-                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
-                                                ( subday$CSflag[w_sta:w_end] == 99) &
-                                                  pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
+                                                (   subday$CSflag[w_sta:w_end] == 99) &
+                                                    pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -962,7 +990,7 @@ for (ay in unique(year(dayslist))) {
 
 
         #### PLOTS ####
-        ## _  Main plot ---------------------------------------------------------
+        #---- Main plot ----
         ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
@@ -984,12 +1012,16 @@ for (ay in unique(year(dayslist))) {
         # lines(subday$Date, subday$wattDIR, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
 
 
+
+
         ## plot expected global reference line
         lines(subday$Date, CS_ref_safe, lty = 3, col = "green", lwd = 2 )
 
         ## direct irradiance test value !!
         lines(subday$Date, subday$CS_ref_HOR, lty = 3, col = "red", lwd = 2 )
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
+
+
 
         if (MeanVIP_active & any(have_glb)) {
             lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
@@ -1113,7 +1145,6 @@ for (ay in unique(year(dayslist))) {
 
         par("mar" = c(.5, 4.2, .5, 1) )
 
-        ## _ 1. Mean value of irradiance during the time period ----------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
             ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
@@ -1125,7 +1156,6 @@ for (ay in unique(year(dayslist))) {
             text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
-        ## _ 2. Max value of irradiance during the time period -----------------
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
@@ -1146,6 +1176,7 @@ for (ay in unique(year(dayslist))) {
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
             text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
             text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
+
         }
 
         if (VCT_active) {
@@ -1245,35 +1276,35 @@ for (ay in unique(year(dayslist))) {
 
 par(def.par)  # reset to default
 layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
-
-#'
-#' | CS Flag | Test |
-#' |:-------:|:--------------------------------------------------------------|
-#' |   NA    | Undefined, untested                                           |
-#' |    0    | Passed as clear sky                                           |
-#' |    1    | Mean value of irradiance during the time period (MeanVIP)     |
-#' |    2    | Max Value of Irradiance during the time Period (MaxVIP)       |
-#' |    3    | Variability in irradiance by the length (VIL)                 |
-#' |    4    | Variance of Changes in the Time series (VCT)                  |
-#' |    5    | Variability in the Shape of the irradiance Measurements (VSM) |
-#' |    6    | Low Direct Irradiance limit (LDI)                             |
-#' |    7    | Low Global Irradiance limit (LGI)                             |
-#' |    8    | Too Few CS point for the day (FCS)                            |
-#' |    9    | Too Few data points for the day                               |
-#' |   10    | Missing Data                                                  |
-#' |   11    | Direct irradiance simple threshold                            |
-#'
+```
 
 
+| CS Flag | Test |
+|:-------:|:--------------------------------------------------------------|
+|   NA    | Undefined, untested                                           |
+|    0    | Passed as clear sky                                           |
+|    1    | Mean value of irradiance during the time period (MeanVIP)     |
+|    2    | Max Value of Irradiance during the time Period (MaxVIP)       |
+|    3    | Variability in irradiance by the length (VIL)                 |
+|    4    | Variance of Changes in the Time series (VCT)                  |
+|    5    | Variability in the Shape of the irradiance Measurements (VSM) |
+|    6    | Low Direct Irradiance limit (LDI)                             |
+|    7    | Low Global Irradiance limit (LGI)                             |
+|    8    | Too Few CS point for the day (FCS)                            |
+|    9    | Too Few data points for the day                               |
+|   10    | Missing Data                                                  |
+|   11    | Direct irradiance simple threshold                            |
 
-#+ include=T, echo=FALSE
+
+```{r include=T, echo=FALSE}
 pander(summary(strong$CSflag))
 
 pander(print(table(strong$CSflag)))
-#'
+```
 
 
-#+ include=T, echo=FALSE
+
+```{r include=T, echo=FALSE}
 par("mar" = c(3, 3, 2, 1) )
 
 barplot( table(strong$CSflag),
@@ -1281,9 +1312,11 @@ barplot( table(strong$CSflag),
 
 barplot(prop.table(table(strong$CSflag)),
         main = "Flag Frequency" )
-#'
+```
 
 
+
+```{r }
 ## Evaluation of CS detection
 clear_sky <- strong$CSflag == 0
 
@@ -1292,14 +1325,16 @@ RMSE <- sqrt( mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 
 
 MBE  <- mean( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) /
         mean( strong$wattGLB[clear_sky] , na.rm = T)
+```
 
 
-#'
-#' ### Cost function for optimazition of alpha value.
-#'
-#' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
-#'                 { n } , \qquad a > 0 $$
-#'
+### Cost function for optimazition of alpha value.
+
+$$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
+                { n } , \qquad a > 0 $$
+
+
+```{r }
 cost <- sum( ( ( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T ) /
         sum(clear_sky, na.rm = T)
 
@@ -1338,7 +1373,8 @@ mean(daily_stats$RMSE, na.rm = T)
 
 
 
-#+ include=T, echo=FALSE
+```
+```{r include=T, echo=FALSE}
 
 ## complete days
 daterange <- range(strong$Date)
@@ -1366,10 +1402,11 @@ for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
     propt  <- prop.table(counts, margin = 2 )
     barplot(propt, space = 0, col = c("green",kcols), border = NA)
 }
-#'
+```
 
 
 
+```{r }
 # load("~/Aerosols/DATA/model_opt/Combinations_results_2017-05-25_194849.Rds")
 # gather_results <- data.frame()
 # for (fmm in unique( combinations_results$CS_models )) {
@@ -1379,9 +1416,12 @@ for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
 # }
 # plot(gather_results$rmse, gather_results$CS_count)
 # text(gather_results$rmse, gather_results$CS_count, labels = gather_results$CS_models, cex = .6,pos = 4)
+```
 
+**END**
 
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 tac <- Sys.time()
 cat(sprintf("\n%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+

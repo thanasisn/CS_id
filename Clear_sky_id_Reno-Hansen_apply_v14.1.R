@@ -109,7 +109,7 @@ walk <- function(i, nt_hw, tot_p) {
 
 # MONTHLY     <- T
 MONTHLY     <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 TEST        <- FALSE
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 # START_DAY   <- "2022-01-01"
@@ -583,7 +583,6 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 # daily_stats <- data.frame()
 
 #+ include=T, echo=F
-
 ##  Iterate all years
 for (ay in unique(year(dayslist))) {
 # foreach(ay = unique(year(dayslist))) %dopar% {
