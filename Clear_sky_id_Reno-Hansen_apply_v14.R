@@ -73,7 +73,6 @@ if(!interactive()) {
     filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
-
 options("width" = 130)
 
 
@@ -131,7 +130,7 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 ## daily plots
 plotsbase <- paste0("~/Aerosols/DATA/Graphs/Level_2/CS_id/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
-
+plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14_"
 
 
 par(mar = c(2,4,2,1))
@@ -301,7 +300,8 @@ inverted      <- strong$wattGLB < strong$wattHOR
 #' ### There are instances where global irradiance is less than direct.
 #'
 #' This happens for `r sum(inverted, na.rm = T)`
-#' minutes (records), near sunset and sunrise due to obstacles.
+#' minutes (records), near sunset and sunrise due to obstacles,
+#' or due to different sunrise/sunset time due to small spatial differences.
 #' We will exclude all this data both for global and direct.
 #'
 #+ include=T, echo=FALSE
@@ -328,7 +328,7 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 
 
 #### Model status ####
-MeanVIP_active <- F
+MeanVIP_active <- F  ## 1. Mean value of irradiance during the time period
 MaxVIP_active  <- F
 VIL_active     <- F
 VCT_active     <- F
@@ -340,7 +340,7 @@ FDP_active     <- F
 FAST_SKIP      <- F
 
 ## Reno-Hansen filters
-MeanVIP_active <- T
+MeanVIP_active <- T  ## 1. Mean value of irradiance during the time period
 MaxVIP_active  <- T
 VIL_active     <- T
 VCT_active     <- T
@@ -579,7 +579,7 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 # daily_stats <- data.frame()
 
 #+ include=T, echo=F
-#### iterate all days by year ####
+##  Iterate all years
 for (ay in unique(year(dayslist))) {
 # foreach(ay = unique(year(dayslist))) %dopar% {
 
@@ -590,6 +590,7 @@ for (ay in unique(year(dayslist))) {
 
     pdf(file = paste0(plotsbase, ay, ".pdf"), onefile = T, width = 10 )
 
+    ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
         aday  <- as.Date( aa , origin = "1970-01-01")
@@ -659,6 +660,7 @@ for (ay in unique(year(dayslist))) {
         }
 
 
+
         #---- 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
@@ -668,7 +670,6 @@ for (ay in unique(year(dayslist))) {
             CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
-            ## TEST feature
             ## don't allow negative values on models
             CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
             CS_ref_rm_VIP_low[ CS_ref_rm_VIP_low < 0 ] <- NA
@@ -717,8 +718,8 @@ for (ay in unique(year(dayslist))) {
 
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
-                    subday$CSflag[w_sta:w_end][ (! subday$CSflag[w_sta:w_end] == 0 ) &
-                                                (  subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
+                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -761,9 +762,9 @@ for (ay in unique(year(dayslist))) {
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
+                                                ( subday$CSflag[w_sta:w_end] == 99) &
+                                                  pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -961,7 +962,7 @@ for (ay in unique(year(dayslist))) {
 
 
         #### PLOTS ####
-        #---- Main plot ----
+        ## _  Main plot ---------------------------------------------------------
         ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
@@ -983,16 +984,12 @@ for (ay in unique(year(dayslist))) {
         # lines(subday$Date, subday$wattDIR, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
 
 
-
-
         ## plot expected global reference line
         lines(subday$Date, CS_ref_safe, lty = 3, col = "green", lwd = 2 )
 
         ## direct irradiance test value !!
         lines(subday$Date, subday$CS_ref_HOR, lty = 3, col = "red", lwd = 2 )
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
-
-
 
         if (MeanVIP_active & any(have_glb)) {
             lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
@@ -1116,6 +1113,7 @@ for (ay in unique(year(dayslist))) {
 
         par("mar" = c(.5, 4.2, .5, 1) )
 
+        ## _ 1. Mean value of irradiance during the time period ----------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
             ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
@@ -1127,6 +1125,7 @@ for (ay in unique(year(dayslist))) {
             text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
+        ## _ 2. Max value of irradiance during the time period -----------------
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
@@ -1147,7 +1146,6 @@ for (ay in unique(year(dayslist))) {
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
             text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
             text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
-
         }
 
         if (VCT_active) {
