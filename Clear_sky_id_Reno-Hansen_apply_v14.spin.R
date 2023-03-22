@@ -64,11 +64,12 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.1.R"
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.R"
 
-if (!interactive()) {
+if(!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 options("width" = 130)
@@ -125,10 +126,10 @@ if (MONTHLY) {
 model_selection <- "HAU"
 monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 
-## daily plots file name
-plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
+## daily plots
+plotsbase <- paste0("~/Aerosols/DATA/Graphs/Level_2/CS_id/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
-plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14.1_"
+plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14_"
 
 
 par(mar = c(2,4,2,1))
@@ -359,29 +360,25 @@ FAST_SKIP      <- F   ## allow faster skip of filters also reduce data kept
 
 # -- all the variables for this run are initialized here --------------------- #
 
-MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
-                  MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
-                  CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_RelUpp =  0.095,      ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIL_fct           =  1.2,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
-                  MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
-                  offVIL_upl           = 10,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
-                  offVIL_dwl           =  5,          ##  3. MIN Offset Variability in irradiance by the length (VIL)
-                  offVCT               =  0.00011,    ##  4. Variance of Changes in the Time series (VCT)
-                  offVSM               =  7.5,        ##  5. Variability in the Shape of the irradiance Measurements (VSM)
-                  alpha                =  1,
-                  relative_CS          =  0.3,        ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
-                  sample_n_days        = SAMPLE_DAYS, ## Sample of that much days to be evaluated
-                  tolerance            =  0.02,       ## Optimization algorithm tolerance
-                  start_day            = START_DAY,   ## The first day of the data we are using
-                  DIR_s_T_fact         = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
+MS <- data.frame( nt                = 11,          ##     Window size prefer odd numbers so not to be left right bias
+                  MeanVIP_fct       = 1,           ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
+                  CS_ref_rm_VIP_low = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP)
+                  CS_ref_rm_VIP_upp = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP)
+                  MaxVIP_fct        = 1 ,          ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIP_off_upp    = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIP_off_low    = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIL_fct        = 1.2,         ##  3. MAX Factor Variability in irradiance by the length (VIL)
+                  MinVIL_fct        = 1,           ##  3. MIN Factor Variability in irradiance by the length (VIL)
+                  offVIL_upl        = 10,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
+                  offVIL_dwl        = 5,           ##  3. MIN Offset Variability in irradiance by the length (VIL)
+                  offVCT            = 0.00011,     ##  4. Variance of Changes in the Time series (VCT)
+                  offVSM            = 7.5,         ##  5. Variability in the Shape of the irradiance Measurements (VSM)
+                  alpha             = 1,
+                  relative_CS       = 0.3,         ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
+                  sample_n_days     = SAMPLE_DAYS, ## Sample of that much days to be evaluated
+                  tolerance         = 0.02,        ## Optimization algorithm tolerance
+                  start_day         = START_DAY,   ## The first day of the data we are using
+                  DIR_s_T_fact      = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
 )
 
 
@@ -595,7 +592,7 @@ for (ay in unique(year(dayslist))) {
     ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
-        aday  <- as.Date(aa , origin = "1970-01-01")
+        aday  <- as.Date( aa , origin = "1970-01-01")
         sell  <- strong$Day == (aday)
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
@@ -668,19 +665,8 @@ for (ay in unique(year(dayslist))) {
             Flag_key <- 1
             ## create some modeled values
             CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            ## first implementation
-            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
-            ## newer implementation ?
-            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
-            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
-
-            # plot(CS_ref_rm_VIP_upp, type = "l",col = 1)
-            # lines(CS_ref_rm_VIP_low,           col = 2)
-            # lines(CS_ref_rm_VIP_low_0,         col = 3)
-            # lines(CS_ref_rm_VIP_upp_0,         col = 4)
-            # lines(CS_ref_rm_base,              col = 6)
-
+            CS_ref_rm_VIP_low <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
+            CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
             ## don't allow negative values on models
@@ -856,9 +842,9 @@ for (ay in unique(year(dayslist))) {
                     }
 
                     ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
-                                                (  subday$CSflag[w_sta:w_end] == 99) &
-                                                   pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
+                                                (   subday$CSflag[w_sta:w_end] == 99) &
+                                                    pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -1005,13 +991,13 @@ for (ay in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
+            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 3, lwd = 2 )
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
+            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 2, lwd = 2 )
+            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2 )
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -1129,25 +1115,13 @@ for (ay in unique(year(dayslist))) {
         ## _ 1. Mean value of irradiance during the time period ----------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
-
-            # ## Old style offset thresholds
-            # ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
-            # plot( subday$Date, GLB_rm - CS_ref_rm_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
-            # abline( h = - MS$CS_ref_rm_VIP_low, lty = 2, col = kcols[1], lwd = 2)
-            # abline( h =   MS$CS_ref_rm_VIP_upp, lty = 3, col = kcols[1], lwd = 2)
-            # abline( h = 0 , lty = 1, col = kcols[1], lwd = 2)
-            # text(x = subday$Date[20], y = - MS$CS_ref_rm_VIP_low, labels = - MS$CS_ref_rm_VIP_low, pos = 1)
-            # text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
-
-            ## new style relative thresholds
-            ylim <- range(GLB_rm - CS_ref_rm_base,
-                          CS_ref_rm_VIP_low - CS_ref_rm_base,
-                          CS_ref_rm_VIP_upp - CS_ref_rm_base,na.rm = T)
-            plot(subday$Date, GLB_rm - CS_ref_rm_base,
-                 pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
-            lines(subday$Date, CS_ref_rm_VIP_low - CS_ref_rm_base, col = kcols[1], lty = 2)
-            lines(subday$Date, CS_ref_rm_VIP_upp - CS_ref_rm_base, col = kcols[1], lty = 2)
-
+            ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
+            plot( subday$Date, GLB_rm - CS_ref_rm_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
+            abline( h = - MS$CS_ref_rm_VIP_low, lty = 2, col = kcols[1], lwd = 2)
+            abline( h =   MS$CS_ref_rm_VIP_upp, lty = 3, col = kcols[1], lwd = 2)
+            abline( h = 0 , lty = 1, col = kcols[1], lwd = 2)
+            text(x = subday$Date[20], y = - MS$CS_ref_rm_VIP_low, labels = - MS$CS_ref_rm_VIP_low, pos = 1)
+            text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
         ## _ 2. Max value of irradiance during the time period -----------------
@@ -1252,14 +1226,12 @@ for (ay in unique(year(dayslist))) {
     suppressWarnings({
         # sub("\\.R$", "", basename(Script.Name)), "_")
         myRtools::write_RDS(object = export,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",sub("\\.R$", "", basename(Script.Name)), "_", ay)
 
         )
 
         myRtools::write_RDS(object = daily_stats,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",sub("\\.R$", "", basename(Script.Name)), "_", ay)
 
         )
 
