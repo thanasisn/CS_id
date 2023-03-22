@@ -64,9 +64,8 @@ knitr::opts_chunk$set(fig.align  = "center" )
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Clear_sky_id_Reno-Hansen_apply_v14") })
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.R"
+
 if(!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
