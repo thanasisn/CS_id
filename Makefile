@@ -20,10 +20,10 @@ PDF    := $(TARGET).pdf
 SLIDY  := $(TARGET).html
 RUNT   := ./runtime/$(TARGET).pdf
 
-# p1: $(PDF)
-# $(PDF): $(RMD)
-# 	@echo "Building: $@"
-# 	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
+p1: $(PDF)
+$(PDF): $(RMD)
+	@echo "Building: $@"
+	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
 
 h1: $(SLIDY)
 $(SLIDY): $(RMD)
