@@ -66,10 +66,9 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.R"
 
-if(!interactive()) {
-    pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+if (!interactive()) {
+    pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 options("width" = 130)
@@ -86,8 +85,7 @@ source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
-
-kcols <- brewer.pal(11, "Set3")
+kcols   <- brewer.pal(11, "Set3")
 
 ####  data walk function  ####
 walk <- function(i, nt_hw, tot_p) {
@@ -579,20 +577,20 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 
 #+ include=T, echo=F
 ##  Iterate all years
-for (ay in unique(year(dayslist))) {
-# foreach(ay = unique(year(dayslist))) %dopar% {
+for (yyyy in unique(year(dayslist))) {
+# foreach(yyyy = unique(year(dayslist))) %dopar% {
 
     gather       <- data.table()
     daily_stats  <- data.frame()
-    subdayslist  <- dayslist[year(dayslist) == ay]
-    total_points <- sum(year(strong$Date) == ay)
+    subdayslist  <- dayslist[year(dayslist) == yyyy]
+    total_points <- sum(year(strong$Date) == yyyy)
 
-    pdf(file = paste0(plotsbase, ay, ".pdf"), onefile = T, width = 10 )
+    pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
 
     ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
-        aday  <- as.Date( aa , origin = "1970-01-01")
+        aday  <- as.Date(aa , origin = "1970-01-01")
         sell  <- strong$Day == (aday)
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
@@ -842,9 +840,9 @@ for (ay in unique(year(dayslist))) {
                     }
 
                     ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
+                                                (  subday$CSflag[w_sta:w_end] == 99) &
+                                                   pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -991,13 +989,13 @@ for (ay in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 3, lwd = 2 )
+            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2 )
+            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
+            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -1192,7 +1190,7 @@ for (ay in unique(year(dayslist))) {
     dev.off()
 
     ### create a yearly export
-    export <- unique(strong[ year(Date) == ay ])
+    export <- unique(strong[ year(Date) == yyyy ])
     export$CSflag[export$CSflag == 99] <- NA
 
     gather <- unique(gather)
@@ -1200,7 +1198,7 @@ for (ay in unique(year(dayslist))) {
     export <- merge(gather, export, all = T)
 
 
-    test <- strong[ year(Date) == ay ]
+    test <- strong[ year(Date) == yyyy ]
 
     length(unique(test$Date))
     length(unique(gather$Date))
@@ -1226,18 +1224,20 @@ for (ay in unique(year(dayslist))) {
     suppressWarnings({
         # sub("\\.R$", "", basename(Script.Name)), "_")
         myRtools::write_RDS(object = export,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
+                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
 
         )
 
         myRtools::write_RDS(object = daily_stats,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
+                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
 
         )
 
     })
 
-
+stop()
 } ##END year loop
 
 

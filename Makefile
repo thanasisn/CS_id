@@ -18,7 +18,7 @@ TARGET := Clear_sky_id_Reno-Hansen_apply_v14.1
 RMD    := $(TARGET).R
 PDF    := $(TARGET).pdf
 SLIDY  := $(TARGET).html
-RUNT   := ./runtime/$(TARGET).pdf
+RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
 
 p1: $(PDF)
 $(PDF): $(RMD)
@@ -40,7 +40,7 @@ TARGET := Clear_sky_id_Reno-Hansen_apply_v14
 RMD    := $(TARGET).R
 PDF    := $(TARGET).pdf
 SLIDY  := $(TARGET).html
-RUNT   := ./runtime/$(TARGET).pdf
+RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
 
 p2: $(PDF)
 $(PDF): $(RMD)
@@ -55,13 +55,6 @@ $(SLIDY): $(RMD)
 r2: $(RUNT)
 $(RUNT): $(RMD)
 	-Rscript $?
-
-
-
-
-
-
-
 
 
 

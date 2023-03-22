@@ -66,10 +66,9 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.1.R"
 
-if(!interactive()) {
+if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
 options("width" = 130)
@@ -596,7 +595,7 @@ for (ay in unique(year(dayslist))) {
     ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
-        aday  <- as.Date( aa , origin = "1970-01-01")
+        aday  <- as.Date(aa , origin = "1970-01-01")
         sell  <- strong$Day == (aday)
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
@@ -857,9 +856,9 @@ for (ay in unique(year(dayslist))) {
                     }
 
                     ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
+                                                (  subday$CSflag[w_sta:w_end] == 99) &
+                                                   pass                                ] <- 0
 
                 } ##END for loop all points
             }
