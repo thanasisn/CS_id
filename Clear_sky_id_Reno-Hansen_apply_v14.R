@@ -1237,7 +1237,7 @@ for (yyyy in unique(year(dayslist))) {
 
     })
 
-stop()
+
 } ##END year loop
 
 
