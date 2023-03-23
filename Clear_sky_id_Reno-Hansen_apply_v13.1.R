@@ -29,6 +29,7 @@
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
+#'     toc_depth:        4
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     fig_width:        7
@@ -62,13 +63,11 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Clear_sky_id_application_13.1") })
-if(!interactive()) {
-    pdf(  file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink( file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".out", Script.Name))), split=TRUE)
-    filelock::lock(paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v13.1.R"
+
+if (!interactive()) {
+    pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 options("width" = 130)
@@ -80,6 +79,7 @@ library(scales)
 library(pander)
 library(caTools)
 library(data.table)
+source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 
 
 ## some plot configs ####
@@ -107,7 +107,7 @@ walk <- function(i, nt_hw, tot_p) {
 MONTHLY     <- FALSE
 # TEST        <- TRUE
 TEST        <- FALSE
-SAMPLE_DAYS <- 3000000  ## The total number of days to sample from data
+SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 # START_DAY   <- "2022-01-01"
 START_DAY   <- "1993-01-01"
 
@@ -174,11 +174,13 @@ rm(strict)
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+
 # --- Limit date span of the data ----------------------------------------------
 cat(paste("Use data after date:", START_DAY), "\n\n")
 strong[, Day := as.Date(Date)]
 strong <- strong[ strong$Day >= as.Date(START_DAY), ]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 
 ## days to parse
 dayslist      <- unique( strong$Day )
@@ -189,14 +191,15 @@ strong$CSflag <- 99
 inverted      <- strong$wattGLB < strong$wattHOR
 
 
-#' #### Data set input. ####
-#' First day: `r min(dayslist)`
 #'
-#' Last day: `r max(dayslist)`
+#' ### Data set input.
+#'
+#' First day:      `r min(dayslist)`
+#'
+#' Last day:       `r max(dayslist)`
 #'
 #' Days available: `r length(dayslist)`
 #'
-
 
 #### Exclude inversions ####
 
@@ -289,7 +292,9 @@ CS_flags <- c( "MeanVIP",   #1
              )
 
 
-#' ### Threshold Values for Criteria ###
+#'
+#' ### Threshold Values for Criteria
+#'
 #' For mean and max Most evaluations of clear sky models find that the average
 #' bias error of the model is less than 10%, often around 7% [1, 83]. Therefore,
 #' a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model
@@ -322,12 +327,10 @@ CS_models_list <- c(
 
 
 
-
-
 #'
-#' ### Clear Sky detection Algorithm values ###
+#' ### Clear Sky detection Algorithm values
 #'
-
+#'
 #+ include=T, echo=F
 # panderOptions('table.emphasize.rownames', F)
 panderOptions('table.alignment.default',  "right")
@@ -337,13 +340,12 @@ pander(t(MS))
 pander(alpha_models)
 pander(combinations)
 #'
-
+#+ include=T, echo=F
 
 #### Model selection ####
 
-
 #'
-#' #### Reference clear sky irradiance model and air mass model (AM)
+#' ### Reference clear sky irradiance model and air mass model (AM)
 #'
 #' We select the clear sky model, the air mass calculation
 #' and the period of `r MS$nt`
@@ -358,10 +360,10 @@ CS_model <- get(model_selection)
 
 
 #### 6. LDI ###
-#' #### 6. Low Direct Irradiance limit (LDI)
-#'
-#'
 MS$LDIlim <- 5
+
+#'
+#' ### 6. Low Direct Irradiance limit (LDI)
 #'
 #' Ignore Direct irradiance when it is bellow `r MS$LDIlim` $Watt/m^2$.
 #' This limit is biased due to the slight location difference of the two Instruments.
@@ -375,9 +377,9 @@ MS$LDIlim <- 5
 
 #### 7. LGI ####
 MS$VGIlim <- 5
+
 #'
-#' #### 7. Low Global Irradiance limit (LGI)
-#'
+#' ### 7. Low Global Irradiance limit (LGI)
 #'
 #' Global irradiance below `r MS$VGIlim` level can not be identified
 #'
@@ -385,8 +387,9 @@ MS$VGIlim <- 5
 
 #### 8. FCS ####
 FCSlim <- MS$nt
+
 #'
-#' #### 8. Too Few CS point for the day (FCS)
+#' ### 8. Too Few CS point for the day (FCS)
 #'
 #'
 #' If in a day there less than `r FCSlim` clear sky points will exclude them from optimizing
@@ -396,8 +399,9 @@ FCSlim <- MS$nt
 
 #### 9. FDP ####
 FDPlim <- MS$nt * 3
+
 #'
-#' #### 9. Too Few data points for the day (FDP)
+#' ### 9. Too Few data points for the day (FDP)
 #'
 #'
 #' If in a day there are less than `r FDPlim` data points will be excluded from optimizing.
@@ -407,9 +411,9 @@ FDPlim <- MS$nt * 3
 
 
 #### 11. DsT ####
+
 #'
-#' #### 11. Too low Direct signal (DsT)
-#'
+#' ### 11. Too low Direct signal (DsT)
 #'
 #' This is a simple hard limit on the lower possible Direct radiation with clear sky.
 #'
@@ -437,14 +441,16 @@ if (TEST) {
 dayslist <- sort( dayslist, decreasing = T )
 
 
-#' #### Day range
+#'
+#' ### Day range
 #'
 range(dayslist)
 #'
 #+ include=T, echo=F
 
 
-#' #### Baseline value for direct irradiance
+#'
+#' ### Baseline value for direct irradiance
 #'
 #' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
 strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
@@ -455,7 +461,7 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 daily_stats <- data.frame()
 
 #+ include=T, echo=F
-#### iterate all days by year ####
+##  Iterate all years
 for (ay in unique(year(dayslist))) {
 
     gather       <- data.table()
@@ -464,9 +470,10 @@ for (ay in unique(year(dayslist))) {
 
     pdf(file = paste0(plotsbase,ay,".pdf"), onefile = T, width = 10 )
 
+    ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
-        aday  <- as.Date( aa , origin = "1970-01-01")
+        aday  <- as.Date(aa , origin = "1970-01-01")
         sell  <- strong$Day == (aday)
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
@@ -533,6 +540,7 @@ for (ay in unique(year(dayslist))) {
         }
 
 
+
         #---- 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
@@ -591,8 +599,8 @@ for (ay in unique(year(dayslist))) {
 
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
-                    subday$CSflag[w_sta:w_end][ (! subday$CSflag[w_sta:w_end] == 0 ) &
-                                                (  subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
+                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -635,9 +643,9 @@ for (ay in unique(year(dayslist))) {
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
+                                                ( subday$CSflag[w_sta:w_end] == 99) &
+                                                  pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -716,9 +724,9 @@ for (ay in unique(year(dayslist))) {
                     }
 
                     ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
+                                                (  subday$CSflag[w_sta:w_end] == 99) &
+                                                   pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -733,23 +741,23 @@ for (ay in unique(year(dayslist))) {
             Flag_key  <- 6
             ## low direct and not "Possible Direct Obstruction (23)"
             ## probably we know sun was obscured
-            subday[ CSflag == 0 &
-                    wattHOR < MS$LDIlim &
-                    QCF_DIR != "Possible Direct Obstruction (23)",
-                    CSflag := Flag_key ]
+            subday[CSflag == 0 &
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   CSflag := Flag_key ]
 
-            subday[ CSflag == 99 &
-                    wattHOR < MS$LDIlim &
-                    QCF_DIR != "Possible Direct Obstruction (23)",
-                    CSflag := Flag_key ]
+            subday[CSflag == 99 &
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   CSflag := Flag_key ]
 
-            subday[ wattHOR < MS$LDIlim &
-                    QCF_DIR != "Possible Direct Obstruction (23)",
-                    paste0("CSflag_", Flag_key) := TRUE ]
+            subday[wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   paste0("CSflag_", Flag_key) := TRUE ]
 
-            subday[ wattHOR < MS$LDIlim &
-                    QCF_DIR != "Possible Direct Obstruction (23)",
-                    paste0("CSflag_", Flag_key) := TRUE ]
+            subday[wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   paste0("CSflag_", Flag_key) := TRUE ]
         }
 
 
@@ -814,10 +822,10 @@ for (ay in unique(year(dayslist))) {
 
         RMSE <- RMSE(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
 
-        MBE  <- mean( CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky]  , na.rm = T) /
-                mean( subday$wattGLB[clear_sky] , na.rm = T)
+        MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
+                mean(subday$wattGLB[clear_sky], na.rm = T)
 
-        cost <- sum( ( ( subday$wattGLB[clear_sky] ) - CS_ref_safe[clear_sky] )**2 , na.rm = T ) /
+        cost <- sum( ( ( subday$wattGLB[clear_sky]) - CS_ref_safe[clear_sky] )**2 , na.rm = T ) /
                 sum(clear_sky, na.rm = T)
 
         ## ID statistics
@@ -835,8 +843,8 @@ for (ay in unique(year(dayslist))) {
 
 
         #### PLOTS ####
-        #---- Main plot ----
-        ylim = range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
+        ## _  Main plot ---------------------------------------------------------
+        ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
         ylim[1] = -25
@@ -857,8 +865,6 @@ for (ay in unique(year(dayslist))) {
         # lines(subday$Date, subday$wattDIR, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
 
 
-
-
         ## plot expected global reference line
         lines(subday$Date, CS_ref_safe, lty = 3, col = "green", lwd = 2 )
 
@@ -866,16 +872,14 @@ for (ay in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR, lty = 3, col = "red", lwd = 2 )
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
-
-
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 3, lwd = 2 )
+            lines(subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 2 )
+            lines(subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 3, lwd = 2 )
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 2, lwd = 2 )
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2 )
+            lines(subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 2, lwd = 2 )
+            lines(subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 2 )
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -897,20 +901,20 @@ for (ay in unique(year(dayslist))) {
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[2], cex = .2)
 
         ##  3. Variability in irradiance by the length (VIL)
-        ddd = subday$Date[    subday$CSflag == 3 ]
-        vvv = subday$wattGLB[ subday$CSflag == 3 ]
+        ddd <- subday$Date[    subday$CSflag == 3 ]
+        vvv <- subday$wattGLB[ subday$CSflag == 3 ]
         points(ddd, vvv,            pch = 8, col = kcols[3], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[3], cex = .2)
 
         ##  4.  Variance of Changes in the Time series (VCT)
-        ddd = subday$Date[    subday$CSflag == 4 ]
-        vvv = subday$wattGLB[ subday$CSflag == 4 ]
+        ddd <- subday$Date[    subday$CSflag == 4 ]
+        vvv <- subday$wattGLB[ subday$CSflag == 4 ]
         points(ddd, vvv,            pch = 8, col = kcols[4], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[4], cex = .2)
 
         ##  5.  Variability in the Shape of the irradiance Measurements (VSM)
-        ddd = subday$Date[    subday$CSflag == 5 ]
-        vvv = subday$wattGLB[ subday$CSflag == 5 ]
+        ddd <- subday$Date[    subday$CSflag == 5 ]
+        vvv <- subday$wattGLB[ subday$CSflag == 5 ]
         points(ddd, vvv,            pch = 8, col = kcols[5], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[5], cex = .2)
 
@@ -985,11 +989,12 @@ for (ay in unique(year(dayslist))) {
 
 
         #---- Filter Plots ----
-        layou_n = sum(MeanVIP_active, MaxVIP_active,VIL_active,VCT_active,VSM_active)
+        layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
         layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
         par("mar" = c(.5, 4.2, .5, 1) )
 
+        ## _ 1. Mean value of irradiance during the time period ----------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
             ylim = range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
@@ -1001,9 +1006,10 @@ for (ay in unique(year(dayslist))) {
             text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
+        ## _ 2. Max value of irradiance during the time period -----------------
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim = range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
+            ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
             plot(  subday$Date, GLB_rmax - CS_ref_rmax_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Max VIP (2)")
             abline( h =   MS$MaxVIP_off_upp, lty = 2, col = kcols[2], lwd = 2)
             abline( h = - MS$MaxVIP_off_low, lty = 3, col = kcols[2], lwd = 2)
@@ -1014,19 +1020,18 @@ for (ay in unique(year(dayslist))) {
 
         if (VIL_active) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim = range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
+            ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
             plot( subday$Date,  GLB_length - CS_ref_length, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VIL (3)")
             abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
             abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
             text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
             text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
-
         }
 
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim = range(c(0, MS$offVCT*4), na.rm = T)
+            ylim <- range(c(0, MS$offVCT*4), na.rm = T)
             plot(subday$Date, GLB_sigma, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VCT (4)")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
@@ -1034,7 +1039,7 @@ for (ay in unique(year(dayslist))) {
 
         if (VSM_active) {
             par("mar" = c(.5, 4.2, 0, 1) )
-            ylim = range(c(0, MS$offVSM*4), na.rm = T)
+            ylim <- range(c(0, MS$offVSM*4), na.rm = T)
             plot(subday$Date, GLB_Xi, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VSM (5)")
             abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
@@ -1064,6 +1069,7 @@ for (ay in unique(year(dayslist))) {
         daily_stats <<- rbind( daily_stats , keepday )
 
     } ##END day loop
+
     dev.off()
 
     ### create a yearly export
@@ -1080,10 +1086,8 @@ for (ay in unique(year(dayslist))) {
     length(unique(test$Date))
     length(unique(gather$Date))
 
-    ttt <- test[ Date %in% test$Date[duplicated(test$Date)] ]
+    ttt <- test[   Date %in% test$Date[duplicated(test$Date)]    ]
     ggg <- gather[ Date %in% gather$Date[duplicated(gather$Date)]]
-
-    unique(ttt)
 
     sum( !gather$Date %in% test$Date )
 
@@ -1107,7 +1111,7 @@ for (ay in unique(year(dayslist))) {
 
 
 
-par(def.par)  #- reset to default
+par(def.par)  # reset to default
 layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
 
 #'

@@ -4,9 +4,9 @@
 
 # all:       clean_all pdf html rtim
 render:    pdf
-pdf:       p1 p2 upload
-html:      h1 h2
-rtim:      r1 r2
+pdf:       p1 p2 p3 upload
+html:      h1 h2 h3 
+rtim:      r1 r2 r3 
 # clean_all: clean_cache clean_data clean_pdfs
 
 ## use a script to upload all pdfs
@@ -53,6 +53,29 @@ $(SLIDY): $(RMD)
 	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
 
 r2: $(RUNT)
+$(RUNT): $(RMD)
+	-Rscript $?
+
+
+
+
+TARGET := Clear_sky_id_Reno-Hansen_apply_v13.1
+RMD    := $(TARGET).R
+PDF    := $(TARGET).pdf
+SLIDY  := $(TARGET).html
+RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
+
+p3: $(PDF)
+$(PDF): $(RMD)
+	@echo "Building: $@"
+	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
+
+h3: $(SLIDY)
+$(SLIDY): $(RMD)
+	@echo "Building: $@"
+	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
+
+r3: $(RUNT)
 $(RUNT): $(RMD)
 	-Rscript $?
 
