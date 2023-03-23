@@ -61,7 +61,6 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.R"
@@ -127,7 +126,6 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 ## daily plots
 plotsbase <- paste0("~/Aerosols/DATA/Graphs/Level_2/CS_id/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
-plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14_"
 
 
 par(mar = c(2,4,2,1))
@@ -989,13 +987,13 @@ for (yyyy in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines(subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines(subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
+            lines(subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
+            lines(subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -1105,7 +1103,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         #---- Filter Plots ----
-        layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active,VSM_active)
+        layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
         layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
         par("mar" = c(.5, 4.2, .5, 1) )
@@ -1203,8 +1201,8 @@ for (yyyy in unique(year(dayslist))) {
     length(unique(test$Date))
     length(unique(gather$Date))
 
-    ttt <- test[   Date %in% test$Date[duplicated(test$Date)]     ]
-    ggg <- gather[ Date %in% gather$Date[duplicated(gather$Date)] ]
+    ttt <- test[   Date %in% test$Date[duplicated(test$Date)]    ]
+    ggg <- gather[ Date %in% gather$Date[duplicated(gather$Date)]]
 
     sum( !gather$Date %in% test$Date )
 

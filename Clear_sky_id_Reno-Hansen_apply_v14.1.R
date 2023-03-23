@@ -61,14 +61,13 @@ knitr::opts_chunk$set(fig.align  = "center" )
 
 
 ####  Set environment  ####
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.1.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/CS_id/REPORTS/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 options("width" = 130)
@@ -85,8 +84,7 @@ source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
-
-kcols <- brewer.pal(11, "Set3")
+kcols   <- brewer.pal(11, "Set3")
 
 ####  data walk function  ####
 walk <- function(i, nt_hw, tot_p) {
@@ -128,7 +126,6 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 ## daily plots file name
 plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
-plotsbase <- "~/CS_id/REPORTS/DAILY/Clear_sky_id_Reno-Hansen_apply_v14.1_"
 
 
 par(mar = c(2,4,2,1))
@@ -156,8 +153,8 @@ source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 ## The "strict" input files were used before
 strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
                            pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
-                           full.names = T ,
-                           recursive  = F)
+                           full.names = TRUE ,
+                           recursive  = FALSE)
 strict_files <- sort(strict_files)
 ## build one data.frame
 strict <- data.table()
@@ -582,15 +579,15 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 
 #+ include=T, echo=F
 ##  Iterate all years
-for (ay in unique(year(dayslist))) {
+for (yyyy in unique(year(dayslist))) {
 # foreach(ay = unique(year(dayslist))) %dopar% {
 
     gather       <- data.table()
     daily_stats  <- data.frame()
-    subdayslist  <- dayslist[year(dayslist) == ay]
-    total_points <- sum(year(strong$Date) == ay)
+    subdayslist  <- dayslist[year(dayslist) == yyyy]
+    total_points <- sum(year(strong$Date) == yyyy)
 
-    pdf(file = paste0(plotsbase, ay, ".pdf"), onefile = T, width = 10 )
+    pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
 
     ##  Iterate all days
     for (aa in subdayslist) {
@@ -624,10 +621,10 @@ for (ay in unique(year(dayslist))) {
         relative_CS_lim <- sum(sell) * MS$relative_CS
 
         ## Data selection for day
-        subday       <- strong[ sell, ]
-        have_glb     <- !is.na(subday$wattGLB)
-        have_dir     <- !is.na(subday$wattDIR)
-        tot_p        <- length(subday$wattGLB)
+        subday     <- strong[ sell, ]
+        have_glb   <- !is.na(subday$wattGLB)
+        have_dir   <- !is.na(subday$wattDIR)
+        tot_p      <- length(subday$wattGLB)
 
 
         ## Values from Clear sky model used
@@ -656,7 +653,7 @@ for (ay in unique(year(dayslist))) {
             if (nrow(subday) > 0 & tot_p <= FDPlim ) {
                 subday$CSflag <- Flag_key
                 subday[[paste0("CSflag_",Flag_key)]] <- TRUE
-                cat(paste("Skip day FDP:",aday,tot_p),"\n")
+                cat(paste("Skip day FDP:", aday, tot_p),"\n")
                 next
             }
         }
@@ -1005,13 +1002,13 @@ for (ay in unique(year(dayslist))) {
         lines(subday$Date, subday$CS_ref_HOR * ( 1 - ( MS$DIR_s_T_fact / 100 )), "l", lty = 3, col = "red", lwd = 2 )
 
         if (MeanVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
-            lines( subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines(subday$Date, CS_ref_rm_VIP_low,   col = kcols[1], lty = 2, lwd = 1.5)
+            lines(subday$Date, CS_ref_rm_VIP_upp,   col = kcols[1], lty = 2, lwd = 1.5)
         }
 
         if (MaxVIP_active & any(have_glb)) {
-            lines( subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
-            lines( subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
+            lines(subday$Date, CS_ref_rmax_VIP_upp, col = kcols[2], lty = 3, lwd = 1.5)
+            lines(subday$Date, CS_ref_rmax_VIP_low, col = kcols[2], lty = 3, lwd = 1.5)
         }
 
         abline( h = MS$VGIlim, lty = 2 , col = kcols[7])
@@ -1121,7 +1118,7 @@ for (ay in unique(year(dayslist))) {
 
 
         #---- Filter Plots ----
-        layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active,VSM_active)
+        layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
         layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
         par("mar" = c(.5, 4.2, .5, 1) )
@@ -1218,7 +1215,7 @@ for (ay in unique(year(dayslist))) {
     dev.off()
 
     ### create a yearly export
-    export <- unique(strong[ year(Date) == ay ])
+    export <- unique(strong[ year(Date) == yyyy ])
     export$CSflag[export$CSflag == 99] <- NA
 
     gather <- unique(gather)
@@ -1226,13 +1223,13 @@ for (ay in unique(year(dayslist))) {
     export <- merge(gather, export, all = T)
 
 
-    test <- strong[ year(Date) == ay ]
+    test <- strong[ year(Date) == yyyy ]
 
     length(unique(test$Date))
     length(unique(gather$Date))
 
-    ttt <- test[   Date %in% test$Date[duplicated(test$Date)]     ]
-    ggg <- gather[ Date %in% gather$Date[duplicated(gather$Date)] ]
+    ttt <- test[   Date %in% test$Date[duplicated(test$Date)]    ]
+    ggg <- gather[ Date %in% gather$Date[duplicated(gather$Date)]]
 
     sum( !gather$Date %in% test$Date )
 
@@ -1253,13 +1250,13 @@ for (ay in unique(year(dayslist))) {
         # sub("\\.R$", "", basename(Script.Name)), "_")
         myRtools::write_RDS(object = export,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
 
         )
 
         myRtools::write_RDS(object = daily_stats,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", ay)
+                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
 
         )
 
