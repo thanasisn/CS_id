@@ -73,7 +73,6 @@ if (!interactive()) {
 options("width" = 130)
 
 
-# library(RAerosols)
 library(RColorBrewer)
 library(scales)
 library(pander)
@@ -123,8 +122,8 @@ if (MONTHLY) {
 model_selection <- "HAU"
 monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 
-## daily plots
-plotsbase <- paste0("~/Aerosols/DATA/Graphs/Level_2/CS_id/",
+## daily plots file name
+plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
 
 
@@ -153,8 +152,8 @@ source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 ## The "strict" input files were used before
 strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
                            pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
-                           full.names = T ,
-                           recursive  = F)
+                           full.names = TRUE ,
+                           recursive  = FALSE)
 strict_files <- sort(strict_files)
 ## build one data.frame
 strict <- data.table()
@@ -617,10 +616,10 @@ for (yyyy in unique(year(dayslist))) {
         relative_CS_lim <- sum(sell) * MS$relative_CS
 
         ## Data selection for day
-        subday       <- strong[ sell, ]
-        have_glb     <- !is.na(subday$wattGLB)
-        have_dir     <- !is.na(subday$wattDIR)
-        tot_p        <- length(subday$wattGLB)
+        subday     <- strong[ sell, ]
+        have_glb   <- !is.na(subday$wattGLB)
+        have_dir   <- !is.na(subday$wattDIR)
+        tot_p      <- length(subday$wattGLB)
 
 
         ## Values from Clear sky model used
@@ -649,7 +648,7 @@ for (yyyy in unique(year(dayslist))) {
             if (nrow(subday) > 0 & tot_p <= FDPlim ) {
                 subday$CSflag <- Flag_key
                 subday[[paste0("CSflag_",Flag_key)]] <- TRUE
-                cat(paste("Skip day FDP:",aday,tot_p),"\n")
+                cat(paste("Skip day FDP:", aday, tot_p),"\n")
                 next
             }
         }
