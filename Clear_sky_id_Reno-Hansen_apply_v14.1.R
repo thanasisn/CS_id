@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.1.R"
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_1.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
@@ -73,7 +73,6 @@ if (!interactive()) {
 options("width" = 130)
 
 
-# library(RAerosols)
 library(RColorBrewer)
 library(scales)
 library(pander)
@@ -580,7 +579,7 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 #+ include=T, echo=F
 ##  Iterate all years
 for (yyyy in unique(year(dayslist))) {
-# foreach(ay = unique(year(dayslist))) %dopar% {
+# foreach(yyyy = unique(year(dayslist))) %dopar% {
 
     gather       <- data.table()
     daily_stats  <- data.frame()
