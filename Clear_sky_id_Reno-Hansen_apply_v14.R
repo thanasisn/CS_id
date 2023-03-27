@@ -321,34 +321,47 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 #####################################################################
 
 
-#### Model status ####
-MeanVIP_active <- F  ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- F
-VIL_active     <- F
-VCT_active     <- F
-VSM_active     <- F
-LDI_active     <- F
-LGI_active     <- F
-FCS_active     <- F
-FDP_active     <- F
-FAST_SKIP      <- F
+## Init logical flags
+MeanVIP_active <- FALSE  ## 1. Mean value of irradiance during the time period
+MaxVIP_active  <- FALSE
+VIL_active     <- FALSE
+VCT_active     <- FALSE
+VSM_active     <- FALSE
+LDI_active     <- FALSE  ## 6. Low Direct Irradiance limit (LDI)
+LGI_active     <- FALSE
+FCS_active     <- FALSE
+FDP_active     <- FALSE
+DST_active     <- FALSE  ## 11. Too low direct radiation (DsT)
+FAST_SKIP      <- FALSE
 
-## Reno-Hansen filters
-MeanVIP_active <- T  ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- T
-VIL_active     <- T
-VCT_active     <- T
-VSM_active     <- T
+## Reno-Hansen filters control -------------------------------------------------
+MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
+MaxVIP_active  <- TRUE
+VIL_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
+VCT_active     <- TRUE
+VSM_active     <- TRUE
 
-## My filters
-LDI_active     <- T   ## Low __Direct__ Irradiance limit (LDI)
-                      ## careful this also excludes points due to pole shade at
-                      ## afternoon and building in the morning
-LGI_active     <- T   ## Low Global Irradiance limit (LGI)
-                      ## Global irradiance below this level can not be identified
-FCS_active     <- T   ## Skip with few cs
-FDP_active     <- T   ## Skip with few data in a day
-FAST_SKIP      <- F   ## allow faster skip of filters also reduce data kept
+## My filters control  ---------------------------------------------------------
+LDI_active     <- TRUE   ## Low __Direct__ Irradiance limit (LDI)
+                         ## careful this also excludes points due to pole shade at
+                         ## afternoon and building in the morning
+                         ## Don't use for GLB trends!!!!
+LGI_active     <- TRUE   ## Low Global Irradiance limit (LGI)
+                         ## Global irradiance below this level can not be identified
+FCS_active     <- TRUE   ## Skip with few cs
+FDP_active     <- TRUE   ## Skip with few data in a day
+DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
+FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
+
+
+## Ignore direct for pure GLB data process!!
+IGNORE_DIRE     <- TRUE
+if (IGNORE_DIRE) {
+    cat("\nIgnoring filters using Direct radiation!!\n\n")
+    LDI_active <- FALSE  ## 6. Low Direct Irradiance limit (LDI)
+    DST_active <- FALSE  ## 11. Too low direct radiation (DsT)
+}
+
 
 
 
@@ -617,8 +630,8 @@ for (yyyy in unique(year(dayslist))) {
 
         ## Data selection for day
         subday     <- strong[ sell, ]
-        have_glb   <- !is.na(subday$wattGLB)
-        have_dir   <- !is.na(subday$wattDIR)
+        have_glb   <- any(!is.na(subday$wattGLB))
+        have_dir   <- any(!is.na(subday$wattDIR))
         tot_p      <- length(subday$wattGLB)
 
 
@@ -887,7 +900,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         #---- 11. Too low direct radiation (DsT) -----------------~~~-----------
-        if (any(have_dir)) {
+        if (DST_active & have_dir) {
             Flag_key  <- 11
             subday[ (CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
             subday[ (CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
