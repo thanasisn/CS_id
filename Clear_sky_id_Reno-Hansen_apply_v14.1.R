@@ -555,10 +555,11 @@ if (TEST) {
     # dayslist <- dayslist[year(dayslist)>=2019]
     # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
     dayslist <- dayslist
+
 }
 dayslist <- sort( dayslist, decreasing = T )
 
-
+stop()
 #'
 #' ### Day range
 #'
