@@ -104,8 +104,8 @@ walk <- function(i, nt_hw, tot_p) {
 
 # MONTHLY     <- T
 MONTHLY     <- FALSE
-# TEST        <- TRUE
-TEST        <- FALSE
+# TEST        <- FALSE
+TEST        <- TRUE
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 # START_DAY   <- "2022-01-01"
 START_DAY   <- "1993-01-01"
@@ -148,7 +148,7 @@ source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 #+ include=T, echo=FALSE
 
 
-####   Load data from QCRad procedure   ########################################
+##  Load data from QCRad procedure   -------------------------------------------
 ## The "strict" input files were used before
 strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
                            pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
@@ -177,7 +177,9 @@ strict$QCF_DIR      <- TRUE
 strict$QCF_GLB      <- TRUE
 
 
-## we have not reason to ignore that data
+## Select data to use!! --------------------------------------------------------
+
+## we have no reason to ignore that data
 strict$QCF_DIR_01   <- NULL
 strict$QCF_GLB_01   <- NULL
 strict$QCF_GLB_02   <- NULL
@@ -233,7 +235,7 @@ cat(print(table(strict$QCF_GLB)))
 
 
 
-##TODO 7.
+## TODO 7.
 
 
 
@@ -254,7 +256,6 @@ cat(print(table(strict$QCF_GLB)))
 
 
 
-## fill the names of dataframes
 ## FIXME some duplicates rows exist in the database!!!
 strong <- unique(strict)
 rm(strict)
@@ -262,7 +263,7 @@ rm(strict)
 
 
 
-# --- Limit date span of the data ----------------------------------------------
+##  Limit date span of the data ------------------------------------------------
 cat(paste("Use data after date:", START_DAY), "\n\n")
 strong[, Day := as.Date(Date)]
 strong <- strong[ strong$Day >= as.Date(START_DAY), ]
@@ -275,7 +276,6 @@ dayslist      <- unique( strong$Day )
 ## add id column
 strong$CSflag <- 99
 
-inverted      <- strong$wattGLB < strong$wattHOR
 
 
 #'
@@ -289,6 +289,7 @@ inverted      <- strong$wattGLB < strong$wattHOR
 #'
 
 #### Exclude inversions ####
+inverted      <- strong$wattGLB < strong$wattHOR
 
 #'
 #' ### There are instances where global irradiance is less than direct.
@@ -318,7 +319,7 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 
 
 
-#####################################################################
+
 
 
 ## Init logical flags
@@ -342,19 +343,19 @@ VCT_active     <- TRUE
 VSM_active     <- TRUE
 
 ## My filters control  ---------------------------------------------------------
-LDI_active     <- TRUE   ## Low __Direct__ Irradiance limit (LDI)
-                      ## careful this also excludes points due to pole shade at
-                      ## afternoon and building in the morning
-                         ## Don't use for GLB trends!!!!
-LGI_active     <- TRUE   ## Low Global Irradiance limit (LGI)
-                      ## Global irradiance below this level can not be identified
-FCS_active     <- TRUE   ## Skip with few cs
-FDP_active     <- TRUE   ## Skip with few data in a day
+LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
+                        ## careful this also excludes points due to pole shade at
+                        ## afternoon and building in the morning
+                        ## Don't use for GLB trends!!!!
+LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
+                        ## Global irradiance below this level can not be identified
+FCS_active     <- TRUE  ## Skip with few cs
+FDP_active     <- TRUE  ## Skip with few data in a day
 DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
-FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
+FAST_SKIP      <- FALSE ## allow faster skip of filters also reduce data kept
 
 
-## Ignore direct for pure GLB data process!!
+## Ignore filters with direct for pure GLB data process!!  ---------------------
 IGNORE_DIRE     <- TRUE
 if (IGNORE_DIRE) {
     cat("\nIgnoring filters using Direct radiation!!\n\n")
@@ -601,6 +602,12 @@ for (yyyy in unique(year(dayslist))) {
 
     pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
 
+    if (TEST) {
+        pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
+    } else {
+        pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+    }
+
     ##  Iterate all days
     for (aa in subdayslist) {
         ## Day variables
@@ -677,10 +684,10 @@ for (yyyy in unique(year(dayslist))) {
             Flag_key <- 1
             ## create some modeled values
             CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            ## first implementation
+            ## first implementation with offset from reference limits
             CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
             CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
-            ## newer implementation ?
+            ## newer implementation with relative to reference limits
             CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
             CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
 
@@ -984,7 +991,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         #### PLOTS ####
-        ## _  Main plot ---------------------------------------------------------
+        ## _  Main plot --------------------------------------------------------
         ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
@@ -1027,7 +1034,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- Main plot ID points ----
+        # _ Main plot ID points ------------------------------------------------
 
         ## 1. mean value of irradiance during the time period
         ddd = subday$Date[    subday$CSflag == 1 ]
@@ -1129,13 +1136,13 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- Filter Plots ----
+        ## _ Filter Plots ------------------------------------------------------
         layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
         layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
         par("mar" = c(.5, 4.2, .5, 1) )
 
-        ## _ 1. Mean value of irradiance during the time period ----------------
+        ## __ 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
 
@@ -1159,7 +1166,7 @@ for (yyyy in unique(year(dayslist))) {
 
         }
 
-        ## _ 2. Max value of irradiance during the time period -----------------
+        ## __ 2. Max value of irradiance during the time period ----------------
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
@@ -1198,7 +1205,7 @@ for (yyyy in unique(year(dayslist))) {
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
         }
 
-        #} ##END plot by RMSE MBE
+
 
         ## keep Clear Sky detection
         strong$CSflag[sell]   <- subday$CSflag
