@@ -104,8 +104,8 @@ walk <- function(i, nt_hw, tot_p) {
 
 # MONTHLY     <- T
 MONTHLY     <- FALSE
-# TEST        <- TRUE
-TEST        <- FALSE
+# TEST        <- FALSE
+TEST        <- TRUE
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 # START_DAY   <- "2022-01-01"
 START_DAY   <- "1993-01-01"
@@ -148,7 +148,7 @@ source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 #+ include=T, echo=FALSE
 
 
-####   Load data from QCRad procedure   ########################################
+##  Load data from QCRad procedure   -------------------------------------------
 ## The "strict" input files were used before
 strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
                            pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
@@ -177,7 +177,9 @@ strict$QCF_DIR      <- TRUE
 strict$QCF_GLB      <- TRUE
 
 
-## we have not reason to ignore that data
+## Select data to use!! --------------------------------------------------------
+
+## we have no reason to ignore that data
 strict$QCF_DIR_01   <- NULL
 strict$QCF_GLB_01   <- NULL
 strict$QCF_GLB_02   <- NULL
@@ -254,7 +256,6 @@ cat(print(table(strict$QCF_GLB)))
 
 
 
-## fill the names of dataframes
 ## FIXME some duplicates rows exist in the database!!!
 strong <- unique(strict)
 rm(strict)
@@ -262,7 +263,7 @@ rm(strict)
 
 
 
-# --- Limit date span of the data ----------------------------------------------
+##  Limit date span of the data ------------------------------------------------
 cat(paste("Use data after date:", START_DAY), "\n\n")
 strong[, Day := as.Date(Date)]
 strong <- strong[ strong$Day >= as.Date(START_DAY), ]
@@ -275,7 +276,6 @@ dayslist      <- unique( strong$Day )
 ## add id column
 strong$CSflag <- 99
 
-inverted      <- strong$wattGLB < strong$wattHOR
 
 
 #'
@@ -289,6 +289,7 @@ inverted      <- strong$wattGLB < strong$wattHOR
 #'
 
 #### Exclude inversions ####
+inverted      <- strong$wattGLB < strong$wattHOR
 
 #'
 #' ### There are instances where global irradiance is less than direct.
@@ -318,7 +319,7 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 
 
 
-#####################################################################
+
 
 
 ## Init logical flags
@@ -354,7 +355,7 @@ DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
 
 
-## Ignore direct for pure GLB data process!!
+## Ignore filters with direct for pure GLB data process!!  ---------------------
 IGNORE_DIRE     <- TRUE
 if (IGNORE_DIRE) {
     cat("\nIgnoring filters using Direct radiation!!\n\n")
@@ -550,6 +551,7 @@ if (TEST) {
     # dayslist <- dayslist[year(dayslist)>=2019]
     # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
     dayslist <- dayslist
+    dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
 }
 dayslist <- sort( dayslist, decreasing = T )
 
@@ -595,7 +597,13 @@ for (yyyy in unique(year(dayslist))) {
     subdayslist  <- dayslist[year(dayslist) == yyyy]
     total_points <- sum(year(strong$Date) == yyyy)
 
-    pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+    if (!interactive()) {
+        if (TEST) {
+            pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
+        } else {
+            pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+        }
+    }
 
     ##  Iterate all days
     for (aa in subdayslist) {
@@ -630,8 +638,8 @@ for (yyyy in unique(year(dayslist))) {
 
         ## Data selection for day
         subday     <- strong[ sell, ]
-        have_glb   <- any(!is.na(subday$wattGLB))
-        have_dir   <- any(!is.na(subday$wattDIR))
+        have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
+        have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
         tot_p      <- length(subday$wattGLB)
 
 
@@ -799,22 +807,23 @@ for (yyyy in unique(year(dayslist))) {
                     DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
                     s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
 
-                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = T )  / ( MS$nt - 1 ) ) /
+                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
                                     sum( data_win_glb , na.rm = T) / MS$nt
 
                     ## pass test as clear
                     pass <- GLB_sigma[i] < MS$offVCT
-                    if (is.na(pass)) pass <- F
+                    if (is.na(pass)) { pass <- FALSE }
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
                                                 (   subday$CSflag[w_sta:w_end] == 99) &
                                                     pass                                ] <- 0
-
                 } ##END for loop all points
             }
             #### if it is not clear is VCT
+            ## set newer flag
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            ## set old flag
             subday$CSflag[subday$CSflag == 99]                           <- Flag_key
         }
 
@@ -911,7 +920,6 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-
         #---- 8. Too Few CS point for the day (FCS) ----------------------------
         if (FCS_active) {
             Flag_key  <- 8
@@ -969,7 +977,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         #### PLOTS ####
-        ## _  Main plot ---------------------------------------------------------
+        ## _  Main plot --------------------------------------------------------
         ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
@@ -1012,7 +1020,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- Main plot ID points ----
+        # _ Main plot ID points ------------------------------------------------
 
         ## 1. mean value of irradiance during the time period
         ddd = subday$Date[    subday$CSflag == 1 ]
@@ -1114,13 +1122,13 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- Filter Plots ----
+        ## _ Filter Plots ------------------------------------------------------
         layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
         layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
         par("mar" = c(.5, 4.2, .5, 1) )
 
-        ## _ 1. Mean value of irradiance during the time period ----------------
+        ## __ 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
             ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
@@ -1132,7 +1140,7 @@ for (yyyy in unique(year(dayslist))) {
             text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
-        ## _ 2. Max value of irradiance during the time period -----------------
+        ## __ 2. Max value of irradiance during the time period ----------------
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
@@ -1157,7 +1165,7 @@ for (yyyy in unique(year(dayslist))) {
 
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim <- range(c(0, MS$offVCT*4), na.rm = T)
+            ylim <- range(c(0, MS$offVCT*5), na.rm = T)
             plot(subday$Date, GLB_sigma, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VCT (4)")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
@@ -1165,13 +1173,13 @@ for (yyyy in unique(year(dayslist))) {
 
         if (VSM_active) {
             par("mar" = c(.5, 4.2, 0, 1) )
-            ylim <- range(c(0, MS$offVSM*4), na.rm = T)
+            ylim <- range(c(0, MS$offVSM*5), na.rm = T)
             plot(subday$Date, GLB_Xi, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VSM (5)")
             abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
         }
 
-        #} ##END plot by RMSE MBE
+
 
         ## keep Clear Sky detection
         strong$CSflag[sell]   <- subday$CSflag
