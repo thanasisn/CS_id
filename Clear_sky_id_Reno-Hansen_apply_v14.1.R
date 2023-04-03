@@ -601,8 +601,6 @@ for (yyyy in unique(year(dayslist))) {
     subdayslist  <- dayslist[year(dayslist) == yyyy]
     total_points <- sum(year(strong$Date) == yyyy)
 
-    pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
-
     if (!interactive()) {
         if (TEST) {
             pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
@@ -644,8 +642,8 @@ for (yyyy in unique(year(dayslist))) {
 
         ## Data selection for day
         subday     <- strong[ sell, ]
-        have_glb   <- any(!is.na(subday$wattGLB))
-        have_dir   <- any(!is.na(subday$wattDIR))
+        have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
+        have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
         tot_p      <- length(subday$wattGLB)
 
 
@@ -763,7 +761,7 @@ for (yyyy in unique(year(dayslist))) {
         #----  3. Variability in irradiance by the length (VIL) ----------------
         if (VIL_active) {
             Flag_key  <- 3
-            indx_todo <- which( have_glb )
+            indx_todo <- which(have_glb)
             if ( length(indx_todo) > 0 ) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
@@ -809,7 +807,6 @@ for (yyyy in unique(year(dayslist))) {
         #---- 4.  Variance of Changes in the Time series (VCT) -----------------
         if (VCT_active) {
             Flag_key  <- 4
-
             indx_todo <- which(have_glb)
             if (length(indx_todo) > 0) {
                 ## start with old clear as 99
@@ -836,7 +833,6 @@ for (yyyy in unique(year(dayslist))) {
                     subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
                                                 (   subday$CSflag[w_sta:w_end] == 99) &
                                                     pass                                ] <- 0
-
                 } ##END for loop all points
             }
             #### if it is not clear is VCT
@@ -846,11 +842,11 @@ for (yyyy in unique(year(dayslist))) {
             subday$CSflag[subday$CSflag == 99]                           <- Flag_key
         }
 
-GLB_sigma
+
         #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
         if (VSM_active) {
             Flag_key  <- 5
-            indx_todo <- which( have_glb )
+            indx_todo <- which(have_glb)
             if ( length(indx_todo) > 0 ) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
@@ -1186,7 +1182,7 @@ GLB_sigma
         if (VIL_active) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
-            plot( subday$Date,  GLB_length - CS_ref_length, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VIL (3)")
+            plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
             abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
             abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
@@ -1196,18 +1192,16 @@ GLB_sigma
 
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim <- range(c(0, MS$offVCT*4), na.rm = T)
-            ylim <- range(c(0, MS$offVCT), na.rm = T)
-
-            plot(subday$Date, GLB_sigma, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VCT (4)")
+            ylim <- range(c(0, MS$offVCT*5), na.rm = T)
+            plot(subday$Date, GLB_sigma, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VCT (4)")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
         }
 
         if (VSM_active) {
             par("mar" = c(.5, 4.2, 0, 1) )
-            ylim <- range(c(0, MS$offVSM*4), na.rm = T)
-            plot(subday$Date, GLB_Xi, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VSM (5)")
+            ylim <- range(c(0, MS$offVSM*5), na.rm = T)
+            plot(subday$Date, GLB_Xi, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VSM (5)")
             abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
         }
@@ -1235,7 +1229,7 @@ GLB_sigma
 
         # daily_stats <<- rbind(daily_stats, keepday )
         daily_stats <- rbind(daily_stats, keepday )
-stop("DDDDD")
+
     } ##END day loop
 
     dev.off()
