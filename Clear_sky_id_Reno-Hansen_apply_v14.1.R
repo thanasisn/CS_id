@@ -104,8 +104,8 @@ walk <- function(i, nt_hw, tot_p) {
 
 # MONTHLY     <- T
 MONTHLY     <- FALSE
-# TEST        <- FALSE
-TEST        <- TRUE
+TEST        <- FALSE
+# TEST        <- TRUE
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 # START_DAY   <- "2022-01-01"
 START_DAY   <- "1993-01-01"
