@@ -603,10 +603,12 @@ for (yyyy in unique(year(dayslist))) {
 
     pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
 
-    if (TEST) {
-        pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
-    } else {
-        pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+    if (!interactive()) {
+        if (TEST) {
+            pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
+        } else {
+            pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+        }
     }
 
     ##  Iterate all days
@@ -807,12 +809,13 @@ for (yyyy in unique(year(dayslist))) {
         #---- 4.  Variance of Changes in the Time series (VCT) -----------------
         if (VCT_active) {
             Flag_key  <- 4
-            indx_todo <- which( have_glb )
-            if ( length(indx_todo) > 0 ) {
+
+            indx_todo <- which(have_glb)
+            if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
                 s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
-stop()
+
                 for (i in indx_todo) {
                     ## resolve window by index
                     walk(i, nt_hw , tot_p )
@@ -822,12 +825,12 @@ stop()
                     DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
                     s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
 
-                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = T )  / ( MS$nt - 1 ) ) /
+                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
                                     sum( data_win_glb , na.rm = T) / MS$nt
 
                     ## pass test as clear
                     pass <- GLB_sigma[i] < MS$offVCT
-                    if (is.na(pass)) pass <- F
+                    if (is.na(pass)) { pass <- FALSE }
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
@@ -837,11 +840,13 @@ stop()
                 } ##END for loop all points
             }
             #### if it is not clear is VCT
+            ## set newer flag
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            ## set old flag
             subday$CSflag[subday$CSflag == 99]                           <- Flag_key
         }
 
-
+GLB_sigma
         #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
         if (VSM_active) {
             Flag_key  <- 5
@@ -930,7 +935,6 @@ stop()
 
             subday[ wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
         }
-
 
 
 
@@ -1193,6 +1197,8 @@ stop()
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c(0, MS$offVCT*4), na.rm = T)
+            ylim <- range(c(0, MS$offVCT), na.rm = T)
+
             plot(subday$Date, GLB_sigma, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VCT (4)")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
@@ -1229,7 +1235,7 @@ stop()
 
         # daily_stats <<- rbind(daily_stats, keepday )
         daily_stats <- rbind(daily_stats, keepday )
-
+stop("DDDDD")
     } ##END day loop
 
     dev.off()
