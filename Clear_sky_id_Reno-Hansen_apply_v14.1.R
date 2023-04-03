@@ -555,7 +555,7 @@ if (TEST) {
     # dayslist <- dayslist[year(dayslist)>=2019]
     # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
     dayslist <- dayslist
-    dayslist <- dayslist[dayslist > as.Date("2023-01-01")]
+    dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
 }
 dayslist <- sort( dayslist, decreasing = T )
 
@@ -812,7 +812,7 @@ for (yyyy in unique(year(dayslist))) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
                 s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
-
+stop()
                 for (i in indx_todo) {
                     ## resolve window by index
                     walk(i, nt_hw , tot_p )
