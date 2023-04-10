@@ -1092,20 +1092,19 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        wecare <- grep("CSflag_", names(subday), value = T)
-        sel    <- rowSums( subday[, ..wecare ], na.rm = T ) == 0
+        wecare    <- grep("CSflag_", names(subday), value = T)
+        sel       <- rowSums( subday[, ..wecare ], na.rm = T ) == 0
+        Clear_cnt <- sum(            sel, na.rm = T)
 
         ##  the rest is clear
         if (any(have_glb)) {
             ddd       <- subday$Date[    sel ]
             vvv       <- subday$wattGLB[ sel ]
-            Clear_cnt <- sum(            sel, na.rm = T)
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
         if (any(have_dir)) {
             ddd       <- subday$Date[    sel ]
             vvv       <- subday$wattHOR[ sel ]
-            Clear_cnt <- sum(            sel, na.rm = T)
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
 
