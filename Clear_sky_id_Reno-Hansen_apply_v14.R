@@ -746,7 +746,7 @@ for (yyyy in unique(year(dayslist))) {
         #----  3. Variability in irradiance by the length (VIL) ----------------
         if (VIL_active) {
             Flag_key  <- 3
-            indx_todo <- which( have_glb )
+            indx_todo <- which(have_glb)
             if ( length(indx_todo) > 0 ) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
@@ -792,8 +792,8 @@ for (yyyy in unique(year(dayslist))) {
         #---- 4.  Variance of Changes in the Time series (VCT) -----------------
         if (VCT_active) {
             Flag_key  <- 4
-            indx_todo <- which( have_glb )
-            if ( length(indx_todo) > 0 ) {
+            indx_todo <- which(have_glb)
+            if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
                 s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
@@ -831,7 +831,7 @@ for (yyyy in unique(year(dayslist))) {
         #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
         if (VSM_active) {
             Flag_key  <- 5
-            indx_todo <- which( have_glb )
+            indx_todo <- which(have_glb)
             if ( length(indx_todo) > 0 ) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
@@ -1077,20 +1077,19 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        wecare <- grep("CSflag_", names(subday), value = T)
-        sel    <- rowSums( subday[, ..wecare ], na.rm = T ) == 0
+        wecare    <- grep("CSflag_", names(subday), value = T)
+        sel       <- rowSums( subday[, ..wecare ], na.rm = T ) == 0
+        Clear_cnt <- sum(            sel, na.rm = T)
 
         ##  the rest is clear
         if (any(have_glb)) {
             ddd       <- subday$Date[    sel ]
             vvv       <- subday$wattGLB[ sel ]
-            Clear_cnt <- sum(            sel, na.rm = T)
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
         if (any(have_dir)) {
             ddd       <- subday$Date[    sel ]
             vvv       <- subday$wattHOR[ sel ]
-            Clear_cnt <- sum(            sel, na.rm = T)
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
 
