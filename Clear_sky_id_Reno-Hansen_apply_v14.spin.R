@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_1.R"
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
@@ -235,7 +235,7 @@ cat(print(table(strict$QCF_GLB)))
 
 
 
-## TODO 7.
+##TODO 7.
 
 
 
@@ -343,16 +343,16 @@ VCT_active     <- TRUE
 VSM_active     <- TRUE
 
 ## My filters control  ---------------------------------------------------------
-LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
-                        ## careful this also excludes points due to pole shade at
-                        ## afternoon and building in the morning
-                        ## Don't use for GLB trends!!!!
-LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
-                        ## Global irradiance below this level can not be identified
-FCS_active     <- TRUE  ## Skip with few cs
-FDP_active     <- TRUE  ## Skip with few data in a day
+LDI_active     <- TRUE   ## Low __Direct__ Irradiance limit (LDI)
+                         ## careful this also excludes points due to pole shade at
+                         ## afternoon and building in the morning
+                         ## Don't use for GLB trends!!!!
+LGI_active     <- TRUE   ## Low Global Irradiance limit (LGI)
+                         ## Global irradiance below this level can not be identified
+FCS_active     <- TRUE   ## Skip with few cs
+FDP_active     <- TRUE   ## Skip with few data in a day
 DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
-FAST_SKIP      <- FALSE ## allow faster skip of filters also reduce data kept
+FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
 
 
 ## Ignore filters with direct for pure GLB data process!!  ---------------------
@@ -369,29 +369,25 @@ if (IGNORE_DIRE) {
 
 # -- all the variables for this run are initialized here --------------------- #
 
-MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
-                  MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
-                  CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_RelUpp =  0.095,      ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIL_fct           =  1.2,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
-                  MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
-                  offVIL_upl           = 10,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
-                  offVIL_dwl           =  5,          ##  3. MIN Offset Variability in irradiance by the length (VIL)
-                  offVCT               =  0.00011,    ##  4. Variance of Changes in the Time series (VCT)
-                  offVSM               =  7.5,        ##  5. Variability in the Shape of the irradiance Measurements (VSM)
-                  alpha                =  1,
-                  relative_CS          =  0.3,        ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
-                  sample_n_days        = SAMPLE_DAYS, ## Sample of that much days to be evaluated
-                  tolerance            =  0.02,       ## Optimization algorithm tolerance
-                  start_day            = START_DAY,   ## The first day of the data we are using
-                  DIR_s_T_fact         = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
+MS <- data.frame( nt                = 11,          ##     Window size prefer odd numbers so not to be left right bias
+                  MeanVIP_fct       = 1,           ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
+                  CS_ref_rm_VIP_low = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP)
+                  CS_ref_rm_VIP_upp = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP)
+                  MaxVIP_fct        = 1 ,          ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIP_off_upp    = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIP_off_low    = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIL_fct        = 1.2,         ##  3. MAX Factor Variability in irradiance by the length (VIL)
+                  MinVIL_fct        = 1,           ##  3. MIN Factor Variability in irradiance by the length (VIL)
+                  offVIL_upl        = 10,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
+                  offVIL_dwl        = 5,           ##  3. MIN Offset Variability in irradiance by the length (VIL)
+                  offVCT            = 0.00011,     ##  4. Variance of Changes in the Time series (VCT)
+                  offVSM            = 7.5,         ##  5. Variability in the Shape of the irradiance Measurements (VSM)
+                  alpha             = 1,
+                  relative_CS       = 0.3,         ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
+                  sample_n_days     = SAMPLE_DAYS, ## Sample of that much days to be evaluated
+                  tolerance         = 0.02,        ## Optimization algorithm tolerance
+                  start_day         = START_DAY,   ## The first day of the data we are using
+                  DIR_s_T_fact      = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
 )
 
 
@@ -685,19 +681,8 @@ for (yyyy in unique(year(dayslist))) {
             Flag_key <- 1
             ## create some modeled values
             CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            ## first implementation with offset from reference limits
-            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
-            ## newer implementation with relative to reference limits
-            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
-            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
-
-            # plot(CS_ref_rm_VIP_upp, type = "l",col = 1)
-            # lines(CS_ref_rm_VIP_low,           col = 2)
-            # lines(CS_ref_rm_VIP_low_0,         col = 3)
-            # lines(CS_ref_rm_VIP_upp_0,         col = 4)
-            # lines(CS_ref_rm_base,              col = 6)
-
+            CS_ref_rm_VIP_low <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
+            CS_ref_rm_VIP_upp <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
             GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
 
             ## don't allow negative values on models
@@ -1145,25 +1130,13 @@ for (yyyy in unique(year(dayslist))) {
         ## __ 1. Mean value of irradiance during the time period ---------------
         if (MeanVIP_active & any(have_glb)){
             par("mar" = c(0, 4.2, .5, 1) )
-
-            # ## Old style offset thresholds
-            # ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
-            # plot( subday$Date, GLB_rm - CS_ref_rm_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
-            # abline( h = - MS$CS_ref_rm_VIP_low, lty = 2, col = kcols[1], lwd = 2)
-            # abline( h =   MS$CS_ref_rm_VIP_upp, lty = 3, col = kcols[1], lwd = 2)
-            # abline( h = 0 , lty = 1, col = kcols[1], lwd = 2)
-            # text(x = subday$Date[20], y = - MS$CS_ref_rm_VIP_low, labels = - MS$CS_ref_rm_VIP_low, pos = 1)
-            # text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
-
-            ## new style relative thresholds
-            ylim <- range(GLB_rm - CS_ref_rm_base,
-                          CS_ref_rm_VIP_low - CS_ref_rm_base,
-                          CS_ref_rm_VIP_upp - CS_ref_rm_base,na.rm = T)
-            plot(subday$Date, GLB_rm - CS_ref_rm_base,
-                 pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
-            lines(subday$Date, CS_ref_rm_VIP_low - CS_ref_rm_base, col = kcols[1], lty = 2)
-            lines(subday$Date, CS_ref_rm_VIP_upp - CS_ref_rm_base, col = kcols[1], lty = 2)
-
+            ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
+            plot( subday$Date, GLB_rm - CS_ref_rm_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
+            abline( h = - MS$CS_ref_rm_VIP_low, lty = 2, col = kcols[1], lwd = 2)
+            abline( h =   MS$CS_ref_rm_VIP_upp, lty = 3, col = kcols[1], lwd = 2)
+            abline( h = 0 , lty = 1, col = kcols[1], lwd = 2)
+            text(x = subday$Date[20], y = - MS$CS_ref_rm_VIP_low, labels = - MS$CS_ref_rm_VIP_low, pos = 1)
+            text(x = subday$Date[20], y =   MS$CS_ref_rm_VIP_upp, labels =   MS$CS_ref_rm_VIP_upp, pos = 1)
         }
 
         ## __ 2. Max value of irradiance during the time period ----------------
@@ -1181,7 +1154,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VIL_active) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
-            plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
+            plot( subday$Date,  GLB_length - CS_ref_length, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VIL (3)")
             abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
             abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
@@ -1192,7 +1165,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c(0, MS$offVCT*5), na.rm = T)
-            plot(subday$Date, GLB_sigma, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VCT (4)")
+            plot(subday$Date, GLB_sigma, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VCT (4)")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
         }
@@ -1200,7 +1173,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VSM_active) {
             par("mar" = c(.5, 4.2, 0, 1) )
             ylim <- range(c(0, MS$offVSM*5), na.rm = T)
-            plot(subday$Date, GLB_Xi, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VSM (5)")
+            plot(subday$Date, GLB_Xi, pch=18, cex=.8, col = "green", ylim = ylim, ylab = "VSM (5)")
             abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
         }
