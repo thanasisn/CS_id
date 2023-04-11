@@ -924,7 +924,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         #---- 11. Too low direct radiation (DsT) -----------------~~~-----------
-        if (DST_active & have_dir) {
+        if (DST_active & any(have_dir)) {
             Flag_key  <- 11
             subday[ (CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
             subday[ (CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
