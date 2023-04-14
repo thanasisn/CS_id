@@ -804,7 +804,9 @@ for (yyyy in unique(year(dayslist))) {
 
                 } ##END for loop all points
             }
-stop()
+
+            if (any(grepl("VIL_", names(subday)))) {stop()}
+
             #### if it is not clear is VIL
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
             subday$CSflag[subday$CSflag == 99]                           <- Flag_key
