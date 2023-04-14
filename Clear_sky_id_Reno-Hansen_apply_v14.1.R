@@ -786,11 +786,10 @@ for (yyyy in unique(year(dayslist))) {
                     DeltaTSq_ref     <- as.numeric( !is.na(DeltaVSq_ref) )**2
                     CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = T )
 
-                    ## store comparison values ?
-                    subday$VIL_glb[w_sta] <- CS_ref_length[i]
-                    subday$VIL_upp[w_sta] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
-                    subday$VIL_low[w_sta] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
-
+                    # ## store comparison values ?
+                    # subday$VIL_glb[w_sta] <- CS_ref_length[i]
+                    # subday$VIL_upp[w_sta] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
+                    # subday$VIL_low[w_sta] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
 
                     ## pass test as clear
                     pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
@@ -801,11 +800,14 @@ for (yyyy in unique(year(dayslist))) {
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
                                                 ( subday$CSflag[w_sta:w_end] == 99) &
                                                   pass                                ] <- 0
-
                 } ##END for loop all points
+                ## store comparison values ?
+                subday$VIL_GLB   <- GLB_length
+                subday$VIL_upp   <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
+                subday$VIL_low   <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
             }
 
-            if (any(grepl("VIL_", names(subday)))) {stop()}
+            # if (any(grepl("VIL_", names(subday)))) {stop()}
 
             #### if it is not clear is VIL
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
@@ -1187,19 +1189,30 @@ for (yyyy in unique(year(dayslist))) {
             text(x = subday$Date[20], y =   MS$MaxVIP_off_upp, labels =   MS$MaxVIP_off_upp, pos = 1)
         }
 
+        ## __ 3. Variability in irradiance by the length (VIL) -----------------
         if (VIL_active) {
             par("mar" = c(0, 4.2, 0, 1) )
-            ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
-            plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
+            ## old plots
+            # ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
+            # plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
+            #
+            # abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
+            # abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
+            # abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
+            # text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
+            # text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
 
-            abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
-            abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
-            abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
-            text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
-            text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
+            ## new plots
+            if (any(grepl("VIL_", names(subday)))) {
+                ylim <- range(subday[, .(VIL_low, VIL_upp)], na.rm = T)
+                ylim <- c(- abs(max(ylim)), 2 * abs(max(ylim)))
 
-
-            plot(subday$Date, subday$VIL_glb)
+                plot( subday$Date, subday$VIL_GLB, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)" )
+                lines(subday$Date, subday$VIL_upp, lty = 3, col = kcols[3], lwd = 2)
+                lines(subday$Date, subday$VIL_low, lty = 2, col = kcols[3], lwd = 2)
+            } else {
+                plot.new()
+            }
         }
 
         if (VCT_active) {
