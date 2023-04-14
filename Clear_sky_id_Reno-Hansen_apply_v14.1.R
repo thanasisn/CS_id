@@ -322,7 +322,7 @@ strong[QCF_GLB == FALSE, wattDIF     := NA ]
 
 
 
-## Init logical flags
+##  Filters to user  -----------------------------------------------------------
 MeanVIP_active <- FALSE  ## 1. Mean value of irradiance during the time period
 MaxVIP_active  <- FALSE
 VIL_active     <- FALSE
@@ -336,22 +336,22 @@ DST_active     <- FALSE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE
 
 ## Reno-Hansen filters control -------------------------------------------------
-MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- TRUE
+# MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
+# MaxVIP_active  <- TRUE
 VIL_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
-VCT_active     <- TRUE
-VSM_active     <- TRUE
+# VCT_active     <- TRUE
+# VSM_active     <- TRUE
 
 ## My filters control  ---------------------------------------------------------
-LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
+# LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
                         ## careful this also excludes points due to pole shade at
                         ## afternoon and building in the morning
                         ## Don't use for GLB trends!!!!
-LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
+# LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
                         ## Global irradiance below this level can not be identified
-FCS_active     <- TRUE  ## Skip with few cs
-FDP_active     <- TRUE  ## Skip with few data in a day
-DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
+# FCS_active     <- TRUE  ## Skip with few cs
+# FDP_active     <- TRUE  ## Skip with few data in a day
+# DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE ## allow faster skip of filters also reduce data kept
 
 
@@ -762,7 +762,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VIL_active) {
             Flag_key  <- 3
             indx_todo <- which(have_glb)
-            if ( length(indx_todo) > 0 ) {
+            if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
 
@@ -786,6 +786,12 @@ for (yyyy in unique(year(dayslist))) {
                     DeltaTSq_ref     <- as.numeric( !is.na(DeltaVSq_ref) )**2
                     CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = T )
 
+                    ## store comparison values ?
+                    subday$VIL_glb[w_sta:w_end] <- CS_ref_length[i]
+                    subday$VIL_upp[w_sta:w_end] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
+                    subday$VIL_low[w_sta:w_end] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
+
+
                     ## pass test as clear
                     pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
                             GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
@@ -795,9 +801,10 @@ for (yyyy in unique(year(dayslist))) {
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
                                                 ( subday$CSflag[w_sta:w_end] == 99) &
                                                   pass                                ] <- 0
-stop()
+
                 } ##END for loop all points
             }
+stop()
             #### if it is not clear is VIL
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
             subday$CSflag[subday$CSflag == 99]                           <- Flag_key
