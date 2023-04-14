@@ -787,9 +787,9 @@ for (yyyy in unique(year(dayslist))) {
                     CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = T )
 
                     ## store comparison values ?
-                    subday$VIL_glb[w_sta:w_end] <- CS_ref_length[i]
-                    subday$VIL_upp[w_sta:w_end] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
-                    subday$VIL_low[w_sta:w_end] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
+                    subday$VIL_glb[w_sta] <- CS_ref_length[i]
+                    subday$VIL_upp[w_sta] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
+                    subday$VIL_low[w_sta] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
 
 
                     ## pass test as clear
@@ -1197,6 +1197,9 @@ for (yyyy in unique(year(dayslist))) {
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
             text(x = subday$Date[20], y = - MS$offVIL_dwl, labels = - MS$offVIL_dwl, pos = 1)
             text(x = subday$Date[20], y =   MS$offVIL_upl, labels =   MS$offVIL_upl, pos = 1)
+
+
+            plot(subday$Date, subday$VIL_glb)
         }
 
         if (VCT_active) {
