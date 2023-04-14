@@ -339,22 +339,22 @@ DST_active     <- FALSE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE
 
 ## Reno-Hansen filters control -------------------------------------------------
-# MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
-# MaxVIP_active  <- TRUE
+MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
+MaxVIP_active  <- TRUE
 VIL_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
-# VCT_active     <- TRUE
-# VSM_active     <- TRUE
+VCT_active     <- TRUE
+VSM_active     <- TRUE
 
 ## My filters control  ---------------------------------------------------------
-# LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
+LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
                         ## careful this also excludes points due to pole shade at
                         ## afternoon and building in the morning
                         ## Don't use for GLB trends!!!!
-# LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
+LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
                         ## Global irradiance below this level can not be identified
-# FCS_active     <- TRUE  ## Skip with few cs
-# FDP_active     <- TRUE  ## Skip with few data in a day
-# DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
+FCS_active     <- TRUE  ## Skip with few cs
+FDP_active     <- TRUE  ## Skip with few data in a day
+DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE ## allow faster skip of filters also reduce data kept
 
 
