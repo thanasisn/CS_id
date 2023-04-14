@@ -127,7 +127,7 @@ plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
 
 
-par(mar = c(2,4,2,1))
+par(mar = c(2, 4, 2, 1))
 
 
 
@@ -367,7 +367,7 @@ if (IGNORE_DIRE) {
 
 
 
-# -- all the variables for this run are initialized here --------------------- #
+##  Variables initialization -- ------------------------------------------------
 
 MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
@@ -380,7 +380,7 @@ MS <- data.frame( nt                   = 11,          ##     Window size prefer 
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIL_fct           =  1.2,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
+                  MaxVIL_fct           =  1.3,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
                   MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
                   offVIL_upl           = 10,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
                   offVIL_dwl           =  5,          ##  3. MIN Offset Variability in irradiance by the length (VIL)
@@ -795,7 +795,7 @@ for (yyyy in unique(year(dayslist))) {
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
                                                 ( subday$CSflag[w_sta:w_end] == 99) &
                                                   pass                                ] <- 0
-
+stop()
                 } ##END for loop all points
             }
             #### if it is not clear is VIL
@@ -1182,6 +1182,7 @@ for (yyyy in unique(year(dayslist))) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
             plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
+
             abline( h = - MS$offVIL_dwl, lty = 2, col = kcols[3], lwd = 2)
             abline( h =   MS$offVIL_upl, lty = 3, col = kcols[3], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[3], lwd = 2)
