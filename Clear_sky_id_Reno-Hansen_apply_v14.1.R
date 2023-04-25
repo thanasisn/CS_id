@@ -779,12 +779,12 @@ for (yyyy in unique(year(dayslist))) {
                     ## calculate length for data
                     DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)**2
                     DeltaTSq_GLB  <- as.numeric( !is.na(DeltaVSq_GLB) )**2
-                    GLB_length[i] <- sum(sqrt(DeltaVSq_GLB + DeltaTSq_GLB), na.rm = T )
+                    GLB_length[i] <- sum(sqrt(DeltaVSq_GLB + DeltaTSq_GLB), na.rm = TRUE)
 
                     ## calculate length for reference
                     DeltaVSq_ref     <- (data.table::shift(date_win_ref) - date_win_ref)**2
                     DeltaTSq_ref     <- as.numeric( !is.na(DeltaVSq_ref) )**2
-                    CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = T )
+                    CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = TRUE)
 
                     # ## store comparison values ?
                     # subday$VIL_glb[w_sta] <- CS_ref_length[i]
@@ -865,23 +865,31 @@ for (yyyy in unique(year(dayslist))) {
 
                 for (i in indx_todo) {
                     ## resolve window by index
-                    walk(i, nt_hw , tot_p )
+                    walk(i, nt_hw, tot_p)
 
-                    ## Do calculation ##
+                    ## change in measurements
                     data_win_glb  <- subday$wattGLB[w_sta:w_end]
                     DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)
 
-                    suppressWarnings(
-                        {GLB_Xi[i] <- max( abs( DeltaVSq_GLB - x_i_CS[i] ), na.rm = T)}
-                    )
+                    ## change in reference
+                    data_win_ref  <- subday$CS_ref[w_sta:w_end]
+                    DeltaVSq_ref  <- (data.table::shift(data_win_ref) - data_win_ref)
+
+                    suppressWarnings({
+                        GLB_Xi[i]      <- max(abs(DeltaVSq_GLB - x_i_CS[i]   ), na.rm = TRUE)
+                        GLB_Xi_test[i] <- max(abs(DeltaVSq_GLB - DeltaVSq_ref), na.rm = TRUE)
+                    })
 
                     ## pass test as clear
-                    pass = GLB_Xi[i] < MS$offVSM
+                    pass      <- GLB_Xi[i]      < MS$offVSM
+                    pass_test <- GLB_Xi_test[i] < MS$offVSM
+                    stopifnot(pass == pass_test)
+
                     if (is.na(pass)) pass <- FALSE
 
                     ## an info warning
-                    if ( is.infinite(GLB_Xi[i]) & i > 1 ) {
-                        if (interactive()) print(paste(GLB_Xi[i], format(aday, "%F"),i, pass ))
+                    if (is.infinite(GLB_Xi[i]) & i > 1) {
+                        if (interactive()) print(paste(GLB_Xi[i], format(aday, "%F"), i, pass))
                     }
 
                     ## set VCT flag
