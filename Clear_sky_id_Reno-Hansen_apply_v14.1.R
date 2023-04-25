@@ -663,7 +663,7 @@ for (yyyy in unique(year(dayslist))) {
         GLB_length    <- CS_ref * NA
         GLB_sigma     <- CS_ref * NA
         GLB_Xi        <- CS_ref * NA
-
+        GLB_Xi_test   <- CS_ref * NA
 
         #### Apply filters ####
 
