@@ -4,9 +4,9 @@
 
 # all:       clean_all pdf html rtim
 render:    pdf
-pdf:       p1  p3 p4 upload
-html:      h1  h3 h4 
-rtim:      r1  r3 r4 
+pdf:       p1   upload
+html:      h1   
+rtim:      r1   
 # clean_all: clean_cache clean_data clean_pdfs
 
 ## use a script to upload all pdfs
