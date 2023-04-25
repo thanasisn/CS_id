@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_1.R"
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_2.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
@@ -378,7 +378,7 @@ MS <- data.frame( nt                   = 11,          ##     Window size prefer 
                   CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
                   MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_upp       = 70,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
+                  MaxVIP_off_upp       = 75,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
                   MaxVIL_fct           =  1.3,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
                   MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
@@ -663,6 +663,7 @@ for (yyyy in unique(year(dayslist))) {
         GLB_length    <- CS_ref * NA
         GLB_sigma     <- CS_ref * NA
         GLB_Xi        <- CS_ref * NA
+        GLB_Xi_test   <- CS_ref * NA
 
         #### Apply filters ####
 
@@ -870,13 +871,19 @@ for (yyyy in unique(year(dayslist))) {
                     data_win_glb  <- subday$wattGLB[w_sta:w_end]
                     DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)
 
+                    ## change in reference
+                    data_win_ref  <- subday$CS_ref[w_sta:w_end]
+                    DeltaVSq_ref  <- (data.table::shift(data_win_ref) - data_win_ref)
 
                     suppressWarnings({
-                        GLB_Xi[i] <- max(abs(DeltaVSq_GLB - x_i_CS[i]   ), na.rm = TRUE)
+                        # GLB_Xi[i]      <- max(abs(DeltaVSq_GLB - x_i_CS[i]   ), na.rm = TRUE)
+                        GLB_Xi[i] <- max(abs(DeltaVSq_GLB - DeltaVSq_ref), na.rm = TRUE)
                     })
 
                     ## pass test as clear
-                    pass      <- GLB_Xi[i]      < MS$offVSM
+                    # pass      <- GLB_Xi[i]      < MS$offVSM
+                    pass <- GLB_Xi[i] < MS$offVSM
+
                     if (is.na(pass)) pass <- FALSE
 
                     ## an info warning
@@ -934,13 +941,15 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- 11. Too low direct radiation (DsT) -----------------~~~-----------
+        #---- 11. Too low direct radiation (DsT) -----------------````----------
         if (DST_active & any(have_dir)) {
             Flag_key  <- 11
-            subday[ (CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
-            subday[ (CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))), CSflag := Flag_key ]
+            subday[(CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+                   CSflag := Flag_key]
+            subday[(CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+                   CSflag := Flag_key]
 
-            subday[ wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
+            subday[wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
         }
 
 
