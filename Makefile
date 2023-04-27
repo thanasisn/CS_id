@@ -7,7 +7,6 @@ render:    pdf
 pdf:       p1   upload
 html:      h1   
 rtim:      r1   
-# clean_all: clean_cache clean_data clean_pdfs
 
 ## use a script to upload all pdfs
 upload:
