@@ -225,16 +225,16 @@ strict$QCF_DIR_05 <- NULL
 
 ## 6.  Rayleigh Limit Diffuse Comparison
 ## On this region can not infer CS results
-Lim6_azim <- 130
-Lim6_elev <- 13
-test <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR)  ]
-hist(test$Elevat,  breaks = 100)
-abline(v = Lim6_elev, col = "red")
-hist(test$Azimuth, breaks = 100)
-abline(v = Lim6_azim, col = "red")
-test2 <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev ]
-hist(test2$Elevat,  breaks = 100)
-hist(test2$Azimuth, breaks = 100)
+# Lim6_azim <- 130
+# Lim6_elev <- 13
+# test <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR)  ]
+# hist(test$Elevat,  breaks = 100)
+# abline(v = Lim6_elev, col = "red")
+# hist(test$Azimuth, breaks = 100)
+# abline(v = Lim6_azim, col = "red")
+# test2 <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev ]
+# hist(test2$Elevat,  breaks = 100)
+# hist(test2$Azimuth, breaks = 100)
 
 warning("Disabled this for trends !!")
 # strict[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_DIR := FALSE]
@@ -601,7 +601,6 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 # registerDoParallel(cl = my.cluster)
 
 
-stop("ASTOP")
 
 
 #+ include=T, echo=F
