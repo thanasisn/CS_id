@@ -179,6 +179,12 @@ strict$QCF_GLB      <- TRUE
 
 ## Select data to use!! --------------------------------------------------------
 
+#'
+#' ## Excluded data summary
+#'
+#' Some data are excluded from proccessing
+#'
+
 ## we have no reason to ignore that data
 strict$QCF_DIR_01   <- NULL
 strict$QCF_GLB_01   <- NULL
@@ -192,13 +198,17 @@ strict$QCF_GLB_09   <- NULL
 strict$QCF_BTH_06_1 <- NULL
 
 
-## 3.
+
+
+## 3. COMPARISON TESTS PER BSRN “non-definitive”
 ## remove only some of the offending data
-test <- strict[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
-hist(test$Elevat,  breaks = 100)
-hist(test$Azimuth, breaks = 100)
-strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_DIR := FALSE]
-strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_GLB := FALSE]
+warning("Disabled this for trends !!")
+# test <- strict[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
+# hist(test$Elevat,  breaks = 100)
+# hist(test$Azimuth, breaks = 100)
+# ## trends use data above 5
+# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_DIR := FALSE]
+# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_GLB := FALSE]
 strict$QCF_BTH_03_1 <- NULL
 strict$QCF_BTH_03_2 <- NULL
 ## check the tables
@@ -213,21 +223,22 @@ cat(print(table(strict$QCF_GLB)))
 strict$QCF_DIR_05 <- NULL
 
 
-## 6.
+## 6.  Rayleigh Limit Diffuse Comparison
 ## On this region can not infer CS results
 Lim6_azim <- 130
 Lim6_elev <- 13
 test <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR)  ]
 hist(test$Elevat,  breaks = 100)
-abline(v=Lim6_elev, col = "red")
+abline(v = Lim6_elev, col = "red")
 hist(test$Azimuth, breaks = 100)
-abline(v=Lim6_azim, col = "red")
+abline(v = Lim6_azim, col = "red")
 test2 <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev ]
 hist(test2$Elevat,  breaks = 100)
 hist(test2$Azimuth, breaks = 100)
 
-strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_DIR := FALSE]
-strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_GLB := FALSE]
+warning("Disabled this for trends !!")
+# strict[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_DIR := FALSE]
+# strict[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_GLB := FALSE]
 strict$QCF_BTH_06_2 <- NULL
 ## check the tables
 cat(print(table(strict$QCF_DIR)))
@@ -243,10 +254,11 @@ cat(print(table(strict$QCF_GLB)))
 table(strict$QCF_BTH_08_1)
 table(strict$QCF_BTH_08_2)
 ## set inclusion flags
-strict[!is.na(QCF_BTH_08_1), QCF_DIR := FALSE]
-strict[!is.na(QCF_BTH_08_1), QCF_GLB := FALSE]
-strict[!is.na(QCF_BTH_08_2), QCF_DIR := FALSE]
-strict[!is.na(QCF_BTH_08_2), QCF_GLB := FALSE]
+warning("Disabled this for trends !!")
+# strict[!is.na(QCF_BTH_08_1), QCF_DIR := FALSE]
+# strict[!is.na(QCF_BTH_08_1), QCF_GLB := FALSE]
+# strict[!is.na(QCF_BTH_08_2), QCF_DIR := FALSE]
+# strict[!is.na(QCF_BTH_08_2), QCF_GLB := FALSE]
 strict$QCF_BTH_08_1 <- NULL
 strict$QCF_BTH_08_2 <- NULL
 ## check the tables
@@ -308,13 +320,13 @@ strong[inverted , QCF_GLB := FALSE ]
 
 #### Remove measurement without good quality code !! ####
 warning("Remove measurement without good quality code !!")
-strong[QCF_DIR == FALSE, wattDIR     := NA ]
-strong[QCF_DIR == FALSE, wattHOR     := NA ]
-strong[QCF_DIR == FALSE, wattDIR_sds := NA ]
-strong[QCF_DIR == FALSE, wattDIF     := NA ]
-strong[QCF_GLB == FALSE, wattGLB     := NA ]
-strong[QCF_GLB == FALSE, wattGLB_sds := NA ]
-strong[QCF_GLB == FALSE, wattDIF     := NA ]
+strong[QCF_DIR == FALSE, wattDIR     := NA]
+strong[QCF_DIR == FALSE, wattHOR     := NA]
+strong[QCF_DIR == FALSE, wattDIR_sds := NA]
+strong[QCF_DIR == FALSE, wattDIF     := NA]
+strong[QCF_GLB == FALSE, wattGLB     := NA]
+strong[QCF_GLB == FALSE, wattGLB_sds := NA]
+strong[QCF_GLB == FALSE, wattDIF     := NA]
 
 
 
@@ -589,7 +601,8 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 # registerDoParallel(cl = my.cluster)
 
 
-# daily_stats <- data.frame()
+stop("ASTOP")
+
 
 #+ include=T, echo=F
 ##  Iterate all years
