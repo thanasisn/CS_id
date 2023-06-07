@@ -182,7 +182,7 @@ strict$QCF_GLB      <- TRUE
 #'
 #' ## Excluded data summary
 #'
-#' Some data are excluded from proccessing
+#' Some data are excluded from processing
 #'
 
 ## we have no reason to ignore that data
