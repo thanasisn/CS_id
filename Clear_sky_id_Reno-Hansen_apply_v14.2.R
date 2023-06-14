@@ -73,12 +73,14 @@ if (!interactive()) {
 options("width" = 130)
 
 
+
 library(RColorBrewer)
 library(scales)
 library(pander)
 library(caTools)
 library(data.table)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
+source("~/Aerosols/RAerosols/R/statistics.R")
 
 
 ## some plot configs ####
