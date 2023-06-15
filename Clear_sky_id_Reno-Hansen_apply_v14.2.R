@@ -1008,6 +1008,12 @@ for (yyyy in unique(year(dayslist))) {
 
         RMSE <- RMSE(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
 
+
+        # RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
+        #         mean(strong$wattGLB[clear_sky] , na.rm = T)
+
+
+
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
                 mean(subday$wattGLB[clear_sky], na.rm = T)
 
@@ -1382,15 +1388,15 @@ barplot(prop.table(table(strong$CSflag)),
 ## Evaluation of CS detection
 clear_sky <- strong$CSflag == 0
 
-RMSE <- sqrt( mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
-        mean( strong$wattGLB[clear_sky] , na.rm = T)
+RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
+        mean(strong$wattGLB[clear_sky] , na.rm = T)
 
-MBE  <- mean( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) /
-        mean( strong$wattGLB[clear_sky] , na.rm = T)
+MBE  <- mean(strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) /
+        mean(strong$wattGLB[clear_sky] , na.rm = T)
 
 
 #'
-#' ### Cost function for optimazition of alpha value.
+#' ### Cost function for optimization of alpha value.
 #'
 #' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
 #'                 { n } , \qquad a > 0 $$
