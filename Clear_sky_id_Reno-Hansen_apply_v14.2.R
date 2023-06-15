@@ -974,11 +974,11 @@ for (yyyy in unique(year(dayslist))) {
             Flag_key  <- 8
             ## check all other CS flags to set this
             wecare <- grep("CSflag_", names(subday), value = T)
-            acount <- nrow(subday[ rowSums( subday[, ..wecare ], na.rm = T ) == 0, ])
+            acount <- nrow(subday[ rowSums( subday[, ..wecare], na.rm = T) == 0, ])
             if ( acount < FCSlim ) {
-                subday[ subday$CSflag == 0 , CSflag := Flag_key ]
-                subday[ subday$CSflag == 99, CSflag := Flag_key ]
-                subday[, paste0("CSflag_", Flag_key) := TRUE ]
+                subday[ subday$CSflag == 0 , CSflag := Flag_key]
+                subday[ subday$CSflag == 99, CSflag := Flag_key]
+                subday[, paste0("CSflag_", Flag_key) := TRUE]
             }
         }
 
@@ -1208,8 +1208,8 @@ for (yyyy in unique(year(dayslist))) {
             abline( h =   MS$MaxVIP_off_upp, lty = 2, col = kcols[2], lwd = 2)
             abline( h = - MS$MaxVIP_off_low, lty = 3, col = kcols[2], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[2], lwd = 2)
-            text(x = subday$Date[20], y = - MS$MaxVIP_off_low, labels = - MS$MaxVIP_off_low, pos = 1)
-            text(x = subday$Date[20], y =   MS$MaxVIP_off_upp, labels =   MS$MaxVIP_off_upp, pos = 1)
+            text(x = subday$Date[20], y = -MS$MaxVIP_off_low, labels = -MS$MaxVIP_off_low, pos = 1)
+            text(x = subday$Date[20], y =  MS$MaxVIP_off_upp, labels =  MS$MaxVIP_off_upp, pos = 1)
         }
 
         ## __ 3. Variability in irradiance by the length (VIL) -----------------
