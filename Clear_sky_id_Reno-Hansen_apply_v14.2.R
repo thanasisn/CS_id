@@ -79,8 +79,10 @@ library(scales)
 library(pander)
 library(caTools)
 library(data.table)
+library(yardstick)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
+
 
 
 ## some plot configs ####
@@ -1005,19 +1007,16 @@ for (yyyy in unique(year(dayslist))) {
         #     next  ##  skip the rest of the loop and avoid alpha optimization
         # }
         #----------------------------------------------------------------------#
+stop("sss")
+        RMSE_r <- RMSE(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
 
-        RMSE <- RMSE(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
-
-
-        # RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
-        #         mean(strong$wattGLB[clear_sky] , na.rm = T)
-
-
+        # yardstick::rmse()
+        Metrics::rmse(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
                 mean(subday$wattGLB[clear_sky], na.rm = T)
 
-        cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T ) /
+        cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
                 sum(clear_sky, na.rm = T)
 
         ## ID statistics
@@ -1031,7 +1030,7 @@ for (yyyy in unique(year(dayslist))) {
         ## plotting selection
         # if ( any(clear_sky) &
         #      any(!is.na(subday$wattGLB[clear_sky])) &
-        #      (RMSE < 0.005 | abs(MBE) < 0.005 ) ) {
+        #      (RMSE_r < 0.005 | abs(MBE) < 0.005 ) ) {
 
 
         #### PLOTS ####
@@ -1153,7 +1152,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
         title(main = paste(aday,    format(aday, "%j"),
-                           "RMSE:", round(RMSE, 3),
+                           "RMSE:", round(RMSE_r, 3),
                            "MBE:",  round(MBE,  3) ), cex.main = 1)
 
         legend("topright", bty = "n",
@@ -1275,7 +1274,7 @@ for (yyyy in unique(year(dayslist))) {
         strong$CS_ref[sell]   <- CS_ref
 
         keepday <- data.frame( Date       = aday,
-                               RMSE       = RMSE,
+                               RMSE       = RMSE_r,
                                MBE        = MBE,
                                cost       = cost,
                                MeanVIPcnt = MeanVIPcnt,
