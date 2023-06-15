@@ -107,10 +107,13 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-# TEST        <- TRUE
+TEST        <- TRUE
+
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
-# START_DAY   <- "2022-01-01"
 START_DAY   <- "1993-01-01"
+
+if (TEST) {warning("Test is active")}
+if (TEST) START_DAY <- "2022-01-01"
 
 ## load previous state have to override it for alpha to be used
 if (MONTHLY) {
@@ -999,7 +1002,7 @@ for (yyyy in unique(year(dayslist))) {
         # ## skip day from training
         # if (sum(clear_sky, na.rm = T) < relative_CS_lim )  {
         #     # print(paste(CS_name, "Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
-        #     next  ##  skip the rest of the loop and avoid alpha optimisation
+        #     next  ##  skip the rest of the loop and avoid alpha optimization
         # }
         #----------------------------------------------------------------------#
 
@@ -1392,7 +1395,7 @@ MBE  <- mean( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T)
 #' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
 #'                 { n } , \qquad a > 0 $$
 #'
-cost <- sum( ( ( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T ) /
+cost <- sum((( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T) /
         sum(clear_sky, na.rm = T)
 
 
