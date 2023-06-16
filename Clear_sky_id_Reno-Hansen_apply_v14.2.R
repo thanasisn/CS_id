@@ -699,7 +699,7 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        #---- 1. Mean value of irradiance during the time period ---------------
+        #---- 1. Mean value of irradiance during the time period (MeanVIP) -----
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
             ## create some modeled values
