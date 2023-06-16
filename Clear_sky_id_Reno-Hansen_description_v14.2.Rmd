@@ -18,15 +18,25 @@ header-includes:
 
 output:
   bookdown::pdf_document2:
-    number_sections:  no
+    number_sections:  yes
     fig_caption:      no
-    keep_tex:         yes
+    keep_tex:         no
     toc_depth:        4
     latex_engine:     xelatex
     toc:              yes
     fig_width:        7
     fig_height:       4.5
 ---
+
+```{r echo=F, include=T}
+library(data.table)
+MS <- readRDS("PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.Rds")
+window            <- MS$nt
+ref_rm_VIP_RelLow <- 1 - MS$CS_ref_rm_VIP_RelLow
+ref_rm_VIP_LowOff <-     MS$CS_ref_rm_VIP_LowOff
+ref_rm_VIP_RelUpp <- 1 + MS$CS_ref_rm_VIP_RelUpp
+ref_rm_VIP_UppOff <-     MS$CS_ref_rm_VIP_UppOff
+```
 
 
 <!-- `````{r echo=F, include=F, eval=F} -->
@@ -118,6 +128,7 @@ was chosen.
 
 We select the clear sky model, the air mass calculation
 and the period of 11 minutes to use.
+The charactirization is done to the center value of the window.
 
 
 `````{r include=F, eval=F, echo=F}
@@ -126,16 +137,60 @@ CS_model <- get(model_selection)
 `````
 
 
-`````{r include=F, eval=F, echo=F}
+`````{r include=F, eval=T, echo=F}
 MS <- data.frame()
-#### 6. LDI ###
-MS$LDIlim <- 5
 `````
+
+Air mass model
+
+$$ AM = \frac{1}{\cos(z)} $$
+
+### Clear Sky irradiance Haurwitz model (HAU) (1945)  
+
+\begin{equation}
+\text{GHI}_\text{Clear Sky} = 0.965 \times 1098 \times \cos( \text{SZA} ) \times \exp \left( \frac{ - 0.057}{\cos(\text{SZA})} \right)  (\#eq:ahau)
+\end{equation}
+
+
+## Clear sky Id procedure
+
+<!-- FDP -->
+### 9. Too Few data points for the day
+
+Days with less than $`r window * 3`$ data points (minutes) will be ignored.
+
+
+
+<!-- MeanVIP -->
+### 1. Mean value of irradiance during the time period 
+
+Comparing value in a moving window of $`r window`$ minutes.
+The mean of the measured value $\overline{G}_i$ inside an envelope based on the reference model $\text{GHI}_\text{Clear Sky}$.
+
+
+\begin{equation}
+\overline{\text{GHI}}_{i\text{Clear Sky}} \times `r ref_rm_VIP_RelLow` - `r ref_rm_VIP_LowOff`
+< \overline{G}_i <
+\overline{\text{GHI}}_{i\text{Clear Sky}} \times `r ref_rm_VIP_RelUpp` + `r ref_rm_VIP_UppOff`
+(\#eq:MeanVIP)
+\end{equation}
+
+<!-- MaxVIP -->
+### 2. Max value of irradiance during the time period
+
+The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$ is compared to a similar constructed value from the reference $M_{CSi} = max[\text{GHI}_{i\text{Clear Sky}}]$.
+
+
+
+
+
+
+
 
 
 ### 6. Low Direct Irradiance limit (LDI)
 
-Ignore Direct irradiance when it is bellow 5 $Watt/m^2$.
+Ignore Direct irradiance when it is bellow $5 Watt/m^2$.
 This limit is biased due to the slight location difference of the two Instruments.
 The difference in shadow especially the afternoon "pole shadow" of some periods of the year.
 May limit the implementation by time of day or/and period of the year
@@ -200,20 +255,12 @@ strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA
 `````{r include=F, eval=F, echo=F}
 ##  Iterate all years
 for (yyyy in unique(year(dayslist))) {
-# foreach(yyyy = unique(year(dayslist))) %dopar% {
 
     gather       <- data.table()
     daily_stats  <- data.frame()
     subdayslist  <- dayslist[year(dayslist) == yyyy]
     total_points <- sum(year(strong$Date) == yyyy)
 
-    if (!interactive()) {
-        if (TEST) {
-            pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
-        } else {
-            pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
-        }
-    }
 
     ##  Iterate all days
     for (aa in subdayslist) {
@@ -223,25 +270,7 @@ for (yyyy in unique(year(dayslist))) {
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
         nt_hw <- MS$nt %/% 2
-        if (interactive()) cat(paste(aday),"\n")
 
-        if (MONTHLY) {
-            ## get alpha for month
-            alpha <- monthly_alphas$alpha[monthly_alphas$month == mont]
-        } else {
-            ## get unique alpha for all days
-            alpha <- gather_results[gather_results$CS_models == model_selection, "alpha"]
-            stopifnot( length(alpha) == 1        )
-            stopifnot( typeof(alpha) == "double" )
-        }
-
-
-        ## empty daily variables
-        MeanVIPcnt <- NA
-        MaxVIPcnt  <- NA
-        VILcnt     <- NA
-        VCTcnt     <- NA
-        VSMcnt     <- NA
 
         ## relative clear sky acceptance limit
         relative_CS_lim <- sum(sell) * MS$relative_CS
@@ -264,70 +293,10 @@ for (yyyy in unique(year(dayslist))) {
         CS_ref_safe[ CS_ref_safe < 0 ] <- NA
 
 
-        ## Create some empty columns
-        CS_ref_length <- CS_ref * NA
-        GLB_length    <- CS_ref * NA
-        GLB_sigma     <- CS_ref * NA
-        GLB_Xi        <- CS_ref * NA
-        GLB_Xi_test   <- CS_ref * NA
-
         #### Apply filters ####
 
         #---- 9. Too Few data point for the day (FDP) --------------------------
-        if (FDP_active) {
-            Flag_key <- 9
-            if (nrow(subday) > 0 & tot_p <= FDPlim ) {
-                subday$CSflag <- Flag_key
-                subday[[paste0("CSflag_",Flag_key)]] <- TRUE
-                cat(paste("Skip day FDP:", aday, tot_p),"\n")
-                next
-            }
-        }
-
-
-
         #---- 1. Mean value of irradiance during the time period ---------------
-        if (MeanVIP_active & any(have_glb)) {
-            Flag_key <- 1
-            ## create some modeled values
-            CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            ## first implementation with offset from reference limits
-            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
-            ## newer implementation with relative to reference limits
-            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
-            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
-
-            # plot(CS_ref_rm_VIP_upp, type = "l",col = 1)
-            # lines(CS_ref_rm_VIP_low,           col = 2)
-            # lines(CS_ref_rm_VIP_low_0,         col = 3)
-            # lines(CS_ref_rm_VIP_upp_0,         col = 4)
-            # lines(CS_ref_rm_base,              col = 6)
-
-            GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
-
-            ## don't allow negative values on models
-            CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
-            CS_ref_rm_VIP_low[ CS_ref_rm_VIP_low < 0 ] <- NA
-            CS_ref_rm_VIP_upp[ CS_ref_rm_VIP_upp < 0 ] <- NA
-            GLB_rm[            GLB_rm            < 0 ] <- NA
-
-            ## do characterization if pass as clear
-            # MeanVIP_pass =  GLB_rm > CS_ref_rm_VIP_low                              ## apply only lower limit (default)
-            MeanVIP_pass <- GLB_rm > CS_ref_rm_VIP_low & GLB_rm < CS_ref_rm_VIP_upp   ## apply only lower and upper limit
-
-            indx_todo <- which( have_glb & MeanVIP_pass )
-            if (length(indx_todo) > 0) {
-                for (i in indx_todo) {
-                    walk(i, nt_hw , tot_p )
-                    subday$CSflag[w_sta:w_end][ ! subday$CSflag[w_sta:w_end] == 0 ] <- 0
-                }
-            }
-            ## set MeanVIP flag
-            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
-            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
-        }
-
 
         #---- 2. Max value of irradiance during the time period ----------------
         if (MaxVIP_active & any(have_glb)) {
@@ -343,8 +312,6 @@ for (yyyy in unique(year(dayslist))) {
             CS_ref_rmax_VIP_low[ CS_ref_rmax_VIP_low < 0 ] <- NA
             GLB_rmax[            GLB_rmax            < 0 ] <- NA
 
-            ##  pass as clear
-            # MaxVIP_pass = GLB_rmax < CS_ref_rmax_VIP_upp                                 ## apply only upper filter (default)
             MaxVIP_pass <- GLB_rmax < CS_ref_rmax_VIP_upp & GLB_rmax > CS_ref_rmax_VIP_low  ## apply upper and lower filter
 
             indx_todo   <- which( have_glb & MaxVIP_pass )
@@ -574,9 +541,6 @@ for (yyyy in unique(year(dayslist))) {
             }
         }
 
-
-
- 
 
 
         ## keep Clear Sky detection
