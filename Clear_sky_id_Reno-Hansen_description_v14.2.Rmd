@@ -1,0 +1,652 @@
+---
+title:     Identification of Periods of Clear Sky Irradiance in Time Series of GHI Measurements Matthew J. Reno and Clifford W. Hansen.
+author:    Natsis Athanasios
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+  - \usepackage{caption}
+  - \usepackage{placeins}
+  - \captionsetup{font=small}
+  - \usepackage{multicol}
+  - \setlength{\columnsep}{1cm}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         yes
+    toc_depth:        4
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        7
+    fig_height:       4.5
+---
+
+
+<!-- `````{r echo=F, include=F, eval=F} -->
+<!-- knitr::opts_chunk$set(comment    = ""      ) -->
+<!-- # knitr::opts_chunk$set(dev        = "pdf"   ) -->
+<!-- knitr::opts_chunk$set(dev        = "png"    ) -->
+<!-- knitr::opts_chunk$set(out.width  = "100%"   ) -->
+<!-- knitr::opts_chunk$set(fig.align  = "center" ) -->
+<!-- # knitr::opts_chunk$set(fig.pos    = '!h'    ) -->
+
+
+<!-- #  Use the optimized alpha for the selected models and identify Clear-Sky -->
+<!-- #  minutes. -->
+
+<!-- ## load previous state have to override it for alpha to be used -->
+<!-- load("~/Aerosols/DATA/model_opt/Combinations_results_2022-06-14_153313.Rds") -->
+
+
+<!-- ## Define the model to use for CS detection be inspecting the results of the 'a' optimization script. -->
+<!-- model_selection <- "HAU" -->
+<!-- monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,] -->
+
+<!-- ## daily plots file name -->
+<!-- plotsbase <- paste0("~/CS_id/REPORTS/DAILY/", -->
+<!--                     sub("\\.R$", "", basename(Script.Name)), "_") -->
+<!-- ````` -->
+
+
+
+
+
+\newpage
+
+# Detection of clear periods in GHI measurements for SDR tredns.
+
+
+## Only filters for GHI are used for SDR tredns
+
+## Load all data from `DATA/Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds`
+
+##  Exclude data where `wattGLB < wattHOR`
+
+There are instances where global irradiance is less than direct.
+
+This happens, near sunset and sunrise due to obstacles,
+or due to different sunrise/sunset time due to small spatial differences.
+We will exclude all this data both for global and direct.
+
+
+##  Exclude other bad data indentified in raw data
+
+<!-- strong[QCF_DIR == FALSE, wattDIR     := NA] -->
+<!-- strong[QCF_DIR == FALSE, wattHOR     := NA] -->
+<!-- strong[QCF_DIR == FALSE, wattDIR_sds := NA] -->
+<!-- strong[QCF_DIR == FALSE, wattDIF     := NA] -->
+<!-- strong[QCF_GLB == FALSE, wattGLB     := NA] -->
+<!-- strong[QCF_GLB == FALSE, wattGLB_sds := NA] -->
+<!-- strong[QCF_GLB == FALSE, wattDIF     := NA] -->
+
+
+
+
+### Threshold Values for Criteria
+
+For mean and max Most evaluations of clear sky models find that the average
+bias error of the model is less than 10%, often around 7% [1, 83]. Therefore,
+a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model
+was chosen.
+
+
+
+### Clear Sky detection Algorithm values
+
+
+<!-- `````{r include=F, eval=F, echo=F} -->
+<!-- # panderOptions('table.emphasize.rownames', F) -->
+<!-- panderOptions('table.alignment.default',  "right") -->
+<!-- panderOptions('table.alignment.rownames', "right") -->
+<!-- panderOptions('table.split.cells',        c(50,10)) -->
+<!-- pander(t(MS)) -->
+<!-- pander(alpha_models) -->
+<!-- pander(combinations) -->
+<!-- ````` -->
+
+
+
+
+### Reference clear sky irradiance model and air mass model (AM)
+
+We select the clear sky model, the air mass calculation
+and the period of 11 minutes to use.
+
+
+`````{r include=F, eval=F, echo=F}
+AM       <- AM_simple
+CS_model <- get(model_selection)
+`````
+
+
+`````{r include=F, eval=F, echo=F}
+MS <- data.frame()
+#### 6. LDI ###
+MS$LDIlim <- 5
+`````
+
+
+### 6. Low Direct Irradiance limit (LDI)
+
+Ignore Direct irradiance when it is bellow 5 $Watt/m^2$.
+This limit is biased due to the slight location difference of the two Instruments.
+The difference in shadow especially the afternoon "pole shadow" of some periods of the year.
+May limit the implementation by time of day or/and period of the year
+
+Also this can not characterize all global measurements due to gaps on direct measurements.
+
+
+`````{r include=F, eval=F, echo=F}
+#### 7. LGI ####
+MS$VGIlim <- 5
+`````
+
+
+### 7. Low Global Irradiance limit (LGI)
+
+<!-- Global irradiance below `r MS$VGIlim` 5 $Watt/m^2$ level can not be identified -->
+
+
+
+
+### 8. Too Few CS point for the day (FCS)
+
+
+If in a day there less than 11 clear sky points will exclude them from optimizing
+
+
+
+
+### 9. Too Few data points for the day (FDP)
+
+
+If in a day there are less than 33 data points will be excluded from optimizing.
+
+
+
+
+### 11. Too low Direct signal (DsT)
+
+This is a simple hard limit on the lower possible Direct radiation with clear sky.
+
+The threshold is 25% lower than a reference value.
+
+$$ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) $$
+
+Where ${AM}$ is the selected air-mass model.
+
+"Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf"
+
+
+
+
+
+
+### Baseline value for direct irradiance
+
+See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
+
+`````{r include=F, eval=F}
+strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
+`````
+
+`````{r include=F, eval=F, echo=F}
+##  Iterate all years
+for (yyyy in unique(year(dayslist))) {
+# foreach(yyyy = unique(year(dayslist))) %dopar% {
+
+    gather       <- data.table()
+    daily_stats  <- data.frame()
+    subdayslist  <- dayslist[year(dayslist) == yyyy]
+    total_points <- sum(year(strong$Date) == yyyy)
+
+    if (!interactive()) {
+        if (TEST) {
+            pdf(file = paste0(plotsbase, yyyy, "_test.pdf"), onefile = T, width = 10 )
+        } else {
+            pdf(file = paste0(plotsbase, yyyy, ".pdf"), onefile = T, width = 10 )
+        }
+    }
+
+    ##  Iterate all days
+    for (aa in subdayslist) {
+        ## Day variables
+        aday  <- as.Date(aa , origin = "1970-01-01")
+        sell  <- strong$Day == (aday)
+        doy   <- as.numeric(format(aday, "%j"))
+        mont  <- as.numeric(format(aday, "%m"))
+        nt_hw <- MS$nt %/% 2
+        if (interactive()) cat(paste(aday),"\n")
+
+        if (MONTHLY) {
+            ## get alpha for month
+            alpha <- monthly_alphas$alpha[monthly_alphas$month == mont]
+        } else {
+            ## get unique alpha for all days
+            alpha <- gather_results[gather_results$CS_models == model_selection, "alpha"]
+            stopifnot( length(alpha) == 1        )
+            stopifnot( typeof(alpha) == "double" )
+        }
+
+
+        ## empty daily variables
+        MeanVIPcnt <- NA
+        MaxVIPcnt  <- NA
+        VILcnt     <- NA
+        VCTcnt     <- NA
+        VSMcnt     <- NA
+
+        ## relative clear sky acceptance limit
+        relative_CS_lim <- sum(sell) * MS$relative_CS
+
+        ## Data selection for day
+        subday     <- strong[ sell, ]
+        have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
+        have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
+        tot_p      <- length(subday$wattGLB)
+
+
+        ## Values from Clear sky model used
+        ## this model is used as clear sky reference
+        CS_ref <- CS_model(subday$SZA) * alpha
+        ## Values from Air Mass model used
+        AM_ref <- AM(subday$SZA)
+
+        ## create a more logical model
+        CS_ref_safe <- CS_ref
+        CS_ref_safe[ CS_ref_safe < 0 ] <- NA
+
+
+        ## Create some empty columns
+        CS_ref_length <- CS_ref * NA
+        GLB_length    <- CS_ref * NA
+        GLB_sigma     <- CS_ref * NA
+        GLB_Xi        <- CS_ref * NA
+        GLB_Xi_test   <- CS_ref * NA
+
+        #### Apply filters ####
+
+        #---- 9. Too Few data point for the day (FDP) --------------------------
+        if (FDP_active) {
+            Flag_key <- 9
+            if (nrow(subday) > 0 & tot_p <= FDPlim ) {
+                subday$CSflag <- Flag_key
+                subday[[paste0("CSflag_",Flag_key)]] <- TRUE
+                cat(paste("Skip day FDP:", aday, tot_p),"\n")
+                next
+            }
+        }
+
+
+
+        #---- 1. Mean value of irradiance during the time period ---------------
+        if (MeanVIP_active & any(have_glb)) {
+            Flag_key <- 1
+            ## create some modeled values
+            CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
+            ## first implementation with offset from reference limits
+            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
+            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
+            ## newer implementation with relative to reference limits
+            CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
+            CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
+
+            # plot(CS_ref_rm_VIP_upp, type = "l",col = 1)
+            # lines(CS_ref_rm_VIP_low,           col = 2)
+            # lines(CS_ref_rm_VIP_low_0,         col = 3)
+            # lines(CS_ref_rm_VIP_upp_0,         col = 4)
+            # lines(CS_ref_rm_base,              col = 6)
+
+            GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
+
+            ## don't allow negative values on models
+            CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
+            CS_ref_rm_VIP_low[ CS_ref_rm_VIP_low < 0 ] <- NA
+            CS_ref_rm_VIP_upp[ CS_ref_rm_VIP_upp < 0 ] <- NA
+            GLB_rm[            GLB_rm            < 0 ] <- NA
+
+            ## do characterization if pass as clear
+            # MeanVIP_pass =  GLB_rm > CS_ref_rm_VIP_low                              ## apply only lower limit (default)
+            MeanVIP_pass <- GLB_rm > CS_ref_rm_VIP_low & GLB_rm < CS_ref_rm_VIP_upp   ## apply only lower and upper limit
+
+            indx_todo <- which( have_glb & MeanVIP_pass )
+            if (length(indx_todo) > 0) {
+                for (i in indx_todo) {
+                    walk(i, nt_hw , tot_p )
+                    subday$CSflag[w_sta:w_end][ ! subday$CSflag[w_sta:w_end] == 0 ] <- 0
+                }
+            }
+            ## set MeanVIP flag
+            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
+        }
+
+
+        #---- 2. Max value of irradiance during the time period ----------------
+        if (MaxVIP_active & any(have_glb)) {
+            Flag_key            <- 2
+            CS_ref_rmax_base    <- runmax(x = CS_ref_safe,    k = MS$nt, alg = "C")
+            CS_ref_rmax_VIP_upp <- MS$MaxVIP_fct * CS_ref_rmax_base + MS$MaxVIP_off_upp
+            CS_ref_rmax_VIP_low <- MS$MaxVIP_fct * CS_ref_rmax_base - MS$MaxVIP_off_low
+            GLB_rmax            <- runmax(x = subday$wattGLB, k = MS$nt, alg = "C")
+
+            ## TEST feature
+            CS_ref_rmax_base[    CS_ref_rmax_base    < 0 ] <- NA
+            CS_ref_rmax_VIP_upp[ CS_ref_rmax_VIP_upp < 0 ] <- NA
+            CS_ref_rmax_VIP_low[ CS_ref_rmax_VIP_low < 0 ] <- NA
+            GLB_rmax[            GLB_rmax            < 0 ] <- NA
+
+            ##  pass as clear
+            # MaxVIP_pass = GLB_rmax < CS_ref_rmax_VIP_upp                                 ## apply only upper filter (default)
+            MaxVIP_pass <- GLB_rmax < CS_ref_rmax_VIP_upp & GLB_rmax > CS_ref_rmax_VIP_low  ## apply upper and lower filter
+
+            indx_todo   <- which( have_glb & MaxVIP_pass )
+            if ( length(indx_todo) > 0 ) {
+                ## start with old clear as 99
+                subday$CSflag[subday$CSflag == 0] <- 99
+
+                for (i in indx_todo ) {
+                    walk(i, nt_hw , tot_p )
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
+                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                } ##END for loop all time periods
+            }
+            ## set MaxVIP flag
+            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
+        }
+
+
+        #----  3. Variability in irradiance by the length (VIL) ----------------
+        if (VIL_active) {
+            Flag_key  <- 3
+            indx_todo <- which(have_glb)
+            if (length(indx_todo) > 0) {
+                ## start with old clear as 99
+                subday$CSflag[subday$CSflag == 0] <- 99
+
+                for (i in 1:tot_p) {
+                    ## resolve window by index
+                    walk(i, nt_hw , tot_p )
+
+                    ## Do calculation ##
+                    data_win_glb   <- subday$wattGLB[w_sta:w_end]
+                    # date_win_ref   = CS_ref[w_sta:w_end]
+                    date_win_ref   <- CS_ref_safe[w_sta:w_end]
+                    # print(c(length(data_win_glb),w_sta,i,w_end))
+
+                    ## calculate length for data
+                    DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)**2
+                    DeltaTSq_GLB  <- as.numeric( !is.na(DeltaVSq_GLB) )**2
+                    GLB_length[i] <- sum(sqrt(DeltaVSq_GLB + DeltaTSq_GLB), na.rm = TRUE)
+
+                    ## calculate length for reference
+                    DeltaVSq_ref     <- (data.table::shift(date_win_ref) - date_win_ref)**2
+                    DeltaTSq_ref     <- as.numeric( !is.na(DeltaVSq_ref) )**2
+                    CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = TRUE)
+
+                    # ## store comparison values ?
+                    # subday$VIL_glb[w_sta] <- CS_ref_length[i]
+                    # subday$VIL_upp[w_sta] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
+                    # subday$VIL_low[w_sta] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
+
+                    ## pass test as clear
+                    pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
+                            GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
+                    if (is.na(pass)) pass <- FALSE
+
+                    ## set VIL flag
+                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
+                                                ( subday$CSflag[w_sta:w_end] == 99) &
+                                                  pass                                ] <- 0
+                } ##END for loop all points
+                ## store comparison values ?
+                subday$VIL_GLB   <- GLB_length
+                subday$VIL_upp   <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
+                subday$VIL_low   <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
+            }
+
+            # if (any(grepl("VIL_", names(subday)))) {stop()}
+
+            #### if it is not clear is VIL
+            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
+        }
+
+
+        #---- 4.  Variance of Changes in the Time series (VCT) -----------------
+        if (VCT_active) {
+            Flag_key  <- 4
+            indx_todo <- which(have_glb)
+            if (length(indx_todo) > 0) {
+                ## start with old clear as 99
+                subday$CSflag[subday$CSflag == 0] <- 99
+                s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
+
+                for (i in indx_todo) {
+                    ## resolve window by index
+                    walk(i, nt_hw , tot_p )
+
+                    ## Do calculation ##
+                    data_win_glb <- subday$wattGLB[w_sta:w_end]
+                    DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
+                    s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
+
+                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
+                                    sum( data_win_glb , na.rm = T) / MS$nt
+
+                    ## pass test as clear
+                    pass <- GLB_sigma[i] < MS$offVCT
+                    if (is.na(pass)) { pass <- FALSE }
+
+                    ## set VCT flag
+                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
+                                                (   subday$CSflag[w_sta:w_end] == 99) &
+                                                    pass                                ] <- 0
+                } ##END for loop all points
+            }
+            #### if it is not clear is VCT
+            ## set newer flag
+            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            ## set old flag
+            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
+        }
+
+
+        #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
+        if (VSM_active) {
+            Flag_key  <- 5
+            indx_todo <- which(have_glb)
+            if ( length(indx_todo) > 0 ) {
+                ## start with old clear as 99
+                subday$CSflag[subday$CSflag == 0] <- 99
+                x_i_CS <- data.table::shift(CS_ref) - CS_ref
+
+                for (i in indx_todo) {
+                    ## resolve window by index
+                    walk(i, nt_hw, tot_p)
+
+                    ## change in measurements
+                    data_win_glb  <- subday$wattGLB[w_sta:w_end]
+                    DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)
+
+                    ## change in reference
+                    data_win_ref  <- subday$CS_ref[w_sta:w_end]
+                    DeltaVSq_ref  <- (data.table::shift(data_win_ref) - data_win_ref)
+
+                    suppressWarnings({
+                        # GLB_Xi[i]      <- max(abs(DeltaVSq_GLB - x_i_CS[i]   ), na.rm = TRUE)
+                        GLB_Xi[i] <- max(abs(DeltaVSq_GLB - DeltaVSq_ref), na.rm = TRUE)
+                    })
+
+                    ## pass test as clear
+                    # pass      <- GLB_Xi[i]      < MS$offVSM
+                    pass <- GLB_Xi[i] < MS$offVSM
+
+                    if (is.na(pass)) pass <- FALSE
+
+                    ## an info warning
+                    if (is.infinite(GLB_Xi[i]) & i > 1) {
+                        if (interactive()) print(paste(GLB_Xi[i], format(aday, "%F"), i, pass))
+                    }
+
+                    ## set VCT flag
+                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
+                                                (  subday$CSflag[w_sta:w_end] == 99) &
+                                                   pass                                ] <- 0
+
+                } ##END for loop all points
+            }
+            #### if it is not clear is VCT
+            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
+            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
+        }
+
+
+        #---- 6. Low Direct Irradiance limit (LDI) -----------------------------
+        if (LDI_active) {
+            Flag_key  <- 6
+            ## low direct and not "Possible Direct Obstruction (23)"
+            ## probably we know sun was obscured
+            subday[CSflag == 0 &
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   CSflag := Flag_key ]
+
+            subday[CSflag == 99 &
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   CSflag := Flag_key ]
+
+            subday[wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   paste0("CSflag_", Flag_key) := TRUE ]
+
+            subday[wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
+                   paste0("CSflag_", Flag_key) := TRUE ]
+        }
+
+
+        #---- 7. Low Global Irradiance limit (LGI) -----------------------------
+        if (LGI_active) {
+            Flag_key  <- 7
+            subday[ (CSflag == 0 ) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
+            subday[ (CSflag == 99) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
+
+            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
+            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
+        }
+
+
+
+        #---- 11. Too low direct radiation (DsT) -----------------````----------
+        if (DST_active & any(have_dir)) {
+            Flag_key  <- 11
+            subday[(CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+                   CSflag := Flag_key]
+            subday[(CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+                   CSflag := Flag_key]
+
+            subday[wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
+        }
+
+
+
+
+        #---- 8. Too Few CS point for the day (FCS) ----------------------------
+        if (FCS_active) {
+            Flag_key  <- 8
+            ## check all other CS flags to set this
+            wecare <- grep("CSflag_", names(subday), value = T)
+            acount <- nrow(subday[ rowSums( subday[, ..wecare], na.rm = T) == 0, ])
+            if ( acount < FCSlim ) {
+                subday[ subday$CSflag == 0 , CSflag := Flag_key]
+                subday[ subday$CSflag == 99, CSflag := Flag_key]
+                subday[, paste0("CSflag_", Flag_key) := TRUE]
+            }
+        }
+
+
+
+ 
+
+
+        ## keep Clear Sky detection
+        strong$CSflag[sell]   <- subday$CSflag
+
+        subday$CS_ref <- CS_ref
+
+        gather <- rbind(gather, subday, fill = TRUE)
+
+        strong$CS_ref[sell]   <- CS_ref
+
+        keepday <- data.frame( Date       = aday,
+                               RMSE       = RMSE_r,
+                               MBE        = MBE,
+                               cost       = cost,
+                               MeanVIPcnt = MeanVIPcnt,
+                               MaxVIPcnt  = MaxVIPcnt,
+                               VILcnt     = VILcnt,
+                               VCTcnt     = VCTcnt,
+                               VSMcnt     = VSMcnt)
+
+        # daily_stats <<- rbind(daily_stats, keepday )
+        daily_stats <- rbind(daily_stats, keepday )
+
+    } ##END day loop
+
+    dev.off()
+
+
+} ##END year loop
+
+
+par(def.par)  # reset to default
+layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
+`````
+
+
+| CS Flag | Test |
+|:-------:|:--------------------------------------------------------------|
+|   NA    | Undefined, untested                                           |
+|    0    | Passed as clear sky                                           |
+|    1    | Mean value of irradiance during the time period (MeanVIP)     |
+|    2    | Max Value of Irradiance during the time Period (MaxVIP)       |
+|    3    | Variability in irradiance by the length (VIL)                 |
+|    4    | Variance of Changes in the Time series (VCT)                  |
+|    5    | Variability in the Shape of the irradiance Measurements (VSM) |
+|    6    | Low Direct Irradiance limit (LDI)                             |
+|    7    | Low Global Irradiance limit (LGI)                             |
+|    8    | Too Few CS point for the day (FCS)                            |
+|    9    | Too Few data points for the day                               |
+|   10    | Missing Data                                                  |
+|   11    | Direct irradiance simple threshold                            |
+
+
+
+
+
+
+
+
+
+
+### Cost function for optimization of alpha value.
+
+$$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
+                { n } , \qquad a > 0 $$
+
+
+
+
+
+**END**
+
