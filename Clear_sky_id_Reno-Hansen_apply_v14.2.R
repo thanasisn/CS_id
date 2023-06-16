@@ -640,12 +640,14 @@ for (yyyy in unique(year(dayslist))) {
 
         if (MONTHLY) {
             ## get alpha for month
-            alpha <- monthly_alphas$alpha[monthly_alphas$month == mont]
+            alpha      <- monthly_alphas$alpha[monthly_alphas$month == mont]
+            MS$M_alpha <- monthly_alphas$alpha
         } else {
             ## get unique alpha for all days
             alpha <- gather_results[gather_results$CS_models == model_selection, "alpha"]
             stopifnot( length(alpha) == 1        )
             stopifnot( typeof(alpha) == "double" )
+            MS$alpha <- alpha
         }
 
 
@@ -702,11 +704,11 @@ for (yyyy in unique(year(dayslist))) {
         #---- 1. Mean value of irradiance during the time period (MeanVIP) -----
         if (MeanVIP_active & any(have_glb)) {
             Flag_key <- 1
-            ## create some modeled values
+            ## create running mean of modeled values
             CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
-            ## first implementation with offset from reference limits
-            CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
-            CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
+            # ## first implementation with offset from reference limits
+            # CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
+            # CS_ref_rm_VIP_upp_0 <- MS$MeanVIP_fct * CS_ref_rm_base + MS$CS_ref_rm_VIP_upp
             ## newer implementation with relative to reference limits
             CS_ref_rm_VIP_low <- CS_ref_rm_base - CS_ref_rm_base * MS$CS_ref_rm_VIP_RelLow - MS$CS_ref_rm_VIP_LowOff
             CS_ref_rm_VIP_upp <- CS_ref_rm_base + CS_ref_rm_base * MS$CS_ref_rm_VIP_RelUpp + MS$CS_ref_rm_VIP_UppOff
@@ -742,7 +744,7 @@ for (yyyy in unique(year(dayslist))) {
         }
 
 
-        #---- 2. Max value of irradiance during the time period ----------------
+        #---- 2. Max value of irradiance during the time period (MaxVIP) -------
         if (MaxVIP_active & any(have_glb)) {
             Flag_key            <- 2
             CS_ref_rmax_base    <- runmax(x = CS_ref_safe,    k = MS$nt, alg = "C")
