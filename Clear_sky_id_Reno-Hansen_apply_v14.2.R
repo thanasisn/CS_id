@@ -1468,6 +1468,8 @@ for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
 # plot(gather_results$rmse, gather_results$CS_count)
 # text(gather_results$rmse, gather_results$CS_count, labels = gather_results$CS_models, cex = .6,pos = 4)
 
+## store params
+myRtools::write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
 
 #' **END**
 #+ include=T, echo=F
