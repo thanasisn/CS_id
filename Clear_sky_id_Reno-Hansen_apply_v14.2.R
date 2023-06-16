@@ -109,13 +109,13 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
 
-if (TEST) {warning("Test is active")}
-if (TEST) START_DAY <- "2022-01-01"
+if (TEST) { warning("Test is active") }
+if (TEST) { START_DAY <- "2022-01-01" }
 
 ## load previous state have to override it for alpha to be used
 if (MONTHLY) {
@@ -995,23 +995,13 @@ for (yyyy in unique(year(dayslist))) {
         ## Evaluation of CS detection
         clear_sky <- subday$CSflag == 0
 
+        ## skip non clear days
+        if (sum(clear_sky, na.rm = T) < relative_CS_lim )  {
+            # print(paste(CS_name, "Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
+            next  ##  skip the rest of the loop and avoid alpha optimization
+        }
 
-
-
-
-        #----------------------------------------------------------------------#
-        # ## FIXME why I use that?
-        # ## skip day from training
-        # if (sum(clear_sky, na.rm = T) < relative_CS_lim )  {
-        #     # print(paste(CS_name, "Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
-        #     next  ##  skip the rest of the loop and avoid alpha optimization
-        # }
-        #----------------------------------------------------------------------#
-stop("sss")
-        RMSE_r <- RMSE(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
-
-        # yardstick::rmse()
-        Metrics::rmse(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky])
+        RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
                 mean(subday$wattGLB[clear_sky], na.rm = T)
@@ -1327,13 +1317,11 @@ stop("sss")
         myRtools::write_RDS(object = export,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
                                           sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
-
         )
 
         myRtools::write_RDS(object = daily_stats,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
                                           sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
-
         )
 
     })
