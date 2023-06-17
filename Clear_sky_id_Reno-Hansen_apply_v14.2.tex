@@ -1,0 +1,1444 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,oneside]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Identification of Periods of Clear Sky Irradiance in Time Series of GHI Measurements Matthew J. Reno and Clifford W. Hansen.},
+  pdfauthor={Natsis Athanasios},
+  colorlinks=true,
+  linkcolor=Maroon,
+  filecolor=Maroon,
+  citecolor=Blue,
+  urlcolor=Blue,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[left=0.5in,right=0.5in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs}
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{caption}
+\usepackage{placeins}
+\captionsetup{font=small}
+\usepackage{multicol}
+\setlength{\columnsep}{1cm}
+
+\title{\emph{Identification of Periods of Clear Sky Irradiance in Time Series of GHI Measurements} Matthew J. Reno and Clifford W. Hansen.}
+\author{Natsis Athanasios}
+\date{2023-06-17}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Construction of and examples of clear sky models
+\end{abstract}
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+\newpage
+
+\hypertarget{detection-of-clear-periods-in-ghi-and-dni-measurements}{%
+\subsection{DETECTION OF CLEAR PERIODS IN GHI AND DNI MEASUREMENTS}\label{detection-of-clear-periods-in-ghi-and-dni-measurements}}
+
+\hypertarget{excluded-data-summary}{%
+\subsection{Excluded data summary}\label{excluded-data-summary}}
+
+Some data are excluded from processing
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# we have no reason to ignore that data}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_DIR\_}\DecValTok{01}\NormalTok{   \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_GLB\_}\DecValTok{01}\NormalTok{   \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_GLB\_}\DecValTok{02}\NormalTok{   \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_DIR\_}\DecValTok{02}\NormalTok{   \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_DIR\_}\DecValTok{04}\NormalTok{\_}\DecValTok{1}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_DIR\_}\DecValTok{04}\NormalTok{\_}\DecValTok{2}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_GLB\_}\DecValTok{04}\NormalTok{\_}\DecValTok{1}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_GLB\_}\DecValTok{04}\NormalTok{\_}\DecValTok{2}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_GLB\_}\DecValTok{09}\NormalTok{   \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{06}\NormalTok{\_}\DecValTok{1}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+
+
+
+
+\CommentTok{\#\# 3. COMPARISON TESTS PER BSRN “non{-}definitive”}
+\CommentTok{\#\# remove only some of the offending data}
+\KeywordTok{warning}\NormalTok{(}\StringTok{"Disabled this for trends !!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# test \textless{}{-} strict[ !is.na(QCF\_BTH\_03\_1) | !is.na(QCF\_BTH\_03\_2) ]}
+\CommentTok{\# hist(test$Elevat,  breaks = 100)}
+\CommentTok{\# hist(test$Azimuth, breaks = 100)}
+\CommentTok{\# \#\# trends use data above 5}
+\CommentTok{\# strict[((!is.na(QCF\_BTH\_03\_1) | !is.na(QCF\_BTH\_03\_2)) \& Elevat \textless{} 15), QCF\_DIR := FALSE]}
+\CommentTok{\# strict[((!is.na(QCF\_BTH\_03\_1) | !is.na(QCF\_BTH\_03\_2)) \& Elevat \textless{} 15), QCF\_GLB := FALSE]}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{1}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{2}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\CommentTok{\#\# check the tables}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_DIR)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_GLB)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# 5. No tracking instances}
+\CommentTok{\#\# These will cause problems in CS detection}
+\CommentTok{\#\# No tracking or obstacles on Direct should be remove manual with exclusions?}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_DIR\_}\DecValTok{05}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+
+
+\CommentTok{\#\# 6.  Rayleigh Limit Diffuse Comparison}
+\CommentTok{\#\# On this region can not infer CS results}
+\CommentTok{\# Lim6\_azim \textless{}{-} 130}
+\CommentTok{\# Lim6\_elev \textless{}{-} 13}
+\CommentTok{\# test \textless{}{-} strict[ !is.na(QCF\_BTH\_06\_2) \& (!QCF\_GLB) \& (!QCF\_DIR)  ]}
+\CommentTok{\# hist(test$Elevat,  breaks = 100)}
+\CommentTok{\# abline(v = Lim6\_elev, col = "red")}
+\CommentTok{\# hist(test$Azimuth, breaks = 100)}
+\CommentTok{\# abline(v = Lim6\_azim, col = "red")}
+\CommentTok{\# test2 \textless{}{-} strict[ !is.na(QCF\_BTH\_06\_2) \& (!QCF\_GLB) \& (!QCF\_DIR) \& Azimuth \textless{} Lim6\_azim \& Elevat \textless{} Lim6\_elev ]}
+\CommentTok{\# hist(test2$Elevat,  breaks = 100)}
+\CommentTok{\# hist(test2$Azimuth, breaks = 100)}
+
+\KeywordTok{warning}\NormalTok{(}\StringTok{"Disabled this for trends !!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# strict[!is.na(QCF\_BTH\_06\_2) \& (!QCF\_GLB) \& (!QCF\_DIR) \& Azimuth \textless{} Lim6\_azim \& Elevat \textless{} Lim6\_elev, QCF\_DIR := FALSE]}
+\CommentTok{\# strict[!is.na(QCF\_BTH\_06\_2) \& (!QCF\_GLB) \& (!QCF\_DIR) \& Azimuth \textless{} Lim6\_azim \& Elevat \textless{} Lim6\_elev, QCF\_GLB := FALSE]}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{06}\NormalTok{\_}\DecValTok{2}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\CommentTok{\#\# check the tables}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_DIR)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_GLB)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# }\AlertTok{TODO}\CommentTok{ 7.}
+
+
+
+\CommentTok{\#\# 8. Ignore data with inverted values}
+\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Direct > global soft (14) 
+                     1256 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Direct > global hard (15) 
+                     1271 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# set inclusion flags}
+\KeywordTok{warning}\NormalTok{(}\StringTok{"Disabled this for trends !!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# strict[!is.na(QCF\_BTH\_08\_1), QCF\_DIR := FALSE]}
+\CommentTok{\# strict[!is.na(QCF\_BTH\_08\_1), QCF\_GLB := FALSE]}
+\CommentTok{\# strict[!is.na(QCF\_BTH\_08\_2), QCF\_DIR := FALSE]}
+\CommentTok{\# strict[!is.na(QCF\_BTH\_08\_2), QCF\_GLB := FALSE]}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{1}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\NormalTok{strict}\OperatorTok{$}\NormalTok{QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{2}\NormalTok{ \textless{}{-}}\StringTok{ }\OtherTok{NULL}
+\CommentTok{\#\# check the tables}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_DIR)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{print}\NormalTok{(}\KeywordTok{table}\NormalTok{(strict}\OperatorTok{$}\NormalTok{QCF\_GLB)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+   TRUE 
+7788460 
+7788460
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# }\AlertTok{FIXME}\CommentTok{ some duplicates rows exist in the database!!!}
+\NormalTok{strong \textless{}{-}}\StringTok{ }\KeywordTok{unique}\NormalTok{(strict)}
+\KeywordTok{rm}\NormalTok{(strict)}
+\CommentTok{\# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \#}
+
+
+
+\CommentTok{\#\#  Limit date span of the data {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"Use data after date:"}\NormalTok{, START\_DAY), }\StringTok{"}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Use data after date: 1993-01-01 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{strong[, Day }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(Date)]}
+\NormalTok{strong \textless{}{-}}\StringTok{ }\NormalTok{strong[ strong}\OperatorTok{$}\NormalTok{Day }\OperatorTok{\textgreater{}=}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(START\_DAY), ]}
+\CommentTok{\# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \# \#}
+
+
+\CommentTok{\#\# days to parse}
+\NormalTok{dayslist      \textless{}{-}}\StringTok{ }\KeywordTok{unique}\NormalTok{( strong}\OperatorTok{$}\NormalTok{Day )}
+
+\CommentTok{\#\# add id column}
+\NormalTok{strong}\OperatorTok{$}\NormalTok{CSflag \textless{}{-}}\StringTok{ }\DecValTok{99}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{data-set-input.}{%
+\subsubsection{Data set input.}\label{data-set-input.}}
+
+First day: 1993-04-12
+
+Last day: 2023-06-16
+
+Days available: 10618
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\#\#\# Exclude inversions \#\#\#\#}
+\KeywordTok{warning}\NormalTok{(}\StringTok{"Disabled this for trends !!"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# inverted \textless{}{-} strong$wattGLB \textless{} strong$wattHOR}
+\NormalTok{inverted \textless{}{-}}\StringTok{ }\DecValTok{0}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{there-are-instances-where-global-irradiance-is-less-than-direct.}{%
+\subsubsection{There are instances where global irradiance is less than direct.}\label{there-are-instances-where-global-irradiance-is-less-than-direct.}}
+
+This happens for 0
+minutes (records), near sunset and sunrise due to obstacles,
+or due to different sunrise/sunset time due to small spatial differences.
+We will exclude all this data both for global and direct.
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{verbatim}
+Warning: Remove measurement without good quality code !!
+\end{verbatim}
+
+\begin{verbatim}
+Warning: Disabled this for trends !!
+\end{verbatim}
+
+\begin{verbatim}
+Ignoring filters using Direct radiation For Trends!!
+\end{verbatim}
+
+\hypertarget{threshold-values-for-criteria}{%
+\subsubsection{Threshold Values for Criteria}\label{threshold-values-for-criteria}}
+
+For mean and max Most evaluations of clear sky models find that the average
+bias error of the model is less than 10\%, often around 7\% {[}1, 83{]}. Therefore,
+a fixed threshold of \(\pm 75 W / m^2\) within the mean and max of the clear sky model
+was chosen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# alpha\_models \textless{}{-} data.frame(}
+\CommentTok{\#     DPP      = c( 0.9  , 1.25 , 1.054567  ),}
+\CommentTok{\#     KC       = c( 1    , 1.25 , 1.15983   ),}
+\CommentTok{\#     HAU      = c( 0.8  , 1.20 , 0.9858765 ),}
+\CommentTok{\#     BD       = c( 0.95 , 1.25 , 1.073723  ),}
+\CommentTok{\#     ABCG     = c( 0.95 , 1.30 , 1.102558  ),}
+\CommentTok{\#     RS       = c( 0.90 , 1.25 , 1.00482   ),}
+\CommentTok{\#     KASTEN   = c( 0.95 , 1.25 , 1.12107   ),}
+\CommentTok{\#     INEICHEN = c( 0.85 , 1.25 , 1.155573  ),}
+\CommentTok{\#     row.names = c("lower","upper","best") )}
+
+\CommentTok{\#\# select diffuse model}
+\NormalTok{CS\_models\_list \textless{}{-}}\StringTok{ }\KeywordTok{c}\NormalTok{(}
+                    \StringTok{"DPP"}\NormalTok{,}
+                    \StringTok{"KC"}\NormalTok{,}
+                    \StringTok{"HAU"}\NormalTok{,}
+                    \CommentTok{\# "BD",       \#\# too poor results}
+                    \StringTok{"ABCG"}\NormalTok{,}
+                    \StringTok{"RS"}\NormalTok{,}
+                    \StringTok{"KASTEN"}\NormalTok{,}
+                    \StringTok{"INEICHEN"}
+\NormalTok{                  )}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{clear-sky-detection-algorithm-values}{%
+\subsubsection{Clear Sky detection Algorithm values}\label{clear-sky-detection-algorithm-values}}
+
+\begin{longtable}[]{@{}rr@{}}
+\toprule
+\endhead
+\textbf{nt} & 11\tabularnewline
+\textbf{MeanVIP\_fct} & 1\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_low} & 70\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_upp} & 80\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_RelUpp} & 0.095\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_RelLow} & 0.09\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_UppOff} & 30\tabularnewline
+\textbf{CS\_ref\_rm\_VIP\_LowOff} & 20\tabularnewline
+\textbf{MaxVIP\_fct} & 1\tabularnewline
+\textbf{MaxVIP\_off\_upp} & 75\tabularnewline
+\textbf{MaxVIP\_off\_low} & 75\tabularnewline
+\textbf{MaxVIL\_fct} & 1.3\tabularnewline
+\textbf{MinVIL\_fct} & 1\tabularnewline
+\textbf{offVIL\_upl} & 13\tabularnewline
+\textbf{offVIL\_dwl} & 5\tabularnewline
+\textbf{offVCT} & 0.00011\tabularnewline
+\textbf{offVSM} & 7.5\tabularnewline
+\textbf{alpha} & 1\tabularnewline
+\textbf{relative\_CS} & 0.3\tabularnewline
+\textbf{sample\_n\_days} & 1000\tabularnewline
+\textbf{tolerance} & 0.02\tabularnewline
+\textbf{start\_day} & 1993-01-01\tabularnewline
+\textbf{DIR\_s\_T\_fact} & 25\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{longtable}[]{@{}rrrrrrrrr@{}}
+\toprule
+~ & DPP & KC & HAU & BD & ABCG & RS & KASTEN & INEICHEN\tabularnewline
+\midrule
+\endhead
+\textbf{lower} & 0.9 & 1 & 0.8 & 0.95 & 0.95 & 0.9 & 0.95 & 0.85\tabularnewline
+\textbf{upper} & 1.25 & 1.25 & 1.2 & 1.25 & 1.3 & 1.25 & 1.25 & 1.25\tabularnewline
+\textbf{alpha} & 1.049 & 1.155 & 0.9914 & 1.073 & 1.1 & 1.003 & 1.125 & 1.156\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{longtable}[]{@{}rrrrrrr@{}}
+\toprule
+CS\_models & AM\_models & alpha & cost & rmse & CS\_count & month\tabularnewline
+\midrule
+\endhead
+DPP & AM\_simple & 1.03 & NA & NA & NA & 13\tabularnewline
+KC & AM\_simple & 1.123 & NA & NA & NA & 13\tabularnewline
+HAU & AM\_simple & 0.9653 & NA & NA & NA & 13\tabularnewline
+ABCG & AM\_simple & 1.082 & NA & NA & NA & 13\tabularnewline
+RS & AM\_simple & 0.979 & NA & NA & NA & 13\tabularnewline
+KASTEN & AM\_simple & 1.01 & NA & NA & NA & 13\tabularnewline
+INEICHEN & AM\_simple & 1.192 & NA & NA & NA & 13\tabularnewline
+\bottomrule
+\end{longtable}
+
+\hypertarget{reference-clear-sky-irradiance-model-and-air-mass-model-am}{%
+\subsubsection{Reference clear sky irradiance model and air mass model (AM)}\label{reference-clear-sky-irradiance-model-and-air-mass-model-am}}
+
+We select the clear sky model, the air mass calculation
+and the period of 11
+minutes to use.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{AM       \textless{}{-}}\StringTok{ }\NormalTok{AM\_simple}
+\NormalTok{CS\_model \textless{}{-}}\StringTok{ }\KeywordTok{get}\NormalTok{(model\_selection)}
+\CommentTok{\# alpha    = alpha\_models["best",model\_selection]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{low-direct-irradiance-limit-ldi}{%
+\subsubsection{6. Low Direct Irradiance limit (LDI)}\label{low-direct-irradiance-limit-ldi}}
+
+Ignore Direct irradiance when it is bellow 5 \(Watt/m^2\).
+This limit is biased due to the slight location difference of the two Instruments.
+The difference in shadow especially the afternoon ``pole shadow'' of some periods of the year.
+May limit the implementation by time of day or/and period of the year
+
+Also this can not characterize all global measurements due to gaps on direct measurements.
+
+\hypertarget{low-global-irradiance-limit-lgi}{%
+\subsubsection{7. Low Global Irradiance limit (LGI)}\label{low-global-irradiance-limit-lgi}}
+
+Global irradiance below 5 level can not be identified
+
+\hypertarget{too-few-cs-point-for-the-day-fcs}{%
+\subsubsection{8. Too Few CS point for the day (FCS)}\label{too-few-cs-point-for-the-day-fcs}}
+
+If in a day there less than 11 clear sky points will exclude them from optimizing
+
+\hypertarget{too-few-data-points-for-the-day-fdp}{%
+\subsubsection{9. Too Few data points for the day (FDP)}\label{too-few-data-points-for-the-day-fdp}}
+
+If in a day there are less than 33 data points will be excluded from optimizing.
+
+\hypertarget{too-low-direct-signal-dst}{%
+\subsubsection{11. Too low Direct signal (DsT)}\label{too-low-direct-signal-dst}}
+
+This is a simple hard limit on the lower possible Direct radiation with clear sky.
+
+The threshold is 25\% lower than a reference value.
+
+\[ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) \]
+
+Where \({AM}\) is the selected air-mass model.
+
+``Clear sky direct normal irradiance estimation based on adjustable inputs and error correction\_Zhu2019.pdf''
+
+\hypertarget{day-range}{%
+\subsubsection{Day range}\label{day-range}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{range}\NormalTok{(dayslist)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] "1993-04-12" "2023-06-16"
+\end{verbatim}
+
+\hypertarget{baseline-value-for-direct-irradiance}{%
+\subsubsection{Baseline value for direct irradiance}\label{baseline-value-for-direct-irradiance}}
+
+See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction\_Zhu2019.pdf
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{strong[ , CS\_ref\_HOR }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{( TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\FloatTok{0.7} \OperatorTok{\^{}}\StringTok{ }\KeywordTok{AM}\NormalTok{(SZA) }\OperatorTok{\^{}}\StringTok{ }\FloatTok{0.678}\NormalTok{ ) }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA) ]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2023.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2023.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2023.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2023.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2022.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2022.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2022.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2022.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2021.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2021.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2021.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2021.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2020.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2020.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2020.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2020.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2019.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2019.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2019.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2019.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2018.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2018.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2018.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2018.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2017.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2017.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2017.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2017.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2016.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2016.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2016.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2016.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2015.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2015.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2015.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2015.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2014.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2014.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2014.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2014.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2013.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2013.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2013.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2013.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2012.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2012.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2012.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2012.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2011.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2011.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2011.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2011.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2010.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2010.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2010.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2010.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2009.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2009.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2009.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2009.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2008.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2008.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2008.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2008.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2007.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2007.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2007.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2007.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2006.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2006.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2006.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2006.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2005.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2005.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2005.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2005.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2004.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2004.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2004.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2004.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2003.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2003.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2003.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2003.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2002.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2002.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2002.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2002.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2001.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2001.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2001.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2001.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2000.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_2000.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2000.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_2000.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1999.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1999.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1999.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1999.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1998.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1998.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1998.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1998.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1997.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1997.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1997.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1997.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1996.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1996.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1996.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1996.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1995.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1995.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1995.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1995.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1994.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1994.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1994.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1994.inf.md 
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1993.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_1993.inf.md 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1993.Rds 
+
+Written:  /home/athan/DATA/Broad_Band/CS_id/Daily_stats_Clear_sky_id_Reno-Hansen_apply_v14_2_1993.inf.md 
+\end{verbatim}
+
+\begin{longtable}[]{@{}cl@{}}
+\toprule
+CS Flag & Test\tabularnewline
+\midrule
+\endhead
+NA & Undefined, untested\tabularnewline
+0 & Passed as clear sky\tabularnewline
+1 & Mean value of irradiance during the time period (MeanVIP)\tabularnewline
+2 & Max Value of Irradiance during the time Period (MaxVIP)\tabularnewline
+3 & Variability in irradiance by the length (VIL)\tabularnewline
+4 & Variance of Changes in the Time series (VCT)\tabularnewline
+5 & Variability in the Shape of the irradiance Measurements (VSM)\tabularnewline
+6 & Low Direct Irradiance limit (LDI)\tabularnewline
+7 & Low Global Irradiance limit (LGI)\tabularnewline
+8 & Too Few CS point for the day (FCS)\tabularnewline
+9 & Too Few data points for the day\tabularnewline
+10 & Missing Data\tabularnewline
+11 & Direct irradiance simple threshold\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{longtable}[]{@{}rrrrrr@{}}
+\toprule
+Min. & 1st Qu. & Median & Mean & 3rd Qu. & Max.\tabularnewline
+\midrule
+\endhead
+0 & 0 & 5 & 49.83 & 99 & 99\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+  0       1       2       3       4       5      99 
+\end{verbatim}
+
+2406520 666131 224345 428212 134399 40127 3888726
+
+\begin{longtable}[]{@{}rrrrrrr@{}}
+\toprule
+0 & 1 & 2 & 3 & 4 & 5 & 99\tabularnewline
+\midrule
+\endhead
+2406520 & 666131 & 224345 & 428212 & 134399 & 40127 & 3888726\tabularnewline
+\bottomrule
+\end{longtable}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-24-1} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-24-2} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#\# Evaluation of CS detection}
+\NormalTok{clear\_sky \textless{}{-}}\StringTok{ }\NormalTok{strong}\OperatorTok{$}\NormalTok{CSflag }\OperatorTok{==}\StringTok{ }\DecValTok{0}
+
+\NormalTok{RMSE \textless{}{-}}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{mean}\NormalTok{( ( strong}\OperatorTok{$}\NormalTok{CS\_ref[clear\_sky] }\OperatorTok{{-}}\StringTok{ }\NormalTok{strong}\OperatorTok{$}\NormalTok{wattGLB[clear\_sky] )}\OperatorTok{**}\DecValTok{2}\NormalTok{ , }\DataTypeTok{na.rm =}\NormalTok{ T) ) }\OperatorTok{/}
+\StringTok{        }\KeywordTok{mean}\NormalTok{(strong}\OperatorTok{$}\NormalTok{wattGLB[clear\_sky] , }\DataTypeTok{na.rm =}\NormalTok{ T)}
+
+\NormalTok{MBE  \textless{}{-}}\StringTok{ }\KeywordTok{mean}\NormalTok{(strong}\OperatorTok{$}\NormalTok{CS\_ref[clear\_sky] }\OperatorTok{{-}}\StringTok{ }\NormalTok{strong}\OperatorTok{$}\NormalTok{wattGLB[clear\_sky]  , }\DataTypeTok{na.rm =}\NormalTok{ T) }\OperatorTok{/}
+\StringTok{        }\KeywordTok{mean}\NormalTok{(strong}\OperatorTok{$}\NormalTok{wattGLB[clear\_sky] , }\DataTypeTok{na.rm =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{cost-function-for-optimization-of-alpha-value.}{%
+\subsubsection{Cost function for optimization of alpha value.}\label{cost-function-for-optimization-of-alpha-value.}}
+
+\[ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
+                { n } , \qquad a > 0 \]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cost \textless{}{-}}\StringTok{ }\KeywordTok{sum}\NormalTok{((( alpha }\OperatorTok{*}\StringTok{ }\NormalTok{strong}\OperatorTok{$}\NormalTok{wattGLB[clear\_sky] ) }\OperatorTok{{-}}\StringTok{ }\NormalTok{strong}\OperatorTok{$}\NormalTok{CS\_ref[clear\_sky] )}\OperatorTok{**}\DecValTok{2}\NormalTok{ , }\DataTypeTok{na.rm =}\NormalTok{ T) }\OperatorTok{/}
+\StringTok{        }\KeywordTok{sum}\NormalTok{(clear\_sky, }\DataTypeTok{na.rm =}\NormalTok{ T)}
+
+
+
+\CommentTok{\# plot(daily\_stats$Date, daily\_stats$RMSE)}
+\CommentTok{\# abline(h = RMSE)}
+\CommentTok{\# plot(daily\_stats$Date, daily\_stats$MBE)}
+\CommentTok{\# abline(h = MBE)}
+
+\CommentTok{\# hist(daily\_stats$RMSE)}
+\CommentTok{\# abline(v = RMSE)}
+\CommentTok{\# hist(daily\_stats$MBE)}
+\CommentTok{\# abline(v = MBE)}
+
+\CommentTok{\# library(tdr)}
+\CommentTok{\# tdStats(strong$[clear\_sky], strong$wattGLB[clear\_sky])}
+\CommentTok{\# targetDiagram(tdStats(strong$CS\_ref[clear\_sky], strong$wattGLB[clear\_sky]))}
+\CommentTok{\# targetDiagram(tafff)}
+\CommentTok{\# text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, offset = 0)}
+\CommentTok{\# plot(tafff$cvrmse, tafff$mbe)}
+\CommentTok{\# text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)}
+\CommentTok{\# plot( subset(tafff, select = {-}c(r2,tStone,mbe,nmbe,sdo,sdm,mo,mm,mae) ) )}
+\CommentTok{\# plot( subset(tafff, select = c(mbe,mae,rmse) ) )}
+\CommentTok{\# plot(tafff$rmse, tafff$mbe, xlab = "rmse", ylab = "mbe")}
+\CommentTok{\# text(tafff$rmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)}
+\CommentTok{\# plot(tafff$cvrmse, tafff$cvmbe, xlab = "rmse", ylab = "mbe")}
+\CommentTok{\# plot(tafff$nrmse, tafff$nmbe, xlab = "rmse", ylab = "mbe")}
+
+
+\KeywordTok{mean}\NormalTok{(daily\_stats}\OperatorTok{$}\NormalTok{RMSE, }\DataTypeTok{na.rm =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+[1] 31.578
+\end{verbatim}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-1} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-2} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-3} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-4} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-5} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-6} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-7} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-8} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-9} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-10} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-11} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-12} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-13} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-14} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-15} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-16} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-17} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-18} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-19} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-20} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-21} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-22} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-23} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-24} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-25} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-26} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-27} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-28} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-29} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-30} \end{center}
+
+\begin{center}\includegraphics[width=1\linewidth]{Clear_sky_id_Reno-Hansen_apply_v14.2_files/figure-latex/unnamed-chunk-27-31} \end{center}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# load("\textasciitilde{}/Aerosols/DATA/model\_opt/Combinations\_results\_2017{-}05{-}25\_194849.Rds")}
+\CommentTok{\# gather\_results \textless{}{-} data.frame()}
+\CommentTok{\# for (fmm in unique( combinations\_results$CS\_models )) \{}
+\CommentTok{\#     sell = (combinations\_results$CS\_models == fmm)}
+\CommentTok{\#     temp = combinations\_results[sell,]}
+\CommentTok{\#     gather\_results \textless{}{-} rbind(gather\_results, temp[which(temp$cost == min(temp$cost, na.rm = T)), ][1,])}
+\CommentTok{\# \}}
+\CommentTok{\# plot(gather\_results$rmse, gather\_results$CS\_count)}
+\CommentTok{\# text(gather\_results$rmse, gather\_results$CS\_count, labels = gather\_results$CS\_models, cex = .6,pos = 4)}
+
+\CommentTok{\#\# store params}
+\NormalTok{myRtools}\OperatorTok{::}\KeywordTok{write\_RDS}\NormalTok{(MS, }\KeywordTok{paste0}\NormalTok{(}\StringTok{"\textasciitilde{}/CS\_id/PARAMS/"}\NormalTok{, }\KeywordTok{basename}\NormalTok{(}\KeywordTok{sub}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{.R$"}\NormalTok{,}\StringTok{""}\NormalTok{, Script.Name))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Written:  /home/athan/CS_id/PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.Rds 
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
+\end{verbatim}
+
+\begin{verbatim}
+Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
+cells
+\end{verbatim}
+
+\begin{verbatim}
+Written:  /home/athan/CS_id/PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.inf.md 
+\end{verbatim}
+
+\textbf{END}
+
+\begin{verbatim}
+2023-06-17 18:29:12.6 athan@sagan Clear_sky_id_Reno-Hansen_apply_v14_2.R 247.441879 mins
+\end{verbatim}
+
+\end{document}

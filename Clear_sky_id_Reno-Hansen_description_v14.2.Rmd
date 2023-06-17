@@ -24,7 +24,7 @@ output:
     keep_tex:         no
     toc_depth:        4
     latex_engine:     xelatex
-    toc:              yes
+    toc:              no
     fig_width:        7
     fig_height:       4.5
 ---
@@ -77,6 +77,7 @@ The iterative optimization method, for the selection of the reference is discuss
 
 The following criteria and thresholds were used to identify clear-sky conditions.
 Each criterion was applied for a running window of $`r nt`$ consecutive measurements/minutes, and the characterization is applied at the center value of the window.
+A data point is consider as under cloud-sky condition if it fails to pass any of the criteria, all the other data points are characterized as clear-sky.
 
 
 <!-- 1. MeanVIP -->
@@ -105,18 +106,16 @@ The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$, is compared to a 
 \end{equation}
 
 
-<!-- VIL -->
-###  3. Variability in irradiance by line length
+<!-- 3. VIL -->
+### Variability in irradiance by line length.
 
- The length L of the sequence of line segments connecting the points of the GHI time
-series is calculated by 
+The length $L$ (Eq. \@ref(eq:VILeq)) of the sequence of line segments connecting the points of the GHI time
+series for the measured values $L$ and similar for the reference $L_{CS}$, must be within the limits of Eq. \@ref(eq:VILcr).
 
 \begin{equation}
 L = \sum_{i=1}^{n-1}\sqrt{\left ( \text{GHI}_{i+1} - \text{GHI}_{i}\right )^2 + \left ( t_{i+1} - t_i \right )^2}
 (\#eq:VILeq)
 \end{equation}
-
-for the measured values $L$ and similar $L_{CS}$ using the reference model $\text{GHI}_{i\text{Clear Sky}}$. The criterion is applied
 
 \begin{equation}
 `r MinVIL_fct` \times L_{CSi} - `r offVIL_dwl` < L_i < `r MaxVIL_fct` \times L_{CSi} + `r offVIL_upl`
@@ -124,16 +123,17 @@ for the measured values $L$ and similar $L_{CS}$ using the reference model $\tex
 \end{equation}
 
 
-<!-- VCT -->
-### 4. Variance of Changes in the Time series
+<!-- 4. VCT -->
+### Variance of Changes in the Time series.
 
-Standard deviation of rate of change in irradiance. We calculate the standard deviation  of the slope
-(s) between sequential points in the time series, normalized by the average GHI during the time interval:
+<!-- Standard deviation of rate of change in irradiance. -->
+We calculate the standard deviation $\sigma$ of the slope
+($s$) between sequential points in the time series, normalized by the average GHI during the time interval.
 
 \begin{gather}
 s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VCT1) \\
 \bar{s} = \frac{1}{n-1} \sum_{i=1}^{n-1} s_i (\#eq:VCT2) \\
-\sigma = \frac {\sqrt{\frac{1}{n-1} \sum_{i=1}^{n-1} \left( s_i - \bar{s} \right)^2} } {\bar{G}} (\#eq:VCT3)
+\sigma_i = \frac {\sqrt{\frac{1}{n-1} \sum_{i=1}^{n-1} \left( s_i - \bar{s} \right)^2} } {\bar{G_i}} (\#eq:VCT3)
 \end{gather}
 
 \begin{equation}
@@ -143,12 +143,11 @@ s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \le
 
 
 
-<!-- VSM -->
-### 5. Variability in the Shape of the irradiance Measurements 
+<!-- 5. VSM -->
+### Variability in the Shape of the irradiance Measurements.
 
-Maximum difference between changes in GHI and clear sky time series. The final quantity considered
-is the maximum difference $X$ between the change in measured irradiance and the change in clear sky
-irradiance over each measurement interval:
+The maximum difference $X$ between the change in measured irradiance and the change in clear sky
+irradiance over each measurement interval.
 
 \begin{gather}
 x_i = \text{GHI}_{i+1} - \text{GHI}_{i} \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VSM1) \\
@@ -188,10 +187,10 @@ X_i < `r offVSM`
 <!-- If in a day there less than 11 clear sky points will exclude them from optimizing -->
 
 
-<!-- FDP -->
-### 9. Too Few data points for the day
+<!-- 9. FDP -->
+### Too Few data points for the day
 
-Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
+Days with less than $`r nt * 3`$ total data points (minutes) are ignored.
 
 
 
@@ -209,8 +208,6 @@ Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
 <!-- Where ${AM}$ is the selected air-mass model. -->
 
 <!-- "Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf" -->
-
-
 
 
 
