@@ -309,7 +309,8 @@ strong$CSflag <- 99
 
 #### Exclude inversions ####
 warning("Disabled this for trends !!")
-# inverted      <- strong$wattGLB < strong$wattHOR
+# inverted <- strong$wattGLB < strong$wattHOR
+inverted <- 0
 
 #'
 #' ### There are instances where global irradiance is less than direct.
