@@ -209,11 +209,26 @@ for the measured values $L$ and similar $L_{CS}$ using the reference model $\tex
 Standard deviation of rate of change in irradiance. We calculate the standard deviation  of the slope
 (s) between sequential points in the time series, normalized by the average GHI during the time interval:
 
-
 \begin{gather}
 s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VCT1) \\
-\bar{s} = \frac{1}{n-1} \sum_{i=1}^{n-1} s_i (\#eq:VCT2)
+\bar{s} = \frac{1}{n-1} \sum_{i=1}^{n-1} s_i (\#eq:VCT2) \\
+\sigma = \frac {\sqrt{\frac{1}{n-1} \sum_{i=1}^{n-1} \left( s_i - \bar{s} \right)^2} } {\bar{G}} (\#eq:VCT3)
 \end{gather}
+
+\begin{equation}
+\sigma_i < `r offVCT`
+(\#eq:VCTcr)
+\end{equation}
+
+
+
+<!-- VSM -->
+### 5. Variability in the Shape of the irradiance Measurements 
+
+
+
+
+
 
 
 ### 6. Low Direct Irradiance limit (LDI)
@@ -312,48 +327,6 @@ for (yyyy in unique(year(dayslist))) {
 
         #### Apply filters ####
 
-        #---- 9. Too Few data point for the day (FDP) --------------------------
-        #---- 1. Mean value of irradiance during the time period ---------------
-        #---- 2. Max value of irradiance during the time period ----------------
-        #---- 3. Variability in irradiance by the length (VIL) -----------------
- 
-        #---- 4. Variance of Changes in the Time series (VCT) -----------------
-        if (VCT_active) {
-            Flag_key  <- 4
-            indx_todo <- which(have_glb)
-            if (length(indx_todo) > 0) {
-                ## start with old clear as 99
-                subday$CSflag[subday$CSflag == 0] <- 99
-                s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
-
-                for (i in indx_todo) {
-                    ## resolve window by index
-                    walk(i, nt_hw , tot_p )
-
-                    ## Do calculation ##
-                    data_win_glb <- subday$wattGLB[w_sta:w_end]
-                    DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
-                    s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
-
-                    GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
-                                    sum( data_win_glb , na.rm = T) / MS$nt
-
-                    ## pass test as clear
-                    pass <- GLB_sigma[i] < MS$offVCT
-                    if (is.na(pass)) { pass <- FALSE }
-
-                    ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
-                } ##END for loop all points
-            }
-            #### if it is not clear is VCT
-            ## set newer flag
-            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
-            ## set old flag
-            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
-        }
 
 
         #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
