@@ -40,6 +40,7 @@ ref_rm_VIP_UppOff <-     MS$CS_ref_rm_VIP_UppOff
 ```
 
 
+
 <!-- `````{r echo=F, include=F, eval=F} -->
 <!-- knitr::opts_chunk$set(comment    = ""      ) -->
 <!-- # knitr::opts_chunk$set(dev        = "pdf"   ) -->
@@ -183,7 +184,7 @@ The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$ is compared to a s
 
 
 
-
+$`r MS$CS_ref_rm_VIP_RelUpp`$
 
 
 
