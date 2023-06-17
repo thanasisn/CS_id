@@ -779,7 +779,7 @@ for (yyyy in unique(year(dayslist))) {
         }
 
 
-        #----  3. Variability in irradiance by the length (VIL) ----------------
+        #---- 3. Variability in irradiance by the length (VIL) -----------------
         if (VIL_active) {
             Flag_key  <- 3
             indx_todo <- which(have_glb)
@@ -827,8 +827,6 @@ for (yyyy in unique(year(dayslist))) {
                 subday$VIL_upp   <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
                 subday$VIL_low   <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
             }
-
-            # if (any(grepl("VIL_", names(subday)))) {stop()}
 
             #### if it is not clear is VIL
             subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
