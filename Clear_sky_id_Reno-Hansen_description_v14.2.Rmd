@@ -72,28 +72,22 @@ for (an in names(MS)) {
 # Detection of clear periods in GHI measurements for SDR tredns.
 
 
-## Only filters for GHI are used for SDR tredns
+<!-- ## Only filters for GHI are used for SDR trends -->
 
-## Load all data from `DATA/Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds`
+<!-- ## Load all data from `DATA/Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds` -->
 
-##  Exclude data where `wattGLB < wattHOR`
+<!-- ##  Exclude data where `wattGLB < wattHOR` -->
 
-There are instances where global irradiance is less than direct.
+<!-- There are instances where global irradiance is less than direct. -->
 
-This happens, near sunset and sunrise due to obstacles,
-or due to different sunrise/sunset time due to small spatial differences.
-We will exclude all this data both for global and direct.
+<!-- This happens, near sunset and sunrise due to obstacles, -->
+<!-- or due to different sunrise/sunset time due to small spatial differences. -->
+<!-- We will exclude all this data both for global and direct. -->
 
 
-##  Exclude other bad data indentified in raw data
+<!-- ##  Exclude other bad data identified in raw data -->
 
-<!-- strong[QCF_DIR == FALSE, wattDIR     := NA] -->
-<!-- strong[QCF_DIR == FALSE, wattHOR     := NA] -->
-<!-- strong[QCF_DIR == FALSE, wattDIR_sds := NA] -->
-<!-- strong[QCF_DIR == FALSE, wattDIF     := NA] -->
-<!-- strong[QCF_GLB == FALSE, wattGLB     := NA] -->
-<!-- strong[QCF_GLB == FALSE, wattGLB_sds := NA] -->
-<!-- strong[QCF_GLB == FALSE, wattDIF     := NA] -->
+
 
 
 
@@ -149,11 +143,6 @@ $$ AM = \frac{1}{\cos(z)} $$
 
 
 ## Clear sky Id procedure
-
-<!-- FDP -->
-### 9. Too Few data points for the day
-
-Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
 
 
 
@@ -225,259 +214,79 @@ s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \le
 <!-- VSM -->
 ### 5. Variability in the Shape of the irradiance Measurements 
 
+Maximum difference between changes in GHI and clear sky time series. The final quantity considered
+is the maximum difference $X$ between the change in measured irradiance and the change in clear sky
+irradiance over each measurement interval:
 
+\begin{gather}
+x_i = \text{GHI}_{i+1} - \text{GHI}_{i} \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VSM1) \\
+x_{CS,i} = \text{GHI}_{CS,i+1} - \text{GHI}_{CS,i} \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VSM2) \\
+X_i = \max{\left \{ \left | x_i - x_{CS,i} \right | \right \}} (\#eq:VSM3) 
+\end{gather}
 
+\begin{equation}
+X_i < `r offVSM`
+(\#eq:VSMcr)
+\end{equation}
 
 
+<!-- IGNORED FOR GHI TRENDS -->
+<!-- LDI --> 
+<!-- ### 6. Low Direct Irradiance limit (LDI) -->
 
+<!-- Ignore Direct irradiance when it is bellow $5 Watt/m^2$. -->
+<!-- This limit is biased due to the slight location difference of the two Instruments. -->
+<!-- The difference in shadow especially the afternoon "pole shadow" of some periods of the year. -->
+<!-- May limit the implementation by time of day or/and period of the year -->
 
-### 6. Low Direct Irradiance limit (LDI)
+<!-- Also this can not characterize all global measurements due to gaps on direct measurements. -->
 
-Ignore Direct irradiance when it is bellow $5 Watt/m^2$.
-This limit is biased due to the slight location difference of the two Instruments.
-The difference in shadow especially the afternoon "pole shadow" of some periods of the year.
-May limit the implementation by time of day or/and period of the year
 
-Also this can not characterize all global measurements due to gaps on direct measurements.
+<!-- IGNORED FOR GHI TRENDS -->
+<!-- LGI  -->
+<!-- ### 7. Low Global Irradiance limit (LGI) -->
 
+<!-- Global irradiance below `r VGIlim` $Watt/m^2$ level can not be identified -->
 
-`````{r include=F, eval=F, echo=F}
-#### 7. LGI ####
-MS$VGIlim <- 5
-`````
 
+<!-- IGNORED FOR GHI TRENDS -->
+<!-- FCS -->
+<!-- ### 8. Too Few CS point for the day (FCS) -->
 
-### 7. Low Global Irradiance limit (LGI)
+<!-- If in a day there less than 11 clear sky points will exclude them from optimizing -->
 
-<!-- Global irradiance below `r MS$VGIlim` 5 $Watt/m^2$ level can not be identified -->
 
+<!-- FDP -->
+### 9. Too Few data points for the day
 
+Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
 
 
-### 8. Too Few CS point for the day (FCS)
 
 
-If in a day there less than 11 clear sky points will exclude them from optimizing
+<!-- IGNORED FOR GHI TRENDS -->
+<!-- DsT -->
+<!-- ### 11. Too low Direct signal (DsT) -->
 
+<!-- This is a simple hard limit on the lower possible Direct radiation with clear sky. -->
 
+<!-- The threshold is 25% lower than a reference value. -->
 
+<!-- $$ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) $$ -->
 
-### 9. Too Few data points for the day (FDP)
+<!-- Where ${AM}$ is the selected air-mass model. -->
 
+<!-- "Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf" -->
 
-If in a day there are less than 33 data points will be excluded from optimizing.
 
 
 
 
-### 11. Too low Direct signal (DsT)
 
-This is a simple hard limit on the lower possible Direct radiation with clear sky.
+<!-- ### Baseline value for direct irradiance -->
 
-The threshold is 25% lower than a reference value.
+<!-- See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf -->
 
-$$ I_d = I_0 * 0.7^{{AM}^{0.678}} * cos({ZSA}) $$
-
-Where ${AM}$ is the selected air-mass model.
-
-"Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf"
-
-
-
-
-
-
-### Baseline value for direct irradiance
-
-See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
-
-`````{r include=F, eval=F}
-strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
-`````
-
-`````{r include=F, eval=F, echo=F}
-##  Iterate all years
-for (yyyy in unique(year(dayslist))) {
-
-    ##  Iterate all days
-    for (aa in subdayslist) {
-
-        nt_hw <- MS$nt %/% 2
-
-        ## relative clear sky acceptance limit
-        relative_CS_lim <- sum(sell) * MS$relative_CS
-
-        ## Data selection for day
-        subday     <- strong[ sell, ]
-        have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
-        have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
-        tot_p      <- length(subday$wattGLB)
-
-
-        ## Values from Clear sky model used
-        ## this model is used as clear sky reference
-        CS_ref <- CS_model(subday$SZA) * alpha
-        ## Values from Air Mass model used
-        AM_ref <- AM(subday$SZA)
-
-        ## create a more logical model
-        CS_ref_safe <- CS_ref
-        CS_ref_safe[ CS_ref_safe < 0 ] <- NA
-
-
-        #### Apply filters ####
-
-
-
-        #---- 5. Variability in the Shape of the irradiance Measurements (VSM) ----
-        if (VSM_active) {
-            Flag_key  <- 5
-            indx_todo <- which(have_glb)
-            if ( length(indx_todo) > 0 ) {
-                ## start with old clear as 99
-                subday$CSflag[subday$CSflag == 0] <- 99
-                x_i_CS <- data.table::shift(CS_ref) - CS_ref
-
-                for (i in indx_todo) {
-                    ## resolve window by index
-                    walk(i, nt_hw, tot_p)
-
-                    ## change in measurements
-                    data_win_glb  <- subday$wattGLB[w_sta:w_end]
-                    DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)
-
-                    ## change in reference
-                    data_win_ref  <- subday$CS_ref[w_sta:w_end]
-                    DeltaVSq_ref  <- (data.table::shift(data_win_ref) - data_win_ref)
-
-                    suppressWarnings({
-                        # GLB_Xi[i]      <- max(abs(DeltaVSq_GLB - x_i_CS[i]   ), na.rm = TRUE)
-                        GLB_Xi[i] <- max(abs(DeltaVSq_GLB - DeltaVSq_ref), na.rm = TRUE)
-                    })
-
-                    ## pass test as clear
-                    # pass      <- GLB_Xi[i]      < MS$offVSM
-                    pass <- GLB_Xi[i] < MS$offVSM
-
-                    if (is.na(pass)) pass <- FALSE
-
-                    ## an info warning
-                    if (is.infinite(GLB_Xi[i]) & i > 1) {
-                        if (interactive()) print(paste(GLB_Xi[i], format(aday, "%F"), i, pass))
-                    }
-
-                    ## set VCT flag
-                    subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
-                                                (  subday$CSflag[w_sta:w_end] == 99) &
-                                                   pass                                ] <- 0
-
-                } ##END for loop all points
-            }
-            #### if it is not clear is VCT
-            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
-            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
-        }
-
-
-        #---- 6. Low Direct Irradiance limit (LDI) -----------------------------
-        if (LDI_active) {
-            Flag_key  <- 6
-            ## low direct and not "Possible Direct Obstruction (23)"
-            ## probably we know sun was obscured
-            subday[CSflag == 0 &
-                   wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
-                   CSflag := Flag_key ]
-
-            subday[CSflag == 99 &
-                   wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
-                   CSflag := Flag_key ]
-
-            subday[wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
-                   paste0("CSflag_", Flag_key) := TRUE ]
-
-            subday[wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
-                   paste0("CSflag_", Flag_key) := TRUE ]
-        }
-
-
-        #---- 7. Low Global Irradiance limit (LGI) -----------------------------
-        if (LGI_active) {
-            Flag_key  <- 7
-            subday[ (CSflag == 0 ) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
-            subday[ (CSflag == 99) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
-
-            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
-            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
-        }
-
-
-
-        #---- 11. Too low direct radiation (DsT) -----------------````----------
-        if (DST_active & any(have_dir)) {
-            Flag_key  <- 11
-            subday[(CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
-                   CSflag := Flag_key]
-            subday[(CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
-                   CSflag := Flag_key]
-
-            subday[wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
-        }
-
-
-
-
-        #---- 8. Too Few CS point for the day (FCS) ----------------------------
-        if (FCS_active) {
-            Flag_key  <- 8
-            ## check all other CS flags to set this
-            wecare <- grep("CSflag_", names(subday), value = T)
-            acount <- nrow(subday[ rowSums( subday[, ..wecare], na.rm = T) == 0, ])
-            if ( acount < FCSlim ) {
-                subday[ subday$CSflag == 0 , CSflag := Flag_key]
-                subday[ subday$CSflag == 99, CSflag := Flag_key]
-                subday[, paste0("CSflag_", Flag_key) := TRUE]
-            }
-        }
-
-
-
-        ## keep Clear Sky detection
-        strong$CSflag[sell]   <- subday$CSflag
-
-        subday$CS_ref <- CS_ref
-
-        gather <- rbind(gather, subday, fill = TRUE)
-
-        strong$CS_ref[sell]   <- CS_ref
-
-        keepday <- data.frame( Date       = aday,
-                               RMSE       = RMSE_r,
-                               MBE        = MBE,
-                               cost       = cost,
-                               MeanVIPcnt = MeanVIPcnt,
-                               MaxVIPcnt  = MaxVIPcnt,
-                               VILcnt     = VILcnt,
-                               VCTcnt     = VCTcnt,
-                               VSMcnt     = VSMcnt)
-
-        # daily_stats <<- rbind(daily_stats, keepday )
-        daily_stats <- rbind(daily_stats, keepday )
-
-    } ##END day loop
-
-    dev.off()
-
-
-} ##END year loop
-
-
-par(def.par)  # reset to default
-layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
-`````
 
 
 | CS Flag | Test |
