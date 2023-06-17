@@ -28,15 +28,12 @@ output:
     fig_height:       4.5
 ---
 
-```{r echo=F, include=T}
-library(data.table)
-MS <- readRDS("PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.Rds")
-window            <-     MS$nt
-alpha             <-     MS$alpha
-ref_rm_VIP_RelLow <- 1 - MS$CS_ref_rm_VIP_RelLow
-ref_rm_VIP_LowOff <-     MS$CS_ref_rm_VIP_LowOff
-ref_rm_VIP_RelUpp <- 1 + MS$CS_ref_rm_VIP_RelUpp
-ref_rm_VIP_UppOff <-     MS$CS_ref_rm_VIP_UppOff
+```{r setup, echo=F, include=T, eval=TRUE}
+MS <- data.frame(readRDS("PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.Rds"))
+# export all variables
+for (an in names(MS)) {
+    assign(an, MS[[an]])
+}
 ```
 
 
@@ -118,9 +115,6 @@ was chosen.
 <!-- panderOptions('table.alignment.default',  "right") -->
 <!-- panderOptions('table.alignment.rownames', "right") -->
 <!-- panderOptions('table.split.cells',        c(50,10)) -->
-<!-- pander(t(MS)) -->
-<!-- pander(alpha_models) -->
-<!-- pander(combinations) -->
 <!-- ````` -->
 
 
@@ -129,8 +123,8 @@ was chosen.
 ### Reference clear sky irradiance model and air mass model (AM)
 
 We select the clear sky model, the air mass calculation
-and the period of 11 minutes to use.
-The charactirization is done to the center value of the window.
+and the period of $`r nt`$ minutes to use.
+The characterization is done to the center value of the window.
 
 
 `````{r include=F, eval=F, echo=F}
@@ -159,21 +153,21 @@ $$ AM = \frac{1}{\cos(z)} $$
 <!-- FDP -->
 ### 9. Too Few data points for the day
 
-Days with less than $`r window * 3`$ data points (minutes) will be ignored.
+Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
 
 
 
 <!-- MeanVIP -->
 ### 1. Mean value of irradiance during the time period 
 
-Comparing value in a moving window of $`r window`$ minutes.
+Comparing value in a moving window of $`r nt`$ minutes.
 The mean of the measured value $\overline{G}_i$ inside an envelope based on the reference model $\text{GHI}_\text{Clear Sky}$.
 
 
 \begin{equation}
-\overline{\text{GHI}}_{i\text{Clear Sky}} \times `r ref_rm_VIP_RelLow` - `r ref_rm_VIP_LowOff`
+`r 1 - CS_ref_rm_VIP_RelLow` \times \overline{\text{GHI}}_{i\text{Clear Sky}} - `r CS_ref_rm_VIP_LowOff`
 < \overline{G}_i <
-\overline{\text{GHI}}_{i\text{Clear Sky}} \times `r ref_rm_VIP_RelUpp` + `r ref_rm_VIP_UppOff`
+`r 1 + CS_ref_rm_VIP_RelUpp` \times \overline{\text{GHI}}_{i\text{Clear Sky}} + `r CS_ref_rm_VIP_UppOff`
 (\#eq:MeanVIP)
 \end{equation}
 
@@ -183,11 +177,12 @@ The mean of the measured value $\overline{G}_i$ inside an envelope based on the 
 The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$ is compared to a similar constructed value from the reference $M_{CSi} = max[\text{GHI}_{i\text{Clear Sky}}]$.
 
 
-
-$`r MS$CS_ref_rm_VIP_RelUpp`$
-
-
-
+\begin{equation}
+`r MaxVIP_fct` \times M_{CSi} - `r MaxVIP_off_low`
+< M_{Gi} <
+`r MaxVIP_fct` \times M_{CSi} + `r MaxVIP_off_upp`
+(\#eq:MaxVIP)
+\end{equation}
 
 
 ### 6. Low Direct Irradiance limit (LDI)
