@@ -1,6 +1,6 @@
 ---
-title:     Identification of Periods of Clear Sky Irradiance in Time Series of GHI Measurements Matthew J. Reno and Clifford W. Hansen.
-author:    Natsis Athanasios
+# title:     Identification of Periods of Clear Sky Irradiance in Time Series of GHI Measurements Matthew J. Reno and Clifford W. Hansen.
+# author:    Natsis Athanasios
 documentclass: article
 classoption:   a4paper,oneside
 fontsize:      10pt
@@ -37,7 +37,7 @@ for (an in names(MS)) {
 }
 ```
 
-# Detection of clear periods in GHI measurements for SDR trends.
+<!-- # Detection of clear periods in GHI measurements for SDR trends. -->
 
 As global radiation clear sky reference we are using the Haurwitz’s model, adjusted for our site with a factor of `r signif(alpha,3)` (Eq. \@ref(eq:ahau)).
 The selection of a clear sky reference model, was based on GHI observation from the period 2016 – 2021.
