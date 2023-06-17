@@ -8,6 +8,7 @@ geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 
 link-citations:  yes
 colorlinks:      yes
+bibliography:    references.bib
 
 header-includes:
   - \usepackage{caption}
@@ -38,42 +39,18 @@ for (an in names(MS)) {
 
 # Detection of clear periods in GHI measurements for SDR trends.
 
-As a reference clear sky model we used
+As global radiation clear sky reference we are using the Haurwitz’s model, adjusted for our site with a factor of `r signif(alpha,3)` (Eq. \@ref(eq:ahau)).
+The selection of a clear sky reference model, was based on GHI observation from the period 2016 – 2021.
+Where, after an iterative optimization of eight simple models (Daneshyar–Paltridge–Proctor, Kasten–Czeplak, Haurwitz, Berger–Duffie, Adnot–Bourges–Campana–Gicquel, Robledo-Soler, Kasten and Ineichen-Perez) with different factors.
+We found, that Haurwitz’s model, adjusted with a factor of `r signif(alpha,3)` has the lower root mean squared error (RMSE). 
+The tried models are described by @Reno2012 and tested by @Reno2016.
+The iterative optimization method, for the selection of the reference is discussed by @Long2000 and @Reno2016.
 
- We are using, for the global radiation reference, the Haurwitz’s model (reference). The selection was done with data of GHI and DNI for the period 2016 – 2021 using the iterative method of optimizing the ‘Clear sky’ identification method, as proposed by
-@Long2000 and @Reno2016.
-We have calibrated the above method for our site. Among the eight simple models (Daneshyar–Paltridge–Proctor, Kasten–Czeplak, Haurwitz, Berger–Duffie, Adnot–Bourges–Campana–Gicquel, Robledo-Soler, Kasten and Ineichen-Perez), as described in
-@Reno2012 and tested by
-@Reno2016,
-we found the best result with an adjusted Haurwitz model (A-HAU)
-(Eq. \@ref(eq:ahau)),
-using as the main selection criterion the root mean squared error (RMSE).
+\begin{equation}
+\text{GHI}_\text{Clear Sky} = `r signif(alpha,3)` \times 1098 \times \cos( \text{SZA} ) \times \exp \left( \frac{ - 0.057}{\cos(\text{SZA})} \right)  (\#eq:ahau)
+\end{equation}
 
-<!-- `````{r echo=F, include=F, eval=F} -->
-
-<!-- #  Use the optimized alpha for the selected models and identify Clear-Sky -->
-<!-- #  minutes. -->
-
-<!-- ## load previous state have to override it for alpha to be used -->
-<!-- load("~/Aerosols/DATA/model_opt/Combinations_results_2022-06-14_153313.Rds") -->
-
-
-<!-- ## Define the model to use for CS detection be inspecting the results of the 'a' optimization script. -->
-<!-- model_selection <- "HAU" -->
-<!-- monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,] -->
-
-<!-- ## daily plots file name -->
-<!-- plotsbase <- paste0("~/CS_id/REPORTS/DAILY/", -->
-<!--                     sub("\\.R$", "", basename(Script.Name)), "_") -->
-<!-- ````` -->
-
-
-
-
-
-\newpage
-
-
+<!-- Also we tested Air mass models with no better results than the $$ AM = \frac{1}{\cos(z)} $$ -->
 
 <!-- ## Only filters for GHI are used for SDR trends -->
 
@@ -87,73 +64,25 @@ using as the main selection criterion the root mean squared error (RMSE).
 <!-- or due to different sunrise/sunset time due to small spatial differences. -->
 <!-- We will exclude all this data both for global and direct. -->
 
-
 <!-- ##  Exclude other bad data identified in raw data -->
 
 
 
+<!-- ### Threshold Values for Criteria -->
+
+<!-- For mean and max Most evaluations of clear sky models find that the average -->
+<!-- bias error of the model is less than 10%, often around 7% [1, 83]. Therefore, -->
+<!-- a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model -->
+<!-- was chosen. -->
+
+The following criteria and thresholds were used to identify clear-sky conditions.
+Each criterion was applied for a running window of $`r nt`$ consecutive measurements/minutes, and the characterization is applied at the center value of the window.
 
 
+<!-- 1. MeanVIP -->
+### Mean value of irradiance during the time period.
 
-### Threshold Values for Criteria
-
-For mean and max Most evaluations of clear sky models find that the average
-bias error of the model is less than 10%, often around 7% [1, 83]. Therefore,
-a fixed threshold of $\pm 75 W / m^2$ within the mean and max of the clear sky model
-was chosen.
-
-
-
-### Clear Sky detection Algorithm values
-
-
-<!-- `````{r include=F, eval=F, echo=F} -->
-<!-- # panderOptions('table.emphasize.rownames', F) -->
-<!-- panderOptions('table.alignment.default',  "right") -->
-<!-- panderOptions('table.alignment.rownames', "right") -->
-<!-- panderOptions('table.split.cells',        c(50,10)) -->
-<!-- ````` -->
-
-
-
-
-### Reference clear sky irradiance model and air mass model (AM)
-
-We select the clear sky model, the air mass calculation
-and the period of $`r nt`$ minutes to use.
-The characterization is done to the center value of the window.
-
-
-`````{r include=F, eval=F, echo=F}
-AM       <- AM_simple
-CS_model <- get(model_selection)
-`````
-
-
-`````{r include=F, eval=T, echo=F}
-MS <- data.frame()
-`````
-
-Air mass model
-
-$$ AM = \frac{1}{\cos(z)} $$
-
-### Clear Sky irradiance Haurwitz model (HAU) (1945)  
-
-\begin{equation}
-\text{GHI}_\text{Clear Sky} = `r signif(alpha,3)` \times 1098 \times \cos( \text{SZA} ) \times \exp \left( \frac{ - 0.057}{\cos(\text{SZA})} \right)  (\#eq:ahau)
-\end{equation}
-
-
-## Clear sky Id procedure
-
-
-
-<!-- MeanVIP -->
-### 1. Mean value of irradiance during the time period 
-
-Comparing value in a moving window of $`r nt`$ minutes.
-The mean of the measured value $\overline{G}_i$ inside an envelope based on the reference model $\text{GHI}_\text{Clear Sky}$.
+The mean of the measured value $\overline{G}_i$ must be inside an envelope based on the reference model $\text{GHI}_\text{Clear Sky}$ (Eq. \@ref(eq:MeanVIP)).
 
 \begin{equation}
 `r 1 - CS_ref_rm_VIP_RelLow` \times \overline{\text{GHI}}_{i\text{Clear Sky}} - `r CS_ref_rm_VIP_LowOff`
@@ -163,10 +92,10 @@ The mean of the measured value $\overline{G}_i$ inside an envelope based on the 
 \end{equation}
 
 
-<!-- MaxVIP -->
-### 2. Max value of irradiance during the time period
+<!-- 2. MaxVIP -->
+### Max value of irradiance during the time period.
 
-The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$ is compared to a similar constructed value from the reference $M_{CSi} = max[\text{GHI}_{i\text{Clear Sky}}]$.
+The running max measured value $M_{Gi} = max[\text{GHI}_{i}]$, is compared to a similar constructed value from the reference $M_{CSi} = max[\text{GHI}_{i\text{Clear Sky}}]$ (Eq. \@ref(eq:MaxVIP)).
 
 \begin{equation}
 `r MaxVIP_fct` \times M_{CSi} - `r MaxVIP_off_low`
@@ -285,46 +214,30 @@ Days with less than $`r nt * 3`$ data points (minutes) will be ignored.
 
 
 
-
 <!-- ### Baseline value for direct irradiance -->
 
 <!-- See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf -->
 
 
 
-| CS Flag | Test |
-|:-------:|:--------------------------------------------------------------|
-|   NA    | Undefined, untested                                           |
-|    0    | Passed as clear sky                                           |
-|    1    | Mean value of irradiance during the time period (MeanVIP)     |
-|    2    | Max Value of Irradiance during the time Period (MaxVIP)       |
-|    3    | Variability in irradiance by the length (VIL)                 |
-|    4    | Variance of Changes in the Time series (VCT)                  |
-|    5    | Variability in the Shape of the irradiance Measurements (VSM) |
-|    6    | Low Direct Irradiance limit (LDI)                             |
-|    7    | Low Global Irradiance limit (LGI)                             |
-|    8    | Too Few CS point for the day (FCS)                            |
-|    9    | Too Few data points for the day                               |
-|   10    | Missing Data                                                  |
-|   11    | Direct irradiance simple threshold                            |
+<!-- | CS Flag | Test | -->
+<!-- |:-------:|:--------------------------------------------------------------| -->
+<!-- |   NA    | Undefined, untested                                           | -->
+<!-- |    0    | Passed as clear sky                                           | -->
+<!-- |    1    | Mean value of irradiance during the time period (MeanVIP)     | -->
+<!-- |    2    | Max Value of Irradiance during the time Period (MaxVIP)       | -->
+<!-- |    3    | Variability in irradiance by the length (VIL)                 | -->
+<!-- |    4    | Variance of Changes in the Time series (VCT)                  | -->
+<!-- |    5    | Variability in the Shape of the irradiance Measurements (VSM) | -->
+<!-- |    6    | Low Direct Irradiance limit (LDI)                             | -->
+<!-- |    7    | Low Global Irradiance limit (LGI)                             | -->
+<!-- |    8    | Too Few CS point for the day (FCS)                            | -->
+<!-- |    9    | Too Few data points for the day                               | -->
+<!-- |   10    | Missing Data                                                  | -->
+<!-- |   11    | Direct irradiance simple threshold                            | -->
 
+<!-- ### Cost function for optimization of alpha value. -->
 
-
-
-
-
-
-
-
-
-### Cost function for optimization of alpha value.
-
-$$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
-                { n } , \qquad a > 0 $$
-
-
-
-
-
-**END**
+<!-- $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 } -->
+<!--                 { n } , \qquad a > 0 $$ -->
 
