@@ -31,7 +31,8 @@ output:
 ```{r echo=F, include=T}
 library(data.table)
 MS <- readRDS("PARAMS/Clear_sky_id_Reno-Hansen_apply_v14_2.Rds")
-window            <- MS$nt
+window            <-     MS$nt
+alpha             <-     MS$alpha
 ref_rm_VIP_RelLow <- 1 - MS$CS_ref_rm_VIP_RelLow
 ref_rm_VIP_LowOff <-     MS$CS_ref_rm_VIP_LowOff
 ref_rm_VIP_RelUpp <- 1 + MS$CS_ref_rm_VIP_RelUpp
@@ -148,7 +149,7 @@ $$ AM = \frac{1}{\cos(z)} $$
 ### Clear Sky irradiance Haurwitz model (HAU) (1945)  
 
 \begin{equation}
-\text{GHI}_\text{Clear Sky} = 0.965 \times 1098 \times \cos( \text{SZA} ) \times \exp \left( \frac{ - 0.057}{\cos(\text{SZA})} \right)  (\#eq:ahau)
+\text{GHI}_\text{Clear Sky} = `r signif(alpha,3)` \times 1098 \times \cos( \text{SZA} ) \times \exp \left( \frac{ - 0.057}{\cos(\text{SZA})} \right)  (\#eq:ahau)
 \end{equation}
 
 
