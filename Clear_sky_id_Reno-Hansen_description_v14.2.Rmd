@@ -36,16 +36,20 @@ for (an in names(MS)) {
 }
 ```
 
+# Detection of clear periods in GHI measurements for SDR trends.
 
+As a reference clear sky model we used
+
+ We are using, for the global radiation reference, the Haurwitz’s model (reference). The selection was done with data of GHI and DNI for the period 2016 – 2021 using the iterative method of optimizing the ‘Clear sky’ identification method, as proposed by
+@Long2000 and @Reno2016.
+We have calibrated the above method for our site. Among the eight simple models (Daneshyar–Paltridge–Proctor, Kasten–Czeplak, Haurwitz, Berger–Duffie, Adnot–Bourges–Campana–Gicquel, Robledo-Soler, Kasten and Ineichen-Perez), as described in
+@Reno2012 and tested by
+@Reno2016,
+we found the best result with an adjusted Haurwitz model (A-HAU)
+(Eq. \@ref(eq:ahau)),
+using as the main selection criterion the root mean squared error (RMSE).
 
 <!-- `````{r echo=F, include=F, eval=F} -->
-<!-- knitr::opts_chunk$set(comment    = ""      ) -->
-<!-- # knitr::opts_chunk$set(dev        = "pdf"   ) -->
-<!-- knitr::opts_chunk$set(dev        = "png"    ) -->
-<!-- knitr::opts_chunk$set(out.width  = "100%"   ) -->
-<!-- knitr::opts_chunk$set(fig.align  = "center" ) -->
-<!-- # knitr::opts_chunk$set(fig.pos    = '!h'    ) -->
-
 
 <!-- #  Use the optimized alpha for the selected models and identify Clear-Sky -->
 <!-- #  minutes. -->
@@ -69,7 +73,6 @@ for (an in names(MS)) {
 
 \newpage
 
-# Detection of clear periods in GHI measurements for SDR tredns.
 
 
 <!-- ## Only filters for GHI are used for SDR trends -->
