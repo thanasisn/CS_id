@@ -834,7 +834,7 @@ for (yyyy in unique(year(dayslist))) {
         }
 
 
-        #---- 4.  Variance of Changes in the Time series (VCT) -----------------
+        #---- 4. Variance of Changes in the Time series (VCT) ------------------
         if (VCT_active) {
             Flag_key  <- 4
             indx_todo <- which(have_glb)
