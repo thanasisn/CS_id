@@ -211,7 +211,7 @@ Standard deviation of rate of change in irradiance. We calculate the standard de
 
 
 \begin{gather}
-s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VCT1)
+s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VCT1) \\
 \bar{s} = \frac{1}{n-1} \sum_{i=1}^{n-1} s_i (\#eq:VCT2)
 \end{gather}
 
