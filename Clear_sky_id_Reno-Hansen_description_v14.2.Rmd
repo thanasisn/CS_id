@@ -195,10 +195,25 @@ L = \sum_{i=1}^{n-1}\sqrt{\left ( \text{GHI}_{i+1} - \text{GHI}_{i}\right )^2 + 
 (\#eq:VILeq)
 \end{equation}
 
-for the measured values and similar $L_{CS}$ usidng the reference model.
+for the measured values $L$ and similar $L_{CS}$ using the reference model $\text{GHI}_{i\text{Clear Sky}}$. The criterion is applied
+
+\begin{equation}
+`r MinVIL_fct` \times L_{CSi} - `r offVIL_dwl` < L_i < `r MaxVIL_fct` \times L_{CSi} + `r offVIL_upl`
+(\#eq:VILcr)
+\end{equation}
 
 
+<!-- VCT -->
+### 4. Variance of Changes in the Time series
 
+Standard deviation of rate of change in irradiance. We calculate the standard deviation  of the slope
+(s) between sequential points in the time series, normalized by the average GHI during the time interval:
+
+
+\begin{gather}
+s_i = \frac{\text{GHI}_{i+1} - \text{GHI}_{i}}{t_{i+1} - t_i}, \forall i \in \left \{ 1, 2, \ldots, n-1 \right \} (\#eq:VCT1)
+\bar{s} = \frac{1}{n-1} \sum_{i=1}^{n-1} s_i (\#eq:VCT2)
+\end{gather}
 
 
 ### 6. Low Direct Irradiance limit (LDI)
@@ -300,65 +315,9 @@ for (yyyy in unique(year(dayslist))) {
         #---- 9. Too Few data point for the day (FDP) --------------------------
         #---- 1. Mean value of irradiance during the time period ---------------
         #---- 2. Max value of irradiance during the time period ----------------
-
-        #----  3. Variability in irradiance by the length (VIL) ----------------
-        if (VIL_active) {
-            Flag_key  <- 3
-            indx_todo <- which(have_glb)
-            if (length(indx_todo) > 0) {
-                ## start with old clear as 99
-                subday$CSflag[subday$CSflag == 0] <- 99
-
-                for (i in 1:tot_p) {
-                    ## resolve window by index
-                    walk(i, nt_hw , tot_p )
-
-                    ## Do calculation ##
-                    data_win_glb   <- subday$wattGLB[w_sta:w_end]
-                    # date_win_ref   = CS_ref[w_sta:w_end]
-                    date_win_ref   <- CS_ref_safe[w_sta:w_end]
-                    # print(c(length(data_win_glb),w_sta,i,w_end))
-
-                    ## calculate length for data
-                    DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)**2
-                    DeltaTSq_GLB  <- as.numeric( !is.na(DeltaVSq_GLB) )**2
-                    GLB_length[i] <- sum(sqrt(DeltaVSq_GLB + DeltaTSq_GLB), na.rm = TRUE)
-
-                    ## calculate length for reference
-                    DeltaVSq_ref     <- (data.table::shift(date_win_ref) - date_win_ref)**2
-                    DeltaTSq_ref     <- as.numeric( !is.na(DeltaVSq_ref) )**2
-                    CS_ref_length[i] <- sum(sqrt(DeltaVSq_ref + DeltaTSq_ref), na.rm = TRUE)
-
-                    # ## store comparison values ?
-                    # subday$VIL_glb[w_sta] <- CS_ref_length[i]
-                    # subday$VIL_upp[w_sta] <- MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl
-                    # subday$VIL_low[w_sta] <- MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl
-
-                    ## pass test as clear
-                    pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
-                            GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
-                    if (is.na(pass)) pass <- FALSE
-
-                    ## set VIL flag
-                    subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
-                                                ( subday$CSflag[w_sta:w_end] == 99) &
-                                                  pass                                ] <- 0
-                } ##END for loop all points
-                ## store comparison values ?
-                subday$VIL_GLB   <- GLB_length
-                subday$VIL_upp   <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
-                subday$VIL_low   <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
-            }
-
-            # if (any(grepl("VIL_", names(subday)))) {stop()}
-
-            #### if it is not clear is VIL
-            subday[[paste0("CSflag_", Flag_key)]][ subday$CSflag == 99 ] <- TRUE
-            subday$CSflag[subday$CSflag == 99]                           <- Flag_key
-        }
-
-
-        #---- 4.  Variance of Changes in the Time series (VCT) -----------------
+        #---- 3. Variability in irradiance by the length (VIL) -----------------
+ 
+        #---- 4. Variance of Changes in the Time series (VCT) -----------------
         if (VCT_active) {
             Flag_key  <- 4
             indx_todo <- which(have_glb)
