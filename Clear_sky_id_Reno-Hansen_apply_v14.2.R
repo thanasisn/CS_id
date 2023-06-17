@@ -308,7 +308,8 @@ strong$CSflag <- 99
 #'
 
 #### Exclude inversions ####
-inverted      <- strong$wattGLB < strong$wattHOR
+warning("Disabled this for trends !!")
+# inverted      <- strong$wattGLB < strong$wattHOR
 
 #'
 #' ### There are instances where global irradiance is less than direct.
@@ -319,21 +320,23 @@ inverted      <- strong$wattGLB < strong$wattHOR
 #' We will exclude all this data both for global and direct.
 #'
 #+ include=T, echo=FALSE
-strong[inverted , QCF_DIR := FALSE ]
-strong[inverted , QCF_GLB := FALSE ]
+warning("Disabled this for trends !!")
+# strong[inverted , QCF_DIR := FALSE ]
+# strong[inverted , QCF_GLB := FALSE ]
 
 
 
 
 #### Remove measurement without good quality code !! ####
 warning("Remove measurement without good quality code !!")
-strong[QCF_DIR == FALSE, wattDIR     := NA]
-strong[QCF_DIR == FALSE, wattHOR     := NA]
-strong[QCF_DIR == FALSE, wattDIR_sds := NA]
-strong[QCF_DIR == FALSE, wattDIF     := NA]
-strong[QCF_GLB == FALSE, wattGLB     := NA]
-strong[QCF_GLB == FALSE, wattGLB_sds := NA]
-strong[QCF_GLB == FALSE, wattDIF     := NA]
+warning("Disabled this for trends !!")
+# strong[QCF_DIR == FALSE, wattDIR     := NA]
+# strong[QCF_DIR == FALSE, wattHOR     := NA]
+# strong[QCF_DIR == FALSE, wattDIR_sds := NA]
+# strong[QCF_DIR == FALSE, wattDIF     := NA]
+# strong[QCF_GLB == FALSE, wattGLB     := NA]
+# strong[QCF_GLB == FALSE, wattGLB_sds := NA]
+# strong[QCF_GLB == FALSE, wattDIF     := NA]
 
 
 
@@ -342,44 +345,46 @@ strong[QCF_GLB == FALSE, wattDIF     := NA]
 
 
 ##  Filters to user  -----------------------------------------------------------
-MeanVIP_active <- FALSE  ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- FALSE
-VIL_active     <- FALSE
-VCT_active     <- FALSE
-VSM_active     <- FALSE
-LDI_active     <- FALSE  ## 6. Low Direct Irradiance limit (LDI)
-LGI_active     <- FALSE
-FCS_active     <- FALSE
-FDP_active     <- FALSE
+MeanVIP_active <- FALSE  ##  1. Mean value of irradiance during the time period
+MaxVIP_active  <- FALSE  ##  2. Max value of irradiance during the time period
+VIL_active     <- FALSE  ##  3. Variability in irradiance by the length (VIL)
+VCT_active     <- FALSE  ##  4. Variance of Changes in the Time series (VCT)
+VSM_active     <- FALSE  ##  5. Variability in the Shape of the irradiance Measurements
+LDI_active     <- FALSE  ##  6. Low Direct Irradiance limit (LDI)
+LGI_active     <- FALSE  ##  7. Low Global Irradiance limit (LGI)
+FCS_active     <- FALSE  ##  8. Too Few CS point for the day (FCS)
+FDP_active     <- FALSE  ##  9. Too Few data point for the day (FDP)
 DST_active     <- FALSE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE
 
 ## Reno-Hansen filters control -------------------------------------------------
 MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- TRUE
-VIL_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
-VCT_active     <- TRUE
-VSM_active     <- TRUE
+MaxVIP_active  <- TRUE   ## 2. Max value of irradiance during the time period
+VIL_active     <- TRUE   ## 3. Variability in irradiance by the length (VIL)
+VCT_active     <- TRUE   ## 4. Variance of Changes in the Time series (VCT)
+VSM_active     <- TRUE   ## 5. Variability in the Shape of the irradiance Measurements
 
 ## My filters control  ---------------------------------------------------------
-LDI_active     <- TRUE  ## Low __Direct__ Irradiance limit (LDI)
-                        ## careful this also excludes points due to pole shade at
-                        ## afternoon and building in the morning
-                        ## Don't use for GLB trends!!!!
-LGI_active     <- TRUE  ## Low Global Irradiance limit (LGI)
-                        ## Global irradiance below this level can not be identified
-FCS_active     <- TRUE  ## Skip with few cs
-FDP_active     <- TRUE  ## Skip with few data in a day
-DST_active     <- TRUE  ## 11. Too low direct radiation (DsT)
-FAST_SKIP      <- FALSE ## allow faster skip of filters also reduce data kept
+LDI_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
+                         ## this also excludes points due to pole shade at
+                         ## afternoon and building in the morning
+LGI_active     <- TRUE   ##  7. Low Global Irradiance limit (LGI)
+                         ## Global irradiance below this level can not be identified
+FCS_active     <- TRUE   ##  8. Too Few CS point for the day (FCS)
+FDP_active     <- TRUE   ##  9. Too Few data point for the day (FDP)
+DST_active     <- TRUE   ## 11. Too low direct radiation (DsT)
+FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
 
 
 ## Ignore filters with direct for pure GLB data process!!  ---------------------
+## For GHI Trends
 IGNORE_DIRE     <- TRUE
 if (IGNORE_DIRE) {
-    cat("\nIgnoring filters using Direct radiation!!\n\n")
+    cat("\nIgnoring filters using Direct radiation For Trends!!\n\n")
     LDI_active <- FALSE  ## 6. Low Direct Irradiance limit (LDI)
     DST_active <- FALSE  ## 11. Too low direct radiation (DsT)
+    LGI_active <- FALSE  ## Allow data to pass for GHI Trends
+    FCS_active <- FALSE  ## Allow Too Few CS point for the day (FCS)
 }
 
 
