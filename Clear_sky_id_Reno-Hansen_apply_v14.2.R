@@ -28,7 +28,7 @@
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
-#'     keep_tex:         yes
+#'     keep_tex:         no
 #'     toc_depth:        4
 #'     latex_engine:     xelatex
 #'     toc:              yes
@@ -359,18 +359,18 @@ DST_active     <- FALSE  ## 11. Too low direct radiation (DsT)
 FAST_SKIP      <- FALSE
 
 ## Reno-Hansen filters control -------------------------------------------------
-MeanVIP_active <- TRUE   ## 1. Mean value of irradiance during the time period
-MaxVIP_active  <- TRUE   ## 2. Max value of irradiance during the time period
-VIL_active     <- TRUE   ## 3. Variability in irradiance by the length (VIL)
-VCT_active     <- TRUE   ## 4. Variance of Changes in the Time series (VCT)
-VSM_active     <- TRUE   ## 5. Variability in the Shape of the irradiance Measurements
+MeanVIP_active <- TRUE   ##  1. Mean value of irradiance during the time period
+MaxVIP_active  <- TRUE   ##  2. Max value of irradiance during the time period
+VIL_active     <- TRUE   ##  3. Variability in irradiance by the length (VIL)
+VCT_active     <- TRUE   ##  4. Variance of Changes in the Time series (VCT)
+VSM_active     <- TRUE   ##  5. Variability in the Shape of the irradiance Measurements
 
 ## My filters control  ---------------------------------------------------------
-LDI_active     <- TRUE   ## 6. Low Direct Irradiance limit (LDI)
-                         ## this also excludes points due to pole shade at
-                         ## afternoon and building in the morning
+LDI_active     <- TRUE   ##  6. Low Direct Irradiance limit (LDI)
+                         ##     this also excludes points due to pole shade at
+                         ##     afternoon and building in the morning
 LGI_active     <- TRUE   ##  7. Low Global Irradiance limit (LGI)
-                         ## Global irradiance below this level can not be identified
+                         ##     Global irradiance below this level can not be identified
 FCS_active     <- TRUE   ##  8. Too Few CS point for the day (FCS)
 FDP_active     <- TRUE   ##  9. Too Few data point for the day (FDP)
 DST_active     <- TRUE   ## 11. Too low direct radiation (DsT)
@@ -382,10 +382,10 @@ FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
 IGNORE_DIRE     <- TRUE
 if (IGNORE_DIRE) {
     cat("\nIgnoring filters using Direct radiation For Trends!!\n\n")
-    LDI_active <- FALSE  ## 6. Low Direct Irradiance limit (LDI)
+    LDI_active <- FALSE  ##  6. Low Direct Irradiance limit (LDI)
     DST_active <- FALSE  ## 11. Too low direct radiation (DsT)
-    LGI_active <- FALSE  ## Allow data to pass for GHI Trends
-    FCS_active <- FALSE  ## Allow Too Few CS point for the day (FCS)
+    LGI_active <- FALSE  ##  7. Low Global Irradiance limit (LGI) Allow all data for trends
+    FCS_active <- FALSE  ##  9. Too Few data point for the day (FDP) No need can be done after
 }
 
 
