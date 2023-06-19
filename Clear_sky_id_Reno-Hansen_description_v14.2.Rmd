@@ -188,9 +188,9 @@ X_i < `r offVSM`
 
 
 <!-- 9. FDP -->
-### Too Few data points for the day
+<!-- ### Too Few data points for the day -->
 
-Days with less than $`r nt * 3`$ total data points (minutes) are ignored.
+<!-- Days with less than $`r nt * 3`$ total data points (minutes) are ignored. -->
 
 
 
