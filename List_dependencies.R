@@ -6,7 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/CS_id/tools/List_dependencies.R"
+Script.Name <- "~/CS_id/List_dependencies.R"
 
 
 ## __ Describe environment -----------------------------------------------------
