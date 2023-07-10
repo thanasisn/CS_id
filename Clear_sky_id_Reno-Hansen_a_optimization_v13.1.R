@@ -929,7 +929,7 @@ filter <- function( alpha, month ) {
 # for ( mo in 1:3 ) {  ## for test
 for ( mo in 1:nrow(combinations) ) {
 
-    ## In case of paralisation beware that we use global variables in the  !!
+    ## In case of parallelisation beware that we use global variables in the  !!
     ## filter function and elsewhere!                                      !!
 
     ## Get a model instance
