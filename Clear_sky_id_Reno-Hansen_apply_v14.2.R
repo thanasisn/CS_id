@@ -1260,26 +1260,26 @@ for (yyyy in unique(year(dayslist))) {
 
 
 
-        ## keep Clear Sky detection
-        strong$CSflag[sell]   <- subday$CSflag
-
-        subday$CS_ref <- CS_ref
-
+        ## _ Keep Clear Sky values  --------------------------------------------
+        subday$CS_ref         <- CS_ref_safe
         gather <- rbind(gather, subday, fill = TRUE)
 
-        strong$CS_ref[sell]   <- CS_ref
+        strong$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
+        strong$CS_ref[sell]   <- CS_ref_safe
 
-        keepday <- data.frame( Date       = aday,
-                               RMSE       = RMSE_r,
-                               MBE        = MBE,
-                               cost       = cost,
-                               MeanVIPcnt = MeanVIPcnt,
-                               MaxVIPcnt  = MaxVIPcnt,
-                               VILcnt     = VILcnt,
-                               VCTcnt     = VCTcnt,
-                               VSMcnt     = VSMcnt)
 
-        # daily_stats <<- rbind(daily_stats, keepday )
+        ## _ Keep daily statistics  --------------------------------------------
+        keepday <- data.frame(
+            Date       = aday,
+            RMSE       = RMSE_r,
+            MBE        = MBE,
+            cost       = cost,
+            MeanVIPcnt = MeanVIPcnt,
+            MaxVIPcnt  = MaxVIPcnt,
+            VILcnt     = VILcnt,
+            VCTcnt     = VCTcnt,
+            VSMcnt     = VSMcnt
+        )
         daily_stats <- rbind(daily_stats, keepday )
 
     } ##END day loop
