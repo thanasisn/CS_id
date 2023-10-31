@@ -203,14 +203,20 @@ strict$QCF_GLB      <- TRUE
 #'
 
 ## we have no reason to ignore that data
+
+## F1
 strict$QCF_DIR_01       <- NULL
 strict$QCF_GLB_01       <- NULL
 strict$QCv9_01_dir_flag <- NULL
 strict$QCv9_01_glb_flag <- NULL
+## F2
+strict$QCF_GLB_02       <- NULL
+strict$QCF_DIR_02       <- NULL
+strict$QCv9_02_dir_flag <- NULL
+strict$QCv9_02_glb_flag <- NULL
 
 
-strict$QCF_GLB_02   <- NULL
-strict$QCF_DIR_02   <- NULL
+
 strict$QCF_DIR_04_1 <- NULL
 strict$QCF_DIR_04_2 <- NULL
 strict$QCF_GLB_04_1 <- NULL
