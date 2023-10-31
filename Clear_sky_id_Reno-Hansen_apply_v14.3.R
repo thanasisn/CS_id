@@ -230,17 +230,20 @@ strict$QCF_BTH_06_1 <- NULL
 ## 3. COMPARISON TESTS PER BSRN “non-definitive”
 ## remove only some of the offending data
 warning("Disabled this for trends !!")
-# test <- strict[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
+# test <- strict[ !is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag) ]
 # hist(test$Elevat,  breaks = 100)
 # hist(test$Azimuth, breaks = 100)
 # ## trends use data above 5
-# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_DIR := FALSE]
-# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_GLB := FALSE]
-strict$QCF_BTH_03_1 <- NULL
-strict$QCF_BTH_03_2 <- NULL
+# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_DIR := FALSE]
+# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_GLB := FALSE]
+strict$QCF_BTH_03_1     <- NULL
+strict$QCF_BTH_03_2     <- NULL
+strict$QCv9_03_low_flag <- NULL
+strict$QCv9_03_upp_flag <- NULL
 ## check the tables
 cat(print(table(strict$QCF_DIR)))
 cat(print(table(strict$QCF_GLB)))
+
 
 
 
