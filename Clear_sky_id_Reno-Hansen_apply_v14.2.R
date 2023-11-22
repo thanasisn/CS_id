@@ -1262,8 +1262,8 @@ for (yyyy in unique(year(dayslist))) {
 
 
         ## _ Keep Clear Sky values  --------------------------------------------
-        subday$CS_ref         <- CS_ref_raw    ## model without a
-        subday$CS_ref         <- CS_ref_safe   ## model with a
+        subday$CS_ref_raw     <- CS_ref_raw     ## model without a
+        subday$CS_ref         <- CS_ref_safe    ## model with a
         gather <- rbind(gather, subday, fill = TRUE)
 
         strong$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
