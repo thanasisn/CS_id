@@ -676,7 +676,8 @@ for (yyyy in unique(year(dayslist))) {
 
         ## Values from Clear sky model used
         ## this model is used as clear sky reference
-        CS_ref <- CS_model(subday$SZA) * alpha
+        CS_ref_raw <- CS_model(subday$SZA)
+        CS_ref     <- CS_ref_raw * alpha
         ## Values from Air Mass model used
         AM_ref <- AM(subday$SZA)
 
@@ -1261,7 +1262,8 @@ for (yyyy in unique(year(dayslist))) {
 
 
         ## _ Keep Clear Sky values  --------------------------------------------
-        subday$CS_ref         <- CS_ref_safe
+        subday$CS_ref         <- CS_ref_raw    ## model without a
+        subday$CS_ref         <- CS_ref_safe   ## model with a
         gather <- rbind(gather, subday, fill = TRUE)
 
         strong$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
