@@ -83,7 +83,7 @@ library(yardstick)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
-
+warning("Missing days from output!!")
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -113,9 +113,13 @@ TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
+END_DAY     <- Sys.Date()
 
-if (TEST) { warning("Test is active") }
-if (TEST) { START_DAY <- "2022-01-01" }
+if (TEST) {
+    warning("Test is active")
+    START_DAY <- "2017-01-01"
+    END_DAY   <- "2017-12-01"
+}
 
 ## load previous state have to override it for alpha to be used
 if (MONTHLY) {
@@ -166,7 +170,7 @@ strict_files <- sort(strict_files)
 if (TEST) {
     gather <- c()
     year(START_DAY):year(Sys.Date())
-    for (ay in year(START_DAY):year(Sys.Date())) {
+    for (ay in year(START_DAY):year(END_DAY)) {
         gather <- c(gather, grep(ay, strict_files, value = T))
     }
     strict_files <- gather
@@ -607,9 +611,9 @@ if (TEST) {
     # dayslist <- dayslist[year(dayslist)>=2019]
     # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
     dayslist <- dayslist
-    dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
+    # dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
 }
-dayslist <- sort( dayslist, decreasing = T )
+dayslist <- sort( dayslist )
 
 
 #'
@@ -796,7 +800,7 @@ for (yyyy in unique(year(dayslist))) {
             MaxVIP_pass <- GLB_rmax < CS_ref_rmax_VIP_upp & GLB_rmax > CS_ref_rmax_VIP_low  ## apply upper and lower filter
 
             indx_todo   <- which( have_glb & MaxVIP_pass )
-            if ( length(indx_todo) > 0 ) {
+            if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
 
