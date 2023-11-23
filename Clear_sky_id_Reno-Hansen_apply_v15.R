@@ -125,7 +125,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -963,6 +963,7 @@ for (in_fl in strict_files) {
         }
 
 
+        dummy <- subday$CSflag
         ## rest is clear sky (we hope)
         subday$CSflag[subday$CSflag == 99] <- 0
 
@@ -975,6 +976,7 @@ for (in_fl in strict_files) {
         #     next  ##  skip the rest of the loop and avoid alpha optimization
         # }
 
+        ## Clear sky statistics  -----
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
@@ -982,6 +984,7 @@ for (in_fl in strict_files) {
 
         cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
             sum(clear_sky, na.rm = T)
+
 
         ## ID statistics
         MeanVIPcnt <- sum(subday$CSflag == 1, na.rm = T)
