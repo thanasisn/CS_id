@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_3.R"
+Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v15.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
@@ -85,6 +85,21 @@ source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
 warning("Missing days from output!!")
+
+
+# ## For parallel
+# library(parallel)
+# library(doParallel)
+# library(foreach)
+# n.cores    <- detectCores() - 1
+# my.cluster <- makeCluster(
+#     n.cores,
+#     type = "FORK"
+# )
+# registerDoParallel(cl = my.cluster)
+
+
+
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -110,7 +125,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-# TEST        <- TRUE
+TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -158,227 +173,6 @@ source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 #' ## DETECTION OF CLEAR PERIODS IN GHI AND DNI MEASUREMENTS ##
 #'
 #+ include=T, echo=FALSE
-
-
-##  Load data from QCRad procedure   -------------------------------------------
-## The "strict" input files were used before
-strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
-                           pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
-                           full.names = TRUE ,
-                           recursive  = FALSE)
-strict_files <- sort(strict_files)
-
-if (TEST) {
-    gather <- c()
-    year(START_DAY):year(Sys.Date())
-    for (ay in year(START_DAY):year(END_DAY)) {
-        gather <- c(gather, grep(ay, strict_files, value = T))
-    }
-    strict_files <- gather
-}
-
-
-
-
-
-
-
-## build one data.frame
-strict <- data.table()
-for (in_f in strict_files) {
-    stctemp <- data.table(readRDS(in_f))
-
-    ## remove older system flags
-    stctemp$QCF_DIR <- NULL
-    stctemp$QCF_GLB <- NULL
-
-#     ##TODO we have setup filters with the assumption of good.
-#     ## have to check the logic of other filters
-#     allow   <- c( "good", "Possible Direct Obstruction (23)")
-#     stctemp <- stctemp[ QCF_DIR %in% allow | QCF_GLB %in% allow ]
-    strict  <- rbind(strict, stctemp)
-    rm(stctemp)
-}
-
-## create the main flag to include exclude data from processing
-strict$QCF_DIR      <- TRUE
-strict$QCF_GLB      <- TRUE
-
-
-## Select data to use!! --------------------------------------------------------
-
-#'
-#' ## Excluded data summary
-#'
-#' Some data are excluded from processing
-#'
-
-## we have no reason to ignore that data
-
-## F1
-strict$QCF_DIR_01       <- NULL
-strict$QCF_GLB_01       <- NULL
-strict$QCv9_01_dir_flag <- NULL
-strict$QCv9_01_glb_flag <- NULL
-## F2
-strict$QCF_GLB_02       <- NULL
-strict$QCF_DIR_02       <- NULL
-strict$QCv9_02_dir_flag <- NULL
-strict$QCv9_02_glb_flag <- NULL
-## F4
-strict$QCF_DIR_04_1     <- NULL
-strict$QCF_DIR_04_2     <- NULL
-strict$QCF_GLB_04_1     <- NULL
-strict$QCF_GLB_04_2     <- NULL
-strict$QCv9_04_dir_flag <- NULL
-strict$QCv9_04_glb_flag <- NULL
-
-
-
-
-strict$QCF_GLB_09   <- NULL
-strict$QCF_BTH_06_1 <- NULL
-
-
-
-
-## 3. COMPARISON TESTS PER BSRN “non-definitive”
-## remove only some of the offending data
-warning("Disabled this for trends !!")
-# test <- strict[ !is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag) ]
-# hist(test$Elevat,  breaks = 100)
-# hist(test$Azimuth, breaks = 100)
-# ## trends use data above 5
-# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_DIR := FALSE]
-# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_GLB := FALSE]
-strict$QCF_BTH_03_1     <- NULL
-strict$QCF_BTH_03_2     <- NULL
-strict$QCv9_03_low_flag <- NULL
-strict$QCv9_03_upp_flag <- NULL
-## check the tables
-cat(print(table(strict$QCF_DIR)))
-cat(print(table(strict$QCF_GLB)))
-
-
-
-
-## 5. No tracking instances
-## These will cause problems in CS detection
-## No tracking or obstacles on Direct should be remove manual with exclusions?
-strict$QCF_DIR_05 <- NULL
-
-
-## 6.  Rayleigh Limit Diffuse Comparison
-## On this region can not infer CS results
-# Lim6_azim <- 130
-# Lim6_elev <- 13
-# test <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR)  ]
-# hist(test$Elevat,  breaks = 100)
-# abline(v = Lim6_elev, col = "red")
-# hist(test$Azimuth, breaks = 100)
-# abline(v = Lim6_azim, col = "red")
-# test2 <- strict[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev ]
-# hist(test2$Elevat,  breaks = 100)
-# hist(test2$Azimuth, breaks = 100)
-
-warning("Disabled this for trends !!")
-# strict[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_DIR := FALSE]
-# strict[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_GLB := FALSE]
-strict$QCF_BTH_06_2 <- NULL
-## check the tables
-cat(print(table(strict$QCF_DIR)))
-cat(print(table(strict$QCF_GLB)))
-
-
-
-## TODO 7.
-
-
-
-## 8. Ignore data with inverted values
-table(strict$QCF_BTH_08_1)
-table(strict$QCF_BTH_08_2)
-## set inclusion flags
-warning("Disabled this for trends !!")
-# strict[!is.na(QCF_BTH_08_1), QCF_DIR := FALSE]
-# strict[!is.na(QCF_BTH_08_1), QCF_GLB := FALSE]
-# strict[!is.na(QCF_BTH_08_2), QCF_DIR := FALSE]
-# strict[!is.na(QCF_BTH_08_2), QCF_GLB := FALSE]
-strict$QCF_BTH_08_1 <- NULL
-strict$QCF_BTH_08_2 <- NULL
-## check the tables
-cat(print(table(strict$QCF_DIR)))
-cat(print(table(strict$QCF_GLB)))
-
-
-
-
-## FIXME some duplicates rows exist in the database!!!
-strong <- unique(strict)
-rm(strict)
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-
-##  Limit date span of the data ------------------------------------------------
-cat(paste("Use data after date:", START_DAY), "\n\n")
-strong[, Day := as.Date(Date)]
-strong <- strong[ strong$Day >= as.Date(START_DAY), ]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-## days to parse
-dayslist      <- unique( strong$Day )
-
-## add id column
-strong$CSflag <- 99
-
-
-
-#'
-#' ### Data set input.
-#'
-#' First day:      `r min(dayslist)`
-#'
-#' Last day:       `r max(dayslist)`
-#'
-#' Days available: `r length(dayslist)`
-#'
-
-#### Exclude inversions ####
-warning("Disabled this for trends !!")
-# inverted <- strong$wattGLB < strong$wattHOR
-inverted <- 0
-
-#'
-#' ### There are instances where global irradiance is less than direct.
-#'
-#' This happens for `r sum(inverted, na.rm = T)`
-#' minutes (records), near sunset and sunrise due to obstacles,
-#' or due to different sunrise/sunset time due to small spatial differences.
-#' We will exclude all this data both for global and direct.
-#'
-#+ include=T, echo=FALSE
-warning("Disabled this for trends !!")
-# strong[inverted , QCF_DIR := FALSE ]
-# strong[inverted , QCF_GLB := FALSE ]
-
-
-
-
-#### Remove measurement without good quality code !! ####
-warning("Remove measurement without good quality code !!")
-warning("Disabled this for trends !!")
-# strong[QCF_DIR == FALSE, wattDIR     := NA]
-# strong[QCF_DIR == FALSE, wattHOR     := NA]
-# strong[QCF_DIR == FALSE, wattDIR_sds := NA]
-# strong[QCF_DIR == FALSE, wattDIF     := NA]
-# strong[QCF_GLB == FALSE, wattGLB     := NA]
-# strong[QCF_GLB == FALSE, wattGLB_sds := NA]
-# strong[QCF_GLB == FALSE, wattDIF     := NA]
-
-
-
 
 
 
@@ -430,7 +224,7 @@ if (IGNORE_DIRE) {
 
 
 
-##  Variables initialization -- ------------------------------------------------
+##  Variables initialization  --------------------------------------------------
 
 MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
@@ -609,60 +403,194 @@ FDPlim <- MS$nt * 3
 #+ include=T, echo=F
 
 
-## create a list of days to use
+
+
+
+
+
+
+
+
+##  Load data from QCRad procedure   -------------------------------------------
+## The "strict" input files were used before
+strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
+                           pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
+                           full.names = TRUE ,
+                           recursive  = FALSE)
+strict_files <- sort(strict_files)
+
 if (TEST) {
-    if ( length(dayslist) < MS$sample_n_days) { MS$sample_n_days = length(dayslist) }
-    # dayslist <- sample(dayslist, MS$sample_n_days )
-    # dayslist = dayslist[1:10]
-    # dayslist = tail(dayslist, n = 20)
-    # dayslist <- dayslist[year(dayslist)>=2019]
-    # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
-    dayslist <- dayslist
-    # dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
+    gather <- c()
+    year(START_DAY):year(Sys.Date())
+    for (ay in year(START_DAY):year(END_DAY)) {
+        gather <- c(gather, grep(ay, strict_files, value = T))
+    }
+    strict_files <- gather
 }
-dayslist <- sort( dayslist )
 
 
-#'
-#' ### Day range
-#'
-range(dayslist)
-#'
-#+ include=T, echo=F
-
-
-#'
-#' ### Baseline value for direct irradiance
-#'
-#' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
-strong[ , CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
-#+ include=T, echo=F
-
-
-
-# ## For parallel
-# library(parallel)
-# library(doParallel)
-# library(foreach)
-# n.cores    <- detectCores() - 1
-# my.cluster <- makeCluster(
-#     n.cores,
-#     type = "FORK"
-# )
-# registerDoParallel(cl = my.cluster)
-
-
-
-
-#+ include=T, echo=F
-##  Iterate all years
-for (yyyy in unique(year(dayslist))) {
+for (in_fl in strict_files) {
 # foreach(yyyy = unique(year(dayslist))) %dopar% {
 
+    ## get input data
+    DATA <- data.table(readRDS(in_fl))
+    yyyy <- unique(year(DATA$Date))
+
+    ## create the main flag to include exclude data from processing
+    DATA$QCF_DIR <- NULL
+    DATA$QCF_GLB <- NULL
+    DATA$QCF_DIR <- TRUE
+    DATA$QCF_GLB <- TRUE
+
+
+
+    ## Select data to use!! ----------------------------------------------------
+
+    ## we have no reason to ignore that data
+
+    ## F1
+    DATA$QCF_DIR_01       <- NULL
+    DATA$QCF_GLB_01       <- NULL
+    DATA$QCv9_01_dir_flag <- NULL
+    DATA$QCv9_01_glb_flag <- NULL
+    ## F2
+    DATA$QCF_GLB_02       <- NULL
+    DATA$QCF_DIR_02       <- NULL
+    DATA$QCv9_02_dir_flag <- NULL
+    DATA$QCv9_02_glb_flag <- NULL
+    ## F4
+    DATA$QCF_DIR_04_1     <- NULL
+    DATA$QCF_DIR_04_2     <- NULL
+    DATA$QCF_GLB_04_1     <- NULL
+    DATA$QCF_GLB_04_2     <- NULL
+    DATA$QCv9_04_dir_flag <- NULL
+    DATA$QCv9_04_glb_flag <- NULL
+
+
+    DATA$QCF_GLB_09   <- NULL
+    DATA$QCF_BTH_06_1 <- NULL
+
+
+    ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+    ## remove only some of the offending data
+    warning("Disabled this for trends !!")
+    # test <- DATA[ !is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag) ]
+    # hist(test$Elevat,  breaks = 100)
+    # hist(test$Azimuth, breaks = 100)
+    # ## trends use data above 5
+    # DATA[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_DIR := FALSE]
+    # DATA[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_GLB := FALSE]
+    DATA$QCF_BTH_03_1     <- NULL
+    DATA$QCF_BTH_03_2     <- NULL
+    DATA$QCv9_03_low_flag <- NULL
+    DATA$QCv9_03_upp_flag <- NULL
+    ## check the tables
+    cat(print(table(DATA$QCF_DIR)))
+    cat(print(table(DATA$QCF_GLB)))
+
+
+
+
+    ## 5. No tracking instances
+    ## These will cause problems in CS detection
+    ## No tracking or obstacles on Direct should be remove manual with exclusions?
+    DATA$QCF_DIR_05 <- NULL
+
+
+    ## 6.  Rayleigh Limit Diffuse Comparison
+    ## On this region can not infer CS results
+    # Lim6_azim <- 130
+    # Lim6_elev <- 13
+    # test <- DATA[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR)  ]
+    # hist(test$Elevat,  breaks = 100)
+    # abline(v = Lim6_elev, col = "red")
+    # hist(test$Azimuth, breaks = 100)
+    # abline(v = Lim6_azim, col = "red")
+    # test2 <- DATA[ !is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev ]
+    # hist(test2$Elevat,  breaks = 100)
+    # hist(test2$Azimuth, breaks = 100)
+
+    warning("Disabled this for trends !!")
+    # DATA[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_DIR := FALSE]
+    # DATA[!is.na(QCF_BTH_06_2) & (!QCF_GLB) & (!QCF_DIR) & Azimuth < Lim6_azim & Elevat < Lim6_elev, QCF_GLB := FALSE]
+    DATA$QCF_BTH_06_2 <- NULL
+    ## check the tables
+    cat(print(table(DATA$QCF_DIR)))
+    cat(print(table(DATA$QCF_GLB)))
+
+
+
+    ## TODO 7.
+
+
+
+    ## 8. Ignore data with inverted values
+    table(DATA$QCF_BTH_08_1)
+    table(DATA$QCF_BTH_08_2)
+    ## set inclusion flags
+    warning("Disabled this for trends !!")
+    # DATA[!is.na(QCF_BTH_08_1), QCF_DIR := FALSE]
+    # DATA[!is.na(QCF_BTH_08_1), QCF_GLB := FALSE]
+    # DATA[!is.na(QCF_BTH_08_2), QCF_DIR := FALSE]
+    # DATA[!is.na(QCF_BTH_08_2), QCF_GLB := FALSE]
+    DATA$QCF_BTH_08_1 <- NULL
+    DATA$QCF_BTH_08_2 <- NULL
+    ## check the tables
+    cat(print(table(DATA$QCF_DIR)))
+    cat(print(table(DATA$QCF_GLB)))
+
+    ## sanity check
+    if (any(duplicated(DATA)) == TRUE) stop("Dups found")
+
+    ## add id column
+    DATA$CSflag <- 99
+
+
+
+    #### Exclude inversions ####
+    warning("Disabled this for trends !!")
+    # inverted <- DATA$wattGLB < DATA$wattHOR
+    inverted <- 0
+
+    #'
+    #' ### There are instances where global irradiance is less than direct.
+    #'
+    #' This happens for `r sum(inverted, na.rm = T)`
+    #' minutes (records), near sunset and sunrise due to obstacles,
+    #' or due to different sunrise/sunset time due to small spatial differences.
+    #' We will exclude all this data both for global and direct.
+    #'
+    #+ include=T, echo=FALSE
+    warning("Disabled this for trends !!")
+    # DATA[inverted , QCF_DIR := FALSE ]
+    # DATA[inverted , QCF_GLB := FALSE ]
+
+
+    #### Remove measurement without good quality code !! ####
+    warning("Remove measurement without good quality code !!")
+    warning("Disabled this for trends !!")
+    # DATA[QCF_DIR == FALSE, wattDIR     := NA]
+    # DATA[QCF_DIR == FALSE, wattHOR     := NA]
+    # DATA[QCF_DIR == FALSE, wattDIR_sds := NA]
+    # DATA[QCF_DIR == FALSE, wattDIF     := NA]
+    # DATA[QCF_GLB == FALSE, wattGLB     := NA]
+    # DATA[QCF_GLB == FALSE, wattGLB_sds := NA]
+    # DATA[QCF_GLB == FALSE, wattDIF     := NA]
+
+
+    #'
+    #' ### Baseline value for direct irradiance
+    #'
+    #' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
+    DATA[, CS_ref_HOR := ( TSIextEARTH_comb * 0.7 ^ AM(SZA) ^ 0.678 ) * cosde(SZA) ]
+    #+ include=T, echo=F
+
+
+    DATA[, Day := as.Date(Date)]
     gather       <- data.table()
     daily_stats  <- data.frame()
-    subdayslist  <- dayslist[year(dayslist) == yyyy]
-    total_points <- sum(year(strong$Date) == yyyy)
+    subdayslist  <- sort(unique(as.Date(DATA$Date)))
+    total_points <- sum(year(DATA$Date) == yyyy)
 
     if (!interactive()) {
         if (TEST) {
@@ -676,7 +604,7 @@ for (yyyy in unique(year(dayslist))) {
     for (aa in subdayslist) {
         ## Day variables
         aday  <- as.Date(aa , origin = "1970-01-01")
-        sell  <- strong$Day == (aday)
+        sell  <- DATA$Day == (aday)
         doy   <- as.numeric(format(aday, "%j"))
         mont  <- as.numeric(format(aday, "%m"))
         nt_hw <- MS$nt %/% 2
@@ -709,7 +637,7 @@ for (yyyy in unique(year(dayslist))) {
         relative_CS_lim <- sum(sell) * MS$relative_CS
 
         ## Data selection for day
-        subday     <- strong[ sell, ]
+        subday     <- DATA[ sell, ]
         have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
         have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
         tot_p      <- length(subday$wattGLB)
@@ -817,7 +745,7 @@ for (yyyy in unique(year(dayslist))) {
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
-                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                                                    ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -861,13 +789,13 @@ for (yyyy in unique(year(dayslist))) {
 
                     ## pass test as clear
                     pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
-                            GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
+                        GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
-                                                ( subday$CSflag[w_sta:w_end] == 99) &
-                                                  pass                                ] <- 0
+                                                    ( subday$CSflag[w_sta:w_end] == 99) &
+                                                    pass                                ] <- 0
                 } ##END for loop all points
                 ## store comparison values ?
                 subday$VIL_GLB   <- GLB_length
@@ -900,7 +828,7 @@ for (yyyy in unique(year(dayslist))) {
                     s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
 
                     GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
-                                    sum( data_win_glb , na.rm = T) / MS$nt
+                        sum( data_win_glb , na.rm = T) / MS$nt
 
                     ## pass test as clear
                     pass <- GLB_sigma[i] < MS$offVCT
@@ -908,7 +836,7 @@ for (yyyy in unique(year(dayslist))) {
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                (   subday$CSflag[w_sta:w_end] == 99) &
+                                                    (   subday$CSflag[w_sta:w_end] == 99) &
                                                     pass                                ] <- 0
                 } ##END for loop all points
             }
@@ -959,8 +887,8 @@ for (yyyy in unique(year(dayslist))) {
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
-                                                (  subday$CSflag[w_sta:w_end] == 99) &
-                                                   pass                                ] <- 0
+                                                    (  subday$CSflag[w_sta:w_end] == 99) &
+                                                    pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -976,21 +904,21 @@ for (yyyy in unique(year(dayslist))) {
             ## low direct and not "Possible Direct Obstruction (23)"
             ## probably we know sun was obscured
             subday[CSflag == 0 &
-                   wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
+                       wattHOR < MS$LDIlim &
+                       QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
             subday[CSflag == 99 &
-                   wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
+                       wattHOR < MS$LDIlim &
+                       QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
             subday[wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
+                       QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
 
             subday[wattHOR < MS$LDIlim &
-                   QCF_DIR != "Possible Direct Obstruction (23)",
+                       QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
         }
 
@@ -1035,7 +963,6 @@ for (yyyy in unique(year(dayslist))) {
         }
 
 
-
         ## rest is clear sky (we hope)
         subday$CSflag[subday$CSflag == 99] <- 0
 
@@ -1051,10 +978,10 @@ for (yyyy in unique(year(dayslist))) {
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
-                mean(subday$wattGLB[clear_sky], na.rm = T)
+            mean(subday$wattGLB[clear_sky], na.rm = T)
 
         cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
-                sum(clear_sky, na.rm = T)
+            sum(clear_sky, na.rm = T)
 
         ## ID statistics
         MeanVIPcnt <- sum(subday$CSflag == 1, na.rm = T)
@@ -1305,8 +1232,8 @@ for (yyyy in unique(year(dayslist))) {
         subday$CS_ref         <- CS_ref_safe
         gather <- rbind(gather, subday, fill = TRUE)
 
-        strong$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
-        strong$CS_ref[sell]   <- CS_ref_safe
+        DATA$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
+        DATA$CS_ref[sell]   <- CS_ref_safe
 
 
         ## _ Keep daily statistics  --------------------------------------------
@@ -1328,7 +1255,7 @@ for (yyyy in unique(year(dayslist))) {
     dev.off()
 
     ### create a yearly export
-    export <- unique(strong[ year(Date) == yyyy ])
+    export <- unique(DATA[ year(Date) == yyyy ])
     export$CSflag[export$CSflag == 99] <- NA
 
     gather <- unique(gather)
@@ -1336,7 +1263,7 @@ for (yyyy in unique(year(dayslist))) {
     export <- merge(gather, export, all = T)
 
 
-    test <- strong[ year(Date) == yyyy ]
+    test <- DATA[ year(Date) == yyyy ]
 
     length(unique(test$Date))
     length(unique(gather$Date))
@@ -1350,10 +1277,10 @@ for (yyyy in unique(year(dayslist))) {
 
     ## TODO check unmarked records
 
-    as.Date(setdiff(unique(strong$Day),unique(export$Day)), origin = "1970-01-01")
+    as.Date(setdiff(unique(DATA$Day),unique(export$Day)), origin = "1970-01-01")
 
     any(duplicated(unique(export$Day),
-            unique(strong$Day)))
+                   unique(DATA$Day)))
 
     table(export$CSflag)
 
@@ -1373,12 +1300,128 @@ for (yyyy in unique(year(dayslist))) {
 
     })
 
-} ##END year loop
 
 
 
-par(def.par)  # reset to default
-layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
+    par(def.par)  # reset to default
+    layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
+
+
+
+
+    #+ include=T, echo=FALSE
+    pander(summary(DATA$CSflag))
+
+    pander(print(table(DATA$CSflag)))
+    #'
+
+
+    #+ include=T, echo=FALSE
+    par("mar" = c(3, 3, 2, 1) )
+
+    barplot( table(DATA$CSflag),
+             main = "Flag Count")
+
+    barplot(prop.table(table(DATA$CSflag)),
+            main = "Flag Frequency" )
+    #'
+
+
+
+    ## Evaluation of CS detection
+    clear_sky <- DATA$CSflag == 0
+
+    RMSE <- sqrt(mean( ( DATA$CS_ref[clear_sky] - DATA$wattGLB[clear_sky] )**2 , na.rm = T) ) /
+        mean(DATA$wattGLB[clear_sky] , na.rm = T)
+
+    MBE  <- mean(DATA$CS_ref[clear_sky] - DATA$wattGLB[clear_sky]  , na.rm = T) /
+        mean(DATA$wattGLB[clear_sky] , na.rm = T)
+
+
+
+    #'
+    #' ### Cost function for optimization of alpha value.
+    #'
+    #' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
+    #'                 { n } , \qquad a > 0 $$
+    #'
+    cost <- sum((( alpha * DATA$wattGLB[clear_sky] ) - DATA$CS_ref[clear_sky] )**2 , na.rm = T) /
+        sum(clear_sky, na.rm = T)
+
+
+
+    # plot(daily_stats$Date, daily_stats$RMSE)
+    # abline(h = RMSE)
+    # plot(daily_stats$Date, daily_stats$MBE)
+    # abline(h = MBE)
+
+    # hist(daily_stats$RMSE)
+    # abline(v = RMSE)
+    # hist(daily_stats$MBE)
+    # abline(v = MBE)
+
+    # library(tdr)
+    # tdStats(DATA$[clear_sky], DATA$wattGLB[clear_sky])
+    # targetDiagram(tdStats(DATA$CS_ref[clear_sky], DATA$wattGLB[clear_sky]))
+    # targetDiagram(tafff)
+    # text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, offset = 0)
+    # plot(tafff$cvrmse, tafff$mbe)
+    # text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)
+    # plot( subset(tafff, select = -c(r2,tStone,mbe,nmbe,sdo,sdm,mo,mm,mae) ) )
+    # plot( subset(tafff, select = c(mbe,mae,rmse) ) )
+    # plot(tafff$rmse, tafff$mbe, xlab = "rmse", ylab = "mbe")
+    # text(tafff$rmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)
+    # plot(tafff$cvrmse, tafff$cvmbe, xlab = "rmse", ylab = "mbe")
+    # plot(tafff$nrmse, tafff$nmbe, xlab = "rmse", ylab = "mbe")
+
+
+    mean(daily_stats$RMSE, na.rm = T)
+
+
+
+
+
+
+
+    #+ include=T, echo=FALSE
+
+    ## complete days
+    daterange <- range(DATA$Date)
+    all_dates <- data.frame(Day = seq(as.Date(daterange[1]),as.Date(daterange[2]),by="day"))
+    complete  <- base::merge(all_dates, DATA, by.y = "Day", all.x = T, all.y = T )
+
+
+    layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE))
+    par("mar" = c(2, 3, 2, 0) )
+
+
+
+
+
+    for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
+        yyyyselect <- format(complete$Day, "%Y") == paste(yyyy)
+        counts     <- table(complete$CSflag[yyyyselect], complete$Day[yyyyselect] )
+        barplot(counts, space = 0, col = c("green",kcols), border = NA)
+    }
+
+
+    for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
+        yyyyselect <- format(complete$Day, "%Y") == paste(yyyy)
+        counts <- table(complete$CSflag[yyyyselect], complete$Day[yyyyselect] )
+        propt  <- prop.table(counts, margin = 2 )
+        barplot(propt, space = 0, col = c("green",kcols), border = NA)
+    }
+    #'
+
+
+
+
+}
+
+
+
+
+
 
 #'
 #' | CS Flag | Test |
@@ -1396,110 +1439,6 @@ layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
 #' |    9    | Too Few data points for the day                               |
 #' |   10    | Missing Data                                                  |
 #' |   11    | Direct irradiance simple threshold                            |
-#'
-
-
-
-#+ include=T, echo=FALSE
-pander(summary(strong$CSflag))
-
-pander(print(table(strong$CSflag)))
-#'
-
-
-#+ include=T, echo=FALSE
-par("mar" = c(3, 3, 2, 1) )
-
-barplot( table(strong$CSflag),
-         main = "Flag Count")
-
-barplot(prop.table(table(strong$CSflag)),
-        main = "Flag Frequency" )
-#'
-
-
-## Evaluation of CS detection
-clear_sky <- strong$CSflag == 0
-
-RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
-        mean(strong$wattGLB[clear_sky] , na.rm = T)
-
-MBE  <- mean(strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) /
-        mean(strong$wattGLB[clear_sky] , na.rm = T)
-
-
-#'
-#' ### Cost function for optimization of alpha value.
-#'
-#' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
-#'                 { n } , \qquad a > 0 $$
-#'
-cost <- sum((( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T) /
-        sum(clear_sky, na.rm = T)
-
-
-
-# plot(daily_stats$Date, daily_stats$RMSE)
-# abline(h = RMSE)
-# plot(daily_stats$Date, daily_stats$MBE)
-# abline(h = MBE)
-
-# hist(daily_stats$RMSE)
-# abline(v = RMSE)
-# hist(daily_stats$MBE)
-# abline(v = MBE)
-
-# library(tdr)
-# tdStats(strong$[clear_sky], strong$wattGLB[clear_sky])
-# targetDiagram(tdStats(strong$CS_ref[clear_sky], strong$wattGLB[clear_sky]))
-# targetDiagram(tafff)
-# text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, offset = 0)
-# plot(tafff$cvrmse, tafff$mbe)
-# text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)
-# plot( subset(tafff, select = -c(r2,tStone,mbe,nmbe,sdo,sdm,mo,mm,mae) ) )
-# plot( subset(tafff, select = c(mbe,mae,rmse) ) )
-# plot(tafff$rmse, tafff$mbe, xlab = "rmse", ylab = "mbe")
-# text(tafff$rmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, pos = 1)
-# plot(tafff$cvrmse, tafff$cvmbe, xlab = "rmse", ylab = "mbe")
-# plot(tafff$nrmse, tafff$nmbe, xlab = "rmse", ylab = "mbe")
-
-
-mean(daily_stats$RMSE, na.rm = T)
-
-
-
-
-
-
-
-#+ include=T, echo=FALSE
-
-## complete days
-daterange <- range(strong$Date)
-all_dates <- data.frame(Day = seq(as.Date(daterange[1]),as.Date(daterange[2]),by="day"))
-complete  <- base::merge(all_dates, strong, by.y = "Day", all.x = T, all.y = T )
-
-
-layout(matrix(c(1,2), nrow = 2, ncol = 1, byrow = TRUE))
-par("mar" = c(2, 3, 2, 0) )
-
-
-
-
-
-for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
-    yyyyselect <- format(complete$Day, "%Y") == paste(yyyy)
-    counts     <- table(complete$CSflag[yyyyselect], complete$Day[yyyyselect] )
-    barplot(counts, space = 0, col = c("green",kcols), border = NA)
-}
-
-
-for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
-    yyyyselect <- format(complete$Day, "%Y") == paste(yyyy)
-    counts <- table(complete$CSflag[yyyyselect], complete$Day[yyyyselect] )
-    propt  <- prop.table(counts, margin = 2 )
-    barplot(propt, space = 0, col = c("green",kcols), border = NA)
-}
 #'
 
 
