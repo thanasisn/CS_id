@@ -81,6 +81,7 @@ library(caTools)
 library(data.table)
 library(yardstick)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
 warning("Missing days from output!!")
@@ -109,7 +110,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -675,6 +676,9 @@ for (yyyy in unique(year(dayslist))) {
         nt_hw <- MS$nt %/% 2
         if (interactive()) cat(paste(aday),"\n")
 
+        ## TEST!
+        # if (aday == "2017-04-14") stop("test")
+
         if (MONTHLY) {
             ## get alpha for month
             alpha      <- monthly_alphas$alpha[monthly_alphas$month == mont]
@@ -1032,11 +1036,11 @@ for (yyyy in unique(year(dayslist))) {
         ## Evaluation of CS detection
         clear_sky <- subday$CSflag == 0
 
-        ## skip non clear days
-        if (sum(clear_sky, na.rm = T) < relative_CS_lim )  {
-            # print(paste(CS_name, "Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
-            next  ##  skip the rest of the loop and avoid alpha optimization
-        }
+        # ## skip non clear days
+        # if (sum(clear_sky, na.rm = T) < relative_CS_lim)  {
+        #     print(paste("Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
+        #     next  ##  skip the rest of the loop and avoid alpha optimization
+        # }
 
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
@@ -1351,18 +1355,17 @@ for (yyyy in unique(year(dayslist))) {
     ## store data
     suppressWarnings({
         # sub("\\.R$", "", basename(Script.Name)), "_")
-        myRtools::write_RDS(object = export,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+        write_RDS(object = export,
+                  file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
+                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
-        myRtools::write_RDS(object = daily_stats,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+        write_RDS(object = daily_stats,
+                  file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
+                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
     })
-
 
 } ##END year loop
 
@@ -1506,7 +1509,7 @@ for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
 # text(gather_results$rmse, gather_results$CS_count, labels = gather_results$CS_models, cex = .6,pos = 4)
 
 ## store params
-myRtools::write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
+write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
 
 #' **END**
 #+ include=T, echo=F
