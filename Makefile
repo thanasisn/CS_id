@@ -33,8 +33,6 @@ $(RUNT): $(RMD)
 	-Rscript $?
 
 
-
-
 TARGET := Clear_sky_id_Reno-Hansen_description_v14.2
 RMD    := $(TARGET).Rmd
 PDF    := $(TARGET).pdf

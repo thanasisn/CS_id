@@ -13,7 +13,6 @@
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
 #' link-citations:  yes
 #' colorlinks:      yes
 #'
@@ -81,6 +80,7 @@ library(caTools)
 library(data.table)
 library(yardstick)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
 
@@ -113,9 +113,13 @@ TEST        <- FALSE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
+END_DAY     <- Sys.Date()
 
-if (TEST) { warning("Test is active") }
-if (TEST) { START_DAY <- "2022-01-01" }
+if (TEST) {
+    warning("Test is active")
+    START_DAY <- "2022-01-01"
+    END_DAY   <- "2022-12-01"
+}
 
 ## load previous state have to override it for alpha to be used
 if (MONTHLY) {
@@ -162,6 +166,19 @@ strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongS
                            full.names = TRUE ,
                            recursive  = FALSE)
 strict_files <- sort(strict_files)
+
+if (TEST) {
+    gather <- c()
+    year(START_DAY):year(Sys.Date())
+    for (ay in year(START_DAY):year(END_DAY)) {
+        gather <- c(gather, grep(ay, strict_files, value = T))
+    }
+    strict_files <- gather
+}
+
+
+
+
 ## build one data.frame
 strict <- data.table()
 for (in_f in strict_files) {
@@ -175,7 +192,13 @@ for (in_f in strict_files) {
 #     ## have to check the logic of other filters
 #     allow   <- c( "good", "Possible Direct Obstruction (23)")
 #     stctemp <- stctemp[ QCF_DIR %in% allow | QCF_GLB %in% allow ]
-    strict  <- rbind(strict, stctemp)
+
+
+    ## some new columns from BB need to use fill=T
+    names(strict) %in% names(stctemp)
+    names(stctemp)[!names(stctemp) %in% names(strict)]
+
+    strict  <- rbind(strict, stctemp, fill = TRUE)
     rm(stctemp)
 }
 
@@ -193,14 +216,28 @@ strict$QCF_GLB      <- TRUE
 #'
 
 ## we have no reason to ignore that data
+
+## F1
 strict$QCF_DIR_01   <- NULL
 strict$QCF_GLB_01   <- NULL
+strict$QCv9_01_dir_flag <- NULL
+strict$QCv9_01_glb_flag <- NULL
+## F2
 strict$QCF_GLB_02   <- NULL
 strict$QCF_DIR_02   <- NULL
+strict$QCv9_02_dir_flag <- NULL
+strict$QCv9_02_glb_flag <- NULL
+## F4
 strict$QCF_DIR_04_1 <- NULL
 strict$QCF_DIR_04_2 <- NULL
 strict$QCF_GLB_04_1 <- NULL
 strict$QCF_GLB_04_2 <- NULL
+strict$QCv9_04_dir_flag <- NULL
+strict$QCv9_04_glb_flag <- NULL
+
+
+
+
 strict$QCF_GLB_09   <- NULL
 strict$QCF_BTH_06_1 <- NULL
 
@@ -210,17 +247,20 @@ strict$QCF_BTH_06_1 <- NULL
 ## 3. COMPARISON TESTS PER BSRN “non-definitive”
 ## remove only some of the offending data
 warning("Disabled this for trends !!")
-# test <- strict[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
+# test <- strict[ !is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag) ]
 # hist(test$Elevat,  breaks = 100)
 # hist(test$Azimuth, breaks = 100)
 # ## trends use data above 5
-# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_DIR := FALSE]
-# strict[((!is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2)) & Elevat < 15), QCF_GLB := FALSE]
+# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_DIR := FALSE]
+# strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_GLB := FALSE]
 strict$QCF_BTH_03_1 <- NULL
 strict$QCF_BTH_03_2 <- NULL
+strict$QCv9_03_low_flag <- NULL
+strict$QCv9_03_upp_flag <- NULL
 ## check the tables
 cat(print(table(strict$QCF_DIR)))
 cat(print(table(strict$QCF_GLB)))
+
 
 
 
@@ -580,9 +620,9 @@ if (TEST) {
     # dayslist <- dayslist[year(dayslist)>=2019]
     # dayslist <- dayslist[year(dayslist)>=2019 &  month(dayslist) == 7]
     dayslist <- dayslist
-    dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
+    # dayslist <- dayslist[dayslist > as.Date("2023-03-18")]
 }
-dayslist <- sort( dayslist, decreasing = T )
+dayslist <- sort( dayslist )
 
 
 #'
@@ -1001,12 +1041,13 @@ for (yyyy in unique(year(dayslist))) {
         ## Evaluation of CS detection
         clear_sky <- subday$CSflag == 0
 
-        ## skip non clear days
-        if (sum(clear_sky, na.rm = T) < relative_CS_lim )  {
-            # print(paste(CS_name, "Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
-            next  ##  skip the rest of the loop and avoid alpha optimization
-        }
+        ##; ## skip non clear days
+        ##; if (sum(clear_sky, na.rm = T) < relative_CS_lim)  {
+        ##;     print(paste("Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
+        ##;     next  ##  skip the rest of the loop and avoid alpha optimization
+        ##; }
 
+        ## Clear sky statistics  -----
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
@@ -1015,6 +1056,7 @@ for (yyyy in unique(year(dayslist))) {
         cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
                 sum(clear_sky, na.rm = T)
 
+
         ## ID statistics
         MeanVIPcnt <- sum(subday$CSflag == 1, na.rm = T)
         MaxVIPcnt  <- sum(subday$CSflag == 2, na.rm = T)
@@ -1022,11 +1064,6 @@ for (yyyy in unique(year(dayslist))) {
         VCTcnt     <- sum(subday$CSflag == 4, na.rm = T)
         VSMcnt     <- sum(subday$CSflag == 5, na.rm = T)
 
-
-        ## plotting selection
-        # if ( any(clear_sky) &
-        #      any(!is.na(subday$wattGLB[clear_sky])) &
-        #      (RMSE_r < 0.005 | abs(MBE) < 0.005 ) ) {
 
 
         #### PLOTS ####
@@ -1320,18 +1357,17 @@ for (yyyy in unique(year(dayslist))) {
     ## store data
     suppressWarnings({
         # sub("\\.R$", "", basename(Script.Name)), "_")
-        myRtools::write_RDS(object = export,
+        write_RDS(object = export,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
                                           sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
-        myRtools::write_RDS(object = daily_stats,
+        write_RDS(object = daily_stats,
                             file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
                                           sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
     })
-
 
 } ##END year loop
 
@@ -1475,9 +1511,14 @@ for (yyyy in min(year(complete$Day)):max(year(complete$Day))) {
 # text(gather_results$rmse, gather_results$CS_count, labels = gather_results$CS_models, cex = .6,pos = 4)
 
 ## store params
-myRtools::write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
+write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
 
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
-cat(sprintf("\n%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
+            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
+# if (interactive()) {
+    system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
+    system(paste("notify-send -u normal -t 30000 ", basename(Script.Name), " 'R script ended'"))
+# }

@@ -84,7 +84,7 @@ source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
-warning("Missing days from output!!")
+
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -118,8 +118,8 @@ END_DAY     <- Sys.Date()
 
 if (TEST) {
     warning("Test is active")
-    START_DAY <- "2017-01-01"
-    END_DAY   <- "2017-12-01"
+    START_DAY <- "2022-01-01"
+    END_DAY   <- "2022-12-01"
 }
 
 ## load previous state have to override it for alpha to be used
@@ -682,9 +682,6 @@ for (yyyy in unique(year(dayslist))) {
         nt_hw <- MS$nt %/% 2
         if (interactive()) cat(paste(aday),"\n")
 
-        ## TEST!
-        # if (aday == "2017-04-14") stop("test")
-
         if (MONTHLY) {
             ## get alpha for month
             alpha      <- monthly_alphas$alpha[monthly_alphas$month == mont]
@@ -1048,6 +1045,7 @@ for (yyyy in unique(year(dayslist))) {
         #     next  ##  skip the rest of the loop and avoid alpha optimization
         # }
 
+        ## Clear sky statistics  -----
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
@@ -1055,6 +1053,7 @@ for (yyyy in unique(year(dayslist))) {
 
         cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
                 sum(clear_sky, na.rm = T)
+
 
         ## ID statistics
         MeanVIPcnt <- sum(subday$CSflag == 1, na.rm = T)

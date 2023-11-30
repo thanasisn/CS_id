@@ -133,8 +133,8 @@ END_DAY     <- Sys.Date()
 
 if (TEST) {
     warning("Test is active")
-    START_DAY <- "2017-01-01"
-    END_DAY   <- "2017-12-01"
+    START_DAY <- "2022-01-01"
+    END_DAY   <- "2022-12-01"
 }
 
 ## load previous state have to override it for alpha to be used
@@ -610,9 +610,6 @@ for (in_fl in strict_files) {
         nt_hw <- MS$nt %/% 2
         if (interactive()) cat(paste(aday),"\n")
 
-        ## TEST!
-        # if (aday == "2017-04-14") stop("test")
-
         if (MONTHLY) {
             ## get alpha for month
             alpha      <- monthly_alphas$alpha[monthly_alphas$month == mont]
@@ -963,7 +960,7 @@ for (in_fl in strict_files) {
         }
 
 
-        dummy <- subday$CSflag
+
         ## rest is clear sky (we hope)
         subday$CSflag[subday$CSflag == 99] <- 0
 
@@ -1328,7 +1325,6 @@ for (in_fl in strict_files) {
     barplot(prop.table(table(DATA$CSflag)),
             main = "Flag Frequency" )
     #'
-
 
 
     ## Evaluation of CS detection
