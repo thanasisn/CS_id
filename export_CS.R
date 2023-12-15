@@ -9,7 +9,7 @@ filelist <- list.files(path = "~/DATA/Broad_Band/CS_id/",
                        full.names = T)
 filelist <- grep("_stats_", filelist, invert = T, value = T)
 
-filelist <- grep("2021|2022|2023", filelist, invert = F, value = T)
+filelist <- grep("2022|2023", filelist, invert = F, value = T)
 
 DATA <- data.table()
 for (af in filelist) {
@@ -47,6 +47,11 @@ DATA[, chp1TempCF := NULL ]
 DATA[, TSIextEARTH_comb := NULL ]
 DATA[, pressure := NULL ]
 
+stop()
+
+DATA <- DATA[, Date, TYPE]
 
 write.csv(DATA, file = "Export_CS.csv", row.names = F)
 saveRDS(DATA,  file = "Export_CS.Rds")
+
+
