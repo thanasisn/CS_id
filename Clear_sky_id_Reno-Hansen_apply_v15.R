@@ -84,7 +84,6 @@ source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
-warning("Missing days from output!!")
 
 
 # ## For parallel
@@ -742,7 +741,7 @@ for (in_fl in strict_files) {
                 for (i in indx_todo ) {
                     walk(i, nt_hw , tot_p )
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0 ) &
-                                                    ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
+                                                ( subday$CSflag[w_sta:w_end] == 99) ] <- 0
                 } ##END for loop all time periods
             }
             ## set MaxVIP flag
@@ -786,13 +785,13 @@ for (in_fl in strict_files) {
 
                     ## pass test as clear
                     pass <- GLB_length[i] < (MS$MaxVIL_fct * CS_ref_length[i] + MS$offVIL_upl) &
-                        GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
+                            GLB_length[i] > (MS$MinVIL_fct * CS_ref_length[i] - MS$offVIL_dwl)
                     if (is.na(pass)) pass <- FALSE
 
                     ## set VIL flag
                     subday$CSflag[w_sta:w_end][ (!subday$CSflag[w_sta:w_end] == 0)  &
-                                                    ( subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                                                ( subday$CSflag[w_sta:w_end] == 99) &
+                                                  pass                                ] <- 0
                 } ##END for loop all points
                 ## store comparison values ?
                 subday$VIL_GLB   <- GLB_length
@@ -825,7 +824,7 @@ for (in_fl in strict_files) {
                     s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
 
                     GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
-                        sum( data_win_glb , na.rm = T) / MS$nt
+                                    sum( data_win_glb , na.rm = T) / MS$nt
 
                     ## pass test as clear
                     pass <- GLB_sigma[i] < MS$offVCT
@@ -833,7 +832,7 @@ for (in_fl in strict_files) {
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( ! subday$CSflag[w_sta:w_end] == 0)  &
-                                                    (   subday$CSflag[w_sta:w_end] == 99) &
+                                                (   subday$CSflag[w_sta:w_end] == 99) &
                                                     pass                                ] <- 0
                 } ##END for loop all points
             }
@@ -884,8 +883,8 @@ for (in_fl in strict_files) {
 
                     ## set VCT flag
                     subday$CSflag[w_sta:w_end][ ( !subday$CSflag[w_sta:w_end] == 0)  &
-                                                    (  subday$CSflag[w_sta:w_end] == 99) &
-                                                    pass                                ] <- 0
+                                                (  subday$CSflag[w_sta:w_end] == 99) &
+                                                   pass                                ] <- 0
 
                 } ##END for loop all points
             }
@@ -901,21 +900,21 @@ for (in_fl in strict_files) {
             ## low direct and not "Possible Direct Obstruction (23)"
             ## probably we know sun was obscured
             subday[CSflag == 0 &
-                       wattHOR < MS$LDIlim &
-                       QCF_DIR != "Possible Direct Obstruction (23)",
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
             subday[CSflag == 99 &
-                       wattHOR < MS$LDIlim &
-                       QCF_DIR != "Possible Direct Obstruction (23)",
+                   wattHOR < MS$LDIlim &
+                   QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
             subday[wattHOR < MS$LDIlim &
-                       QCF_DIR != "Possible Direct Obstruction (23)",
+                   QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
 
             subday[wattHOR < MS$LDIlim &
-                       QCF_DIR != "Possible Direct Obstruction (23)",
+                   QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
         }
 
@@ -977,10 +976,10 @@ for (in_fl in strict_files) {
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
 
         MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
-            mean(subday$wattGLB[clear_sky], na.rm = T)
+                mean(subday$wattGLB[clear_sky], na.rm = T)
 
         cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
-            sum(clear_sky, na.rm = T)
+                sum(clear_sky, na.rm = T)
 
 
         ## ID statistics
@@ -991,10 +990,6 @@ for (in_fl in strict_files) {
         VSMcnt     <- sum(subday$CSflag == 5, na.rm = T)
 
 
-        ## plotting selection
-        # if ( any(clear_sky) &
-        #      any(!is.na(subday$wattGLB[clear_sky])) &
-        #      (RMSE_r < 0.005 | abs(MBE) < 0.005 ) ) {
 
 
         #### PLOTS ####
@@ -1458,4 +1453,9 @@ write_RDS(MS, paste0("~/CS_id/PARAMS/", basename(sub("\\.R$","", Script.Name))))
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
-cat(sprintf("\n%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
+            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
+# if (interactive()) {
+    system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
+    system(paste("notify-send -u normal -t 30000 ", basename(Script.Name), " 'R script ended'"))
+# }

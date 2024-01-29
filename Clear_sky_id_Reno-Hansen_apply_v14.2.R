@@ -13,6 +13,7 @@
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
 #' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
 #' link-citations:  yes
 #' colorlinks:      yes
 #'
@@ -82,6 +83,18 @@ library(yardstick)
 source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
+
+
+# ## For parallel
+# library(parallel)
+# library(doParallel)
+# library(foreach)
+# n.cores    <- detectCores() - 1
+# my.cluster <- makeCluster(
+#     n.cores,
+#     type = "FORK"
+# )
+# registerDoParallel(cl = my.cluster)
 
 
 
@@ -218,20 +231,20 @@ strict$QCF_GLB      <- TRUE
 ## we have no reason to ignore that data
 
 ## F1
-strict$QCF_DIR_01   <- NULL
-strict$QCF_GLB_01   <- NULL
+strict$QCF_DIR_01       <- NULL
+strict$QCF_GLB_01       <- NULL
 strict$QCv9_01_dir_flag <- NULL
 strict$QCv9_01_glb_flag <- NULL
 ## F2
-strict$QCF_GLB_02   <- NULL
-strict$QCF_DIR_02   <- NULL
+strict$QCF_GLB_02       <- NULL
+strict$QCF_DIR_02       <- NULL
 strict$QCv9_02_dir_flag <- NULL
 strict$QCv9_02_glb_flag <- NULL
 ## F4
-strict$QCF_DIR_04_1 <- NULL
-strict$QCF_DIR_04_2 <- NULL
-strict$QCF_GLB_04_1 <- NULL
-strict$QCF_GLB_04_2 <- NULL
+strict$QCF_DIR_04_1     <- NULL
+strict$QCF_DIR_04_2     <- NULL
+strict$QCF_GLB_04_1     <- NULL
+strict$QCF_GLB_04_2     <- NULL
 strict$QCv9_04_dir_flag <- NULL
 strict$QCv9_04_glb_flag <- NULL
 
@@ -253,8 +266,8 @@ warning("Disabled this for trends !!")
 # ## trends use data above 5
 # strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_DIR := FALSE]
 # strict[((!is.na(QCv9_03_low_flag) | !is.na(QCv9_03_upp_flag)) & Elevat < 15), QCF_GLB := FALSE]
-strict$QCF_BTH_03_1 <- NULL
-strict$QCF_BTH_03_2 <- NULL
+strict$QCF_BTH_03_1     <- NULL
+strict$QCF_BTH_03_2     <- NULL
 strict$QCv9_03_low_flag <- NULL
 strict$QCv9_03_upp_flag <- NULL
 ## check the tables
@@ -432,7 +445,7 @@ if (IGNORE_DIRE) {
 
 
 
-##  Variables initialization -- ------------------------------------------------
+##  Variables initialization  --------------------------------------------------
 
 MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
                   MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
@@ -809,7 +822,7 @@ for (yyyy in unique(year(dayslist))) {
             MaxVIP_pass <- GLB_rmax < CS_ref_rmax_VIP_upp & GLB_rmax > CS_ref_rmax_VIP_low  ## apply upper and lower filter
 
             indx_todo   <- which( have_glb & MaxVIP_pass )
-            if ( length(indx_todo) > 0 ) {
+            if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
 
@@ -1041,11 +1054,11 @@ for (yyyy in unique(year(dayslist))) {
         ## Evaluation of CS detection
         clear_sky <- subday$CSflag == 0
 
-        ##; ## skip non clear days
-        ##; if (sum(clear_sky, na.rm = T) < relative_CS_lim)  {
-        ##;     print(paste("Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
-        ##;     next  ##  skip the rest of the loop and avoid alpha optimization
-        ##; }
+        # ## skip non clear days
+        # if (sum(clear_sky, na.rm = T) < relative_CS_lim)  {
+        #     print(paste("Skip Day minutes CS/lim/total  ", sum(clear_sky, na.rm = T),"/",relative_CS_lim,"/", sum(sell)))
+        #     next  ##  skip the rest of the loop and avoid alpha optimization
+        # }
 
         ## Clear sky statistics  -----
         RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
@@ -1358,13 +1371,13 @@ for (yyyy in unique(year(dayslist))) {
     suppressWarnings({
         # sub("\\.R$", "", basename(Script.Name)), "_")
         write_RDS(object = export,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                  file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
+                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
         write_RDS(object = daily_stats,
-                            file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                          sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                  file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
+                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
         )
 
     })
