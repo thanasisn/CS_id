@@ -26,6 +26,9 @@ for (af in files15) {
 
     cat("Rows ", nrow(DT14), nrow(DT15))
 
+   ## check all days present
+   ## check all flags
+
     DT14$Date
 
 }
