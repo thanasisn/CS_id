@@ -79,7 +79,6 @@ for (amo in unique( gather_results$month ) ) {
     print(amo)
     selm = gather_results$month == amo
 
-
     par(mar= c(2,4,1,1))
     plot(gather_results$cost[selm],gather_results$CS_count[selm], ylab = "count")
     text(gather_results$cost[selm],gather_results$CS_count[selm], labels = gather_results$CS_models[selm], cex = .6, pos = 4)
