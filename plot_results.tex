@@ -106,206 +106,25 @@ Construction of and examples of clear sky models
 
 {[}1{]} 13
 
-\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/unnamed-chunk-3-1} \end{center}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-1} \end{center}
 
-\subsubsection{Clear Sky detection Algorithm values}\label{clear-sky-detection-algorithm-values}
+\subsection{Base plot}\label{base-plot-1}
 
-\begin{longtable}[]{@{}rr@{}}
-\toprule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{nt} & 11 \\
-\textbf{MeanVIP\_fct} & 1 \\
-\textbf{CS\_ref\_rm\_VIP\_low} & 70 \\
-\textbf{CS\_ref\_rm\_VIP\_upp} & 80 \\
-\textbf{MaxVIP\_fct} & 1 \\
-\textbf{MaxVIP\_off\_upp} & 70 \\
-\textbf{MaxVIP\_off\_low} & 75 \\
-\textbf{MaxVIL\_fct} & 1 \\
-\textbf{MinVIL\_fct} & 1 \\
-\textbf{offVIL\_upl} & 9 \\
-\textbf{offVIL\_dwl} & 5 \\
-\textbf{offVCT} & 0.00011 \\
-\textbf{offVSM} & 7.5 \\
-\textbf{alpha} & 1 \\
-\textbf{relative\_CS} & 0.3 \\
-\textbf{sample\_n\_days} & 2229 \\
-\textbf{tolerance} & 0.01 \\
-\textbf{start\_day} & 2016-01-01 \\
-\textbf{LDIlim} & 5 \\
-\textbf{VGIlim} & 5 \\
-\end{longtable}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-multi-1} \end{center}
 
-\begin{verbatim}
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-\end{verbatim}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-multi-2} \end{center}
 
-\begin{verbatim}
-Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
-cells
-\end{verbatim}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-multi-3} \end{center}
 
-\begin{verbatim}
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-\end{verbatim}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-multi-4} \end{center}
 
-\begin{verbatim}
-Warning in split.large.cells(t.colnames): length of split.cells vector is smaller than data. Default value will be used for other
-cells
-\end{verbatim}
-
-\begin{longtable}[]{@{}rrrrrrrr@{}}
-\caption{Table continues below}\tabularnewline
-\toprule\noalign{}
-~ & DPP & KC & HAU & BD & ABCG & RS & KASTEN \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-~ & DPP & KC & HAU & BD & ABCG & RS & KASTEN \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{lower} & 0.85 & 0.9 & 0.8 & 0.95 & 0.9 & 0.85 & 0.85 \\
-\textbf{upper} & 1.25 & 1.25 & 1.2 & 1.25 & 1.3 & 1.25 & 1.25 \\
-\textbf{best} & 1.03 & 1.123 & 0.9653 & 1.072 & 1.082 & 0.979 & 1.01 \\
-\end{longtable}
-
-\begin{longtable}[]{@{}rr@{}}
-\toprule\noalign{}
-~ & INEICHEN \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{lower} & 0.85 \\
-\textbf{upper} & 1.25 \\
-\textbf{best} & 1.192 \\
-\end{longtable}
-
-\begin{verbatim}
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-\end{verbatim}
-
-\begin{longtable}[]{@{}rrrrrrr@{}}
-\toprule\noalign{}
-CS\_models & AM\_models & alpha & cost & rmse & CS\_count & month \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-DPP & AM\_simple & 1.03 & NA & NA & NA & 13 \\
-KC & AM\_simple & 1.123 & NA & NA & NA & 13 \\
-HAU & AM\_simple & 0.9653 & NA & NA & NA & 13 \\
-ABCG & AM\_simple & 1.082 & NA & NA & NA & 13 \\
-RS & AM\_simple & 0.979 & NA & NA & NA & 13 \\
-KASTEN & AM\_simple & 1.01 & NA & NA & NA & 13 \\
-INEICHEN & AM\_simple & 1.192 & NA & NA & NA & 13 \\
-\end{longtable}
-
-\begin{verbatim}
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-Warning in split.large.cells(t): length of split.cells vector is smaller than data. Default value will be used for other cells
-\end{verbatim}
-
-\begin{longtable}[]{@{}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1286}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1571}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1571}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1143}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1000}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1000}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1429}}
-  >{\raggedleft\arraybackslash}p{(\columnwidth - 14\tabcolsep) * \real{0.1000}}@{}}
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedleft
-~
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-CS\_models
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-AM\_models
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-alpha
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-cost
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-rmse
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-CS\_count
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
-month
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-\textbf{1} & DPP & AM\_simple & 1.003 & 993.2 & 31.51 & 491095 & 13 \\
-\textbf{2} & DPP & AM\_simple & 1.097 & 1165 & 34.13 & 418020 & 13 \\
-\textbf{3} & DPP & AM\_simple & 0.9444 & 1635 & 40.44 & 356034 & 13 \\
-\textbf{4} & DPP & AM\_simple & 1.039 & 891.2 & 29.85 & 511339 & 13 \\
-\textbf{5} & DPP & AM\_simple & 1.036 & 883.1 & 29.72 & 511574 & 13 \\
-\textbf{6} & DPP & AM\_simple & 1.03 & 876.2 & 29.6 & 510265 & 13 \\
-\textbf{7} & DPP & AM\_simple & 1.02 & 895.7 & 29.93 & 505920 & 13 \\
-\textbf{8} & DPP & AM\_simple & 1.027 & 878.8 & 29.64 & 509396 & 13 \\
-\textbf{9} & DPP & AM\_simple & 1.03 & 876.2 & 29.6 & 510265 & 13 \\
-\textbf{21} & KC & AM\_simple & 1.034 & 1293 & 35.96 & 340605 & 13 \\
-\textbf{22} & KC & AM\_simple & 1.116 & 909.1 & 30.15 & 483425 & 13 \\
-\textbf{23} & KC & AM\_simple & 1.167 & 1131 & 33.63 & 478656 & 13 \\
-\textbf{24} & KC & AM\_simple & 1.11 & 925.9 & 30.43 & 479335 & 13 \\
-\textbf{25} & KC & AM\_simple & 1.123 & 900.9 & 30.02 & 487144 & 13 \\
-\textbf{26} & KC & AM\_simple & 1.127 & 902.2 & 30.04 & 488563 & 13 \\
-\textbf{27} & KC & AM\_simple & 1.12 & 901.7 & 30.03 & 485268 & 13 \\
-\textbf{28} & KC & AM\_simple & 1.123 & 900.9 & 30.02 & 487144 & 13 \\
-\textbf{31} & HAU & AM\_simple & 0.9528 & 834.2 & 28.88 & 490726 & 13 \\
-\textbf{32} & HAU & AM\_simple & 1.047 & 1488 & 38.57 & 376210 & 13 \\
-\textbf{33} & HAU & AM\_simple & 0.8944 & 1320 & 36.32 & 372950 & 13 \\
-\textbf{34} & HAU & AM\_simple & 0.9653 & 796.1 & 28.22 & 498049 & 13 \\
-\textbf{35} & HAU & AM\_simple & 0.9795 & 831 & 28.83 & 500253 & 13 \\
-\textbf{36} & HAU & AM\_simple & 0.9686 & 796.2 & 28.22 & 499289 & 13 \\
-\textbf{37} & HAU & AM\_simple & 0.962 & 800.7 & 28.3 & 496470 & 13 \\
-\textbf{38} & HAU & AM\_simple & 0.9653 & 796.1 & 28.22 & 498049 & 13 \\
-\textbf{41} & ABCG & AM\_simple & 1.053 & 905 & 30.08 & 482487 & 13 \\
-\textbf{42} & ABCG & AM\_simple & 1.147 & 1259 & 35.48 & 454337 & 13 \\
-\textbf{43} & ABCG & AM\_simple & 0.9944 & 1468 & 38.32 & 355811 & 13 \\
-\textbf{44} & ABCG & AM\_simple & 1.079 & 816.7 & 28.58 & 506293 & 13 \\
-\textbf{45} & ABCG & AM\_simple & 1.082 & 816.6 & 28.58 & 507677 & 13 \\
-\textbf{46} & ABCG & AM\_simple & 1.085 & 817.6 & 28.59 & 508409 & 13 \\
-\textbf{47} & ABCG & AM\_simple & 1.082 & 816.6 & 28.58 & 507677 & 13 \\
-\textbf{51} & RS & AM\_simple & 1.003 & 927.8 & 30.46 & 495720 & 13 \\
-\textbf{52} & RS & AM\_simple & 1.097 & 1773 & 42.11 & 262334 & 13 \\
-\textbf{53} & RS & AM\_simple & 0.9444 & 1021 & 31.96 & 455740 & 13 \\
-\textbf{54} & RS & AM\_simple & 0.9852 & 850.4 & 29.16 & 496278 & 13 \\
-\textbf{55} & RS & AM\_simple & 0.979 & 846.1 & 29.09 & 493250 & 13 \\
-\textbf{56} & RS & AM\_simple & 0.9757 & 852.2 & 29.19 & 491521 & 13 \\
-\textbf{57} & RS & AM\_simple & 0.979 & 846.1 & 29.09 & 493250 & 13 \\
-\textbf{61} & KASTEN & AM\_simple & 1.003 & 924 & 30.4 & 504129 & 13 \\
-\textbf{62} & KASTEN & AM\_simple & 1.097 & 1120 & 33.47 & 358202 & 13 \\
-\textbf{63} & KASTEN & AM\_simple & 0.9444 & 1475 & 38.4 & 404539 & 13 \\
-\textbf{64} & KASTEN & AM\_simple & 1.036 & 982.2 & 31.34 & 505000 & 13 \\
-\textbf{65} & KASTEN & AM\_simple & 0.9805 & 1054 & 32.47 & 480529 & 13 \\
-\textbf{66} & KASTEN & AM\_simple & 1.013 & 908.9 & 30.15 & 509976 & 13 \\
-\textbf{67} & KASTEN & AM\_simple & 1.016 & 913.8 & 30.23 & 511051 & 13 \\
-\textbf{68} & KASTEN & AM\_simple & 1.01 & 908.1 & 30.14 & 508758 & 13 \\
-\textbf{69} & KASTEN & AM\_simple & 1.006 & 915.4 & 30.25 & 507088 & 13 \\
-\textbf{610} & KASTEN & AM\_simple & 1.01 & 908.1 & 30.14 & 508758 & 13 \\
-\textbf{71} & INEICHEN & AM\_simple & 1.003 & 1235 & 35.14 & 454585 & 13 \\
-\textbf{72} & INEICHEN & AM\_simple & 1.097 & 1171 & 34.22 & 455022 & 13 \\
-\textbf{73} & INEICHEN & AM\_simple & 1.156 & 1029 & 32.07 & 305752 & 13 \\
-\textbf{74} & INEICHEN & AM\_simple & 1.192 & 990.9 & 31.48 & 229916 & 13 \\
-\textbf{75} & INEICHEN & AM\_simple & 1.209 & 993 & 31.51 & 201892 & 13 \\
-\textbf{76} & INEICHEN & AM\_simple & 1.198 & 992.3 & 31.5 & 220638 & 13 \\
-\textbf{77} & INEICHEN & AM\_simple & 1.178 & 1001 & 31.63 & 255391 & 13 \\
-\textbf{78} & INEICHEN & AM\_simple & 1.186 & 992.9 & 31.51 & 239245 & 13 \\
-\textbf{79} & INEICHEN & AM\_simple & 1.192 & 990.9 & 31.48 & 229916 & 13 \\
-\end{longtable}
+\begin{center}\includegraphics[width=1\linewidth]{plot_results_files/figure-latex/CS-models-multi-5} \end{center}
 
 \textbf{END}
 
 \begin{verbatim}
 
-2024-11-07 11:21:07.2 athan@tyler ~/CS_id/plot_results.R 0.021380 mins
+2024-11-07 14:30:34.7 athan@tyler ~/CS_id/plot_results.R 0.245772 mins
 \end{verbatim}
 
 \end{document}

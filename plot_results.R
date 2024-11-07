@@ -63,6 +63,8 @@ library(pander)
 library(caTools)
 library(data.table)
 library(ggplot2)
+library(cowplot)
+library(ggrepel)
 library(latex2exp)
 library(data.table)
 
@@ -71,7 +73,7 @@ load("~/Aerosols/DATA/model_opt/Combinations_results_2022-06-14_153313.Rds")
 
 ## __ Set ggplot global theme  -------------------------------------------------
 
-gg_text_size <- 16
+gg_text_size <- 12
 
 theme_paper <- function(){
     # font <- "Georgia"   #assign font family up front
@@ -137,7 +139,7 @@ theme_set(theme_paper())
 
 #' ## Base plot
 #'
-#+ echo=F, include=T, results="asis"
+#+ CS-models, echo=F, include=T, results="asis"
 
 best_results <- data.frame()
 layout(matrix(c(1,2,3),3,1,byrow = TRUE),  TRUE)
@@ -164,48 +166,63 @@ for (amo in unique( gather_results$month ) ) {
 
 
 
+#' ## Base plot
+#'
+#+ CS-models-multi, echo=F, include=T, results="asis"
 
-stop()
 
 DT <- data.table(gather_results)
 
 p1 <- ggplot(DT,
-       aes(x = cost,
-           y = CS_count))    +
-    ylab("Clear sky points") +
-    xlab(element_blank())    +
-    geom_point()
+       aes(x     = cost,
+           y     = CS_count/1000,
+           label = CS_models,
+           color = CS_models))      +
+    ylab(TeX("CS points [$10^3$]"))        +
+    xlab(element_blank())           +
+    geom_point()                    +
+    geom_text_repel() +
+    theme(legend.position = "none")
 p1
 
+
+
 p2 <- ggplot(DT,
-             aes(x = cost,
-                 y = alpha))    +
-    ylab(TeX("Adjustment factor $\\alpha$")) +
+             aes(x     = cost,
+                 y     = alpha,
+                 label = CS_models,
+                 color = CS_models))      +
+    ylab(TeX("Adj. factor $\\alpha$")) +
     xlab(element_blank())    +
-    geom_point()
+    geom_point()+
+    geom_text_repel() +
+    theme(legend.position="none")
 p2
 
 p3 <- ggplot(DT,
              aes(x = cost,
-                 y = rmse))    +
+                 y = rmse,
+                 label = CS_models,
+                 color = CS_models))      +
     ylab("RMSE") +
     xlab(element_blank())    +
-    geom_point()
+    geom_point() +
+    geom_text_repel() +
+    theme(legend.position="none")
 p3
 
-library(cowplot)
 
-plot_grid(p1,
-          p2,
-          p3,
-          ncol    = 1,
-          align   = "v",
-          labels  = c("(a)","(b)","(c)"),
-          label_x = 0.16,
-          label_y = 0.93,
-          hjust   = 0,
-          vjust   = 1
-)
+# plot_grid(p1,
+#           p2,
+#           p3,
+#           ncol    = 1,
+#           align   = "v",
+#           labels  = c("(a)","(b)","(c)"),
+#           label_x = 0.16,
+#           label_y = 0.93,
+#           hjust   = 0,
+#           vjust   = 1
+# )
 
 
 P <- plot_grid(
@@ -215,9 +232,9 @@ P <- plot_grid(
     ncol = 1,
     align = "v",
     labels = c("(a)","(b)","(c)"),
-    label_x = 0.16,
-    label_y = 0.93,
-    hjust = 0, vjust = 1,
+    label_x = 0.10,
+    label_y = 0.60,
+    hjust = 0, vjust = 0,
     rel_heights = c(1,1,1)
 ) #+ theme(plot.margin = margin(0, 0, 0, 0))
 P
@@ -230,65 +247,6 @@ ggdraw(add_sub(P, "Cost", hjust = 0, vjust = 0, size = gg_text_size))
 
 
 
-TeX("$α$")
-TeX("$\\alpha$")
-
-
-p3 <- ggplot(dataset,
-             aes(x = year,
-                 y = get(pvar3))) +
-    geom_point(color = varcol(pvar3),
-               shape = 16,
-               size  = 3) +
-    geom_abline(intercept = lmY3$coefficients[1], slope = lmY3$coefficients[2]) +
-    # ylab(bquote(.(stringr::str_to_title(staname(pvar3))) ~ "CE" ~ .(varname(pvar3)) ~ group("[", W/m^2,"]"))) +
-    ylab(bquote("Mean CE" ~ .(varname(pvar3)) ~ group("[", W/m^2,"]"))) +
-    xlab("Year") +
-    annotation_custom(grob) +
-    scale_y_continuous(guide        = "axis_minor",
-                       minor_breaks = seq(0, 500, by = 1)) +
-    scale_x_continuous(guide        = "axis_minor",
-                       limits = c(1994, NA),
-                       breaks = c(
-                           1994,
-                           pretty(dataset[,year], n = 4),
-                           max(ceiling(dataset[,year]))),
-                       minor_breaks = seq(1990, 2050, by = 1) )
-p3 + theme(aspect.ratio = 0.35)
-
-
-
-
-
-
-#+ P-energy-complete-multi, echo=F, include=T, results="asis", fig.width=7, fig.height=10.5
-plot_grid(p2,
-          p3,
-          p1,
-          ncol = 1,
-          align = "v",
-          labels = c("(a)","(b)","(c)"),
-          label_x = 0.16,
-          label_y = 0.93,
-          hjust = 0, vjust = 1
-)
-
-
-P <- plot_grid(
-    p2 + xlab(element_blank()) + theme(plot.margin = margin(0, 0, 0, 0)),
-    p3 + xlab(element_blank()) + theme(plot.margin = margin(0, 0, 0, 0)),
-    p1 + xlab(element_blank()) + theme(plot.margin = margin(0, 0, 0, 0)),
-    ncol = 1,
-    align = "v",
-    labels = c("(a)","(b)","(c)"),
-    label_x = 0.16,
-    label_y = 0.93,
-    hjust = 0, vjust = 1,
-    rel_heights = c(1,1,1)
-) #+ theme(plot.margin = margin(0, 0, 0, 0))
-P
-
-ggdraw(add_sub(P, "Year", hjust = 0, vjust = 0, size = gg_text_size))
 
 
 
@@ -299,23 +257,6 @@ ggdraw(add_sub(P, "Year", hjust = 0, vjust = 0, size = gg_text_size))
 
 
 
-
-
-
-
-
-#' ### Clear Sky detection Algorithm values ###
-#+ include=T, echo=FALSE
-# panderOptions('table.emphasize.rownames', F)
-panderOptions('table.alignment.default',  "right")
-panderOptions('table.alignment.rownames', "right")
-panderOptions('table.split.cells',        c(50,10))
-panderOptions('table.style',              'rmarkdown' )
-
-pander(t(MS))
-pander(alpha_models)
-pander(combinations)
-pander(combinations_results)
 
 
 
