@@ -122,7 +122,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-# TEST        <- TRUE
+TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -130,8 +130,8 @@ END_DAY     <- Sys.Date()
 
 if (TEST) {
     warning("Test is active")
-    START_DAY <- "2022-01-01"
-    END_DAY   <- "2022-12-01"
+    START_DAY <- "2020-01-01"
+    END_DAY   <- "2020-12-31"
 }
 
 ## load previous state have to override it for alpha to be used
@@ -1095,8 +1095,10 @@ for (yyyy in unique(year(dayslist))) {
 
         ## plot global measurements
         plot(subday$Date, subday$wattGLB, 'l', col = "green" ,
-             ylim = ylim, ylab = "Watt/m^2", xlab = "", xaxt = "n", lwd = 2 )
-        abline( v = axis.POSIXct(1, at = pretty(subday$Date, n=24, min.n=24) ),col = "lightgray", lty = "dotted", lwd = .5)
+             ylim = ylim,
+             ylab = expression(paste("Irradiance [", W/m^{2}, "]")),
+             xlab = "", xaxt = "n", lwd = 2 )
+        abline(v = axis.POSIXct(1, at = pretty(subday$Date, n = 24, min.n = 24)), col = "lightgray", lty = "dotted", lwd = .5)
         ## plot direct measurements
         lines(subday$Date, subday$wattHOR, "l", col = scales::alpha("blue", 0.8 ), lty = 1, lwd = 2 )
         # lines(subday$Date, subday$wattDIR, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
@@ -1196,10 +1198,11 @@ for (yyyy in unique(year(dayslist))) {
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
 
-
-        title(main = paste(aday,    format(aday, "%j"),
-                           "RMSE:", round(RMSE_r, 3),
-                           "MBE:",  round(MBE,  3) ), cex.main = 1)
+        title(main = paste0(aday,
+                           ", DOY:", format(aday, "%j"),
+                           ", RMSE:", round(RMSE_r, 3),
+                           ", MBE:",  round(MBE,    3)),
+              cex.main = 1)
 
         legend("topright", bty = "n",
                legend = c( paste("CS GLB: ", Clear_cnt),
