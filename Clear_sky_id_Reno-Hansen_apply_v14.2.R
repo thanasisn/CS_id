@@ -122,7 +122,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -1251,7 +1251,7 @@ for (yyyy in unique(year(dayslist))) {
                           CS_ref_rm_VIP_low - CS_ref_rm_base,
                           CS_ref_rm_VIP_upp - CS_ref_rm_base,na.rm = T)
             plot(subday$Date, GLB_rm - CS_ref_rm_base,
-                 pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Mean VIP (1)")
+                 pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Mean VIP")
             lines(subday$Date, CS_ref_rm_VIP_low - CS_ref_rm_base, col = kcols[1], lty = 2)
             lines(subday$Date, CS_ref_rm_VIP_upp - CS_ref_rm_base, col = kcols[1], lty = 2)
 
@@ -1261,7 +1261,7 @@ for (yyyy in unique(year(dayslist))) {
         if (MaxVIP_active & any(have_glb)) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
-            plot(  subday$Date, GLB_rmax - CS_ref_rmax_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Run. Max VIP (2)")
+            plot(  subday$Date, GLB_rmax - CS_ref_rmax_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Max VIP")
             abline( h =   MS$MaxVIP_off_upp, lty = 2, col = kcols[2], lwd = 2)
             abline( h = - MS$MaxVIP_off_low, lty = 3, col = kcols[2], lwd = 2)
             abline( h = 0 , lty = 1, col = kcols[2], lwd = 2)
@@ -1287,7 +1287,7 @@ for (yyyy in unique(year(dayslist))) {
                 ylim <- range(subday[, .(VIL_low, VIL_upp)], na.rm = T)
                 ylim <- c(- abs(max(ylim)), 2 * abs(max(ylim)))
 
-                plot( subday$Date, subday$VIL_GLB, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)" )
+                plot( subday$Date, subday$VIL_GLB, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL" )
                 lines(subday$Date, subday$VIL_upp, lty = 3, col = kcols[3], lwd = 2)
                 lines(subday$Date, subday$VIL_low, lty = 2, col = kcols[3], lwd = 2)
             } else {
@@ -1298,7 +1298,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VCT_active) {
             par("mar" = c(0, 4.2, 0, 1) )
             ylim <- range(c(0, MS$offVCT*5), na.rm = T)
-            plot(subday$Date, GLB_sigma, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VCT (4)")
+            plot(subday$Date, GLB_sigma, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VCT")
             abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVCT, labels = MS$offVCT, pos = 1)
         }
@@ -1306,7 +1306,7 @@ for (yyyy in unique(year(dayslist))) {
         if (VSM_active) {
             par("mar" = c(.5, 4.2, 0, 1) )
             ylim <- range(c(0, MS$offVSM*5), na.rm = T)
-            plot(subday$Date, GLB_Xi, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VSM (5)")
+            plot(subday$Date, GLB_Xi, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VSM")
             abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
             text(x = subday$Date[20], y = MS$offVSM, labels = MS$offVSM, pos = 1)
         }
