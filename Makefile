@@ -4,7 +4,7 @@
 
 # all:       clean_all pdf html rtim
 render:    pdf
-pdf:       p1 d1  upload
+pdf:       dp1 p1 d1  upload
 html:      h1
 rtim:      r1
 
@@ -45,6 +45,18 @@ $(PDF): $(RMD)
 	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
 
 
+
+
+TARGET := Clear_sky_id_Reno-Hansen_apply_v14.2_duckdb
+RMD    := $(TARGET).R
+PDF    := $(TARGET).pdf
+SLIDY  := $(TARGET).html
+RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
+
+dp1: $(PDF)
+$(PDF): $(RMD)
+	@echo "Building: $@"
+	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
 
 
 

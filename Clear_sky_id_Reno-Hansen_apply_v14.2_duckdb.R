@@ -67,7 +67,6 @@ Script.Name <- "~/CS_id/Clear_sky_id_Reno-Hansen_apply_v14.2_duckdb.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 options("width" = 130)
@@ -83,17 +82,6 @@ source("~/CODE/R_myRtools/myRtools/R/trigonometric.R")
 source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/Aerosols/RAerosols/R/statistics.R")
 
-
-# ## For parallel
-# library(parallel)
-# library(doParallel)
-# library(foreach)
-# n.cores    <- detectCores() - 1
-# my.cluster <- makeCluster(
-#     n.cores,
-#     type = "FORK"
-# )
-# registerDoParallel(cl = my.cluster)
 
 
 
@@ -121,7 +109,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -214,12 +202,12 @@ for (in_f in strict_files) {
     strict  <- rbind(strict, stctemp, fill = TRUE)
     rm(stctemp)
 }
+strict_old <- strict
 
 
 ## use duck
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 source("~/BBand_LAP/DEFINITIONS.R")
-
 library(duckdb)
 library(dplyr)
 
@@ -228,13 +216,19 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## years in the data base
 strictdb <- tbl(con, "LAP")
-strictdb |>
+strict <- strictdb |>
     filter(Date >= START_DAY) |>
-    filter(Date <= END_DAY)
+    filter(Date <= END_DAY) |>
+    select(Date,
+           DIR_strict, GLB_strict,
+           SZA,
+           TSI_TOA) |>
+    rename(TSIextEARTH_comb = TSI_TOA) |>
+    collect()    |>
+    data.table()
+setorder(strict, Date)
 
 
-
-stop()
 ## create the main flag to include exclude data from processing
 strict$QCF_DIR      <- TRUE
 strict$QCF_GLB      <- TRUE
@@ -382,7 +376,7 @@ strong$CSflag <- 99
 
 #### Exclude inversions ####
 warning("Disabled this for trends !!")
-# inverted <- strong$wattGLB < strong$wattHOR
+# inverted <- strong$GLB_strict < strong$wattHOR
 inverted <- 0
 
 #'
@@ -404,9 +398,9 @@ warning("Disabled this for trends !!")
 #### Remove measurement without good quality code !! ####
 warning("Remove measurement without good quality code !!")
 warning("Disabled this for trends !!")
-# strong[QCF_DIR == FALSE, wattDIR     := NA]
+# strong[QCF_DIR == FALSE, DIR_strict     := NA]
 # strong[QCF_DIR == FALSE, wattHOR     := NA]
-# strong[QCF_DIR == FALSE, wattDIR_sds := NA]
+# strong[QCF_DIR == FALSE, DIR_strict_sds := NA]
 # strong[QCF_DIR == FALSE, wattDIF     := NA]
 # strong[QCF_GLB == FALSE, wattGLB     := NA]
 # strong[QCF_GLB == FALSE, wattGLB_sds := NA]
@@ -742,9 +736,9 @@ for (yyyy in unique(year(dayslist))) {
 
         ## Data selection for day
         subday     <- strong[ sell, ]
-        have_glb   <- !is.na(subday$wattGLB)  ## use vectors!
-        have_dir   <- !is.na(subday$wattDIR)  ## use vectors!
-        tot_p      <- length(subday$wattGLB)
+        have_glb   <- !is.na(subday$GLB_strict)  ## use vectors!
+        have_dir   <- !is.na(subday$DIR_strict)  ## use vectors!
+        tot_p      <- length(subday$GLB_strict)
 
 
         ## Values from Clear sky model used
@@ -798,7 +792,7 @@ for (yyyy in unique(year(dayslist))) {
             # lines(CS_ref_rm_VIP_upp_0,         col = 4)
             # lines(CS_ref_rm_base,              col = 6)
 
-            GLB_rm            <- runmean(x = subday$wattGLB, k = MS$nt, alg = "C")
+            GLB_rm            <- runmean(x = subday$GLB_strict, k = MS$nt, alg = "C")
 
             ## don't allow negative values on models
             CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
@@ -829,7 +823,7 @@ for (yyyy in unique(year(dayslist))) {
             CS_ref_rmax_base    <- runmax(x = CS_ref_safe,    k = MS$nt, alg = "C")
             CS_ref_rmax_VIP_upp <- MS$MaxVIP_fct * CS_ref_rmax_base + MS$MaxVIP_off_upp
             CS_ref_rmax_VIP_low <- MS$MaxVIP_fct * CS_ref_rmax_base - MS$MaxVIP_off_low
-            GLB_rmax            <- runmax(x = subday$wattGLB, k = MS$nt, alg = "C")
+            GLB_rmax            <- runmax(x = subday$GLB_strict, k = MS$nt, alg = "C")
 
             ## TEST feature
             CS_ref_rmax_base[    CS_ref_rmax_base    < 0 ] <- NA
@@ -871,7 +865,7 @@ for (yyyy in unique(year(dayslist))) {
                     walk(i, nt_hw , tot_p )
 
                     ## Do calculation ##
-                    data_win_glb   <- subday$wattGLB[w_sta:w_end]
+                    data_win_glb   <- subday$GLB_strict[w_sta:w_end]
                     # date_win_ref   = CS_ref[w_sta:w_end]
                     date_win_ref   <- CS_ref_safe[w_sta:w_end]
                     # print(c(length(data_win_glb),w_sta,i,w_end))
@@ -920,14 +914,14 @@ for (yyyy in unique(year(dayslist))) {
             if (length(indx_todo) > 0) {
                 ## start with old clear as 99
                 subday$CSflag[subday$CSflag == 0] <- 99
-                s_i <- data.table::shift(subday$wattGLB) - subday$wattGLB ##  /(t_i+i  - t_i)
+                s_i <- data.table::shift(subday$GLB_strict) - subday$GLB_strict ##  /(t_i+i  - t_i)
 
                 for (i in indx_todo) {
                     ## resolve window by index
                     walk(i, nt_hw , tot_p )
 
                     ## Do calculation ##
-                    data_win_glb <- subday$wattGLB[w_sta:w_end]
+                    data_win_glb <- subday$GLB_strict[w_sta:w_end]
                     DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
                     s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
 
@@ -966,7 +960,7 @@ for (yyyy in unique(year(dayslist))) {
                     walk(i, nt_hw, tot_p)
 
                     ## change in measurements
-                    data_win_glb  <- subday$wattGLB[w_sta:w_end]
+                    data_win_glb  <- subday$GLB_strict[w_sta:w_end]
                     DeltaVSq_GLB  <- (data.table::shift(data_win_glb) - data_win_glb)
 
                     ## change in reference
@@ -1030,11 +1024,11 @@ for (yyyy in unique(year(dayslist))) {
         #---- 7. Low Global Irradiance limit (LGI) -----------------------------
         if (LGI_active) {
             Flag_key  <- 7
-            subday[ (CSflag == 0 ) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
-            subday[ (CSflag == 99) & (wattGLB < MS$VGIlim), CSflag := Flag_key ]
+            subday[ (CSflag == 0 ) & (GLB_strict < MS$VGIlim), CSflag := Flag_key ]
+            subday[ (CSflag == 99) & (GLB_strict < MS$VGIlim), CSflag := Flag_key ]
 
-            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
-            subday[ wattGLB < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
+            subday[ GLB_strict < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
+            subday[ GLB_strict < MS$VGIlim, paste0("CSflag_", Flag_key) := TRUE ]
         }
 
 
@@ -1081,12 +1075,12 @@ for (yyyy in unique(year(dayslist))) {
         # }
 
         ## Clear sky statistics  -----
-        RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$wattGLB[clear_sky], na_rm = T)
+        RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$GLB_strict[clear_sky], na_rm = T)
 
-        MBE  <- mean(CS_ref_safe[clear_sky] - subday$wattGLB[clear_sky], na.rm = T) /
-                mean(subday$wattGLB[clear_sky], na.rm = T)
+        MBE  <- mean(CS_ref_safe[clear_sky] - subday$GLB_strict[clear_sky], na.rm = T) /
+                mean(subday$GLB_strict[clear_sky], na.rm = T)
 
-        cost <- sum( ( subday$wattGLB[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
+        cost <- sum( ( subday$GLB_strict[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
                 sum(clear_sky, na.rm = T)
 
 
@@ -1101,7 +1095,7 @@ for (yyyy in unique(year(dayslist))) {
 
         #### PLOTS ####
         ## _  Main plot --------------------------------------------------------
-        ylim <- range( c(subday$wattGLB, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
+        ylim <- range( c(subday$GLB_strict, MS$MaxVIP_fct * CS_ref_safe), na.rm = T )
         if ( ylim[2] > 1500 ) ylim[2] = 1500
         # if ( ylim[2] > 400) ylim[2] = 400
         ylim[1] = -25
@@ -1114,14 +1108,14 @@ for (yyyy in unique(year(dayslist))) {
         layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
 
         ## plot global measurements
-        plot(subday$Date, subday$wattGLB, 'l', col = "green" ,
+        plot(subday$Date, subday$GLB_strict, 'l', col = "green" ,
              ylim = ylim,
              ylab = expression(paste("Irradiance [", W/m^{2}, "]")),
              xlab = "", xaxt = "n", lwd = 2 )
         abline(v = axis.POSIXct(1, at = pretty(subday$Date, n = 24, min.n = 24)), col = "lightgray", lty = "dotted", lwd = .5)
         ## plot direct measurements
         lines(subday$Date, subday$wattHOR, "l", col = scales::alpha("blue", 0.8 ), lty = 1, lwd = 2 )
-        # lines(subday$Date, subday$wattDIR, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
+        # lines(subday$Date, subday$DIR_strict, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
 
 
         ## plot expected global reference line
@@ -1149,37 +1143,37 @@ for (yyyy in unique(year(dayslist))) {
 
         ## 1. mean value of irradiance during the time period
         ddd = subday$Date[    subday$CSflag == 1 ]
-        vvv = subday$wattGLB[ subday$CSflag == 1 ]
+        vvv = subday$GLB_strict[ subday$CSflag == 1 ]
         points(ddd, vvv,            pch = 8, col = kcols[1], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[1], cex = .2)
 
         ## 2. Max value of irradiance during the time period
         ddd = subday$Date[    subday$CSflag == 2 ]
-        vvv = subday$wattGLB[ subday$CSflag == 2 ]
+        vvv = subday$GLB_strict[ subday$CSflag == 2 ]
         points(ddd, vvv,            pch = 8, col = kcols[2], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[2], cex = .2)
 
         ##  3. Variability in irradiance by the length (VIL)
         ddd <- subday$Date[    subday$CSflag == 3 ]
-        vvv <- subday$wattGLB[ subday$CSflag == 3 ]
+        vvv <- subday$GLB_strict[ subday$CSflag == 3 ]
         points(ddd, vvv,            pch = 8, col = kcols[3], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[3], cex = .2)
 
         ##  4.  Variance of Changes in the Time series (VCT)
         ddd <- subday$Date[    subday$CSflag == 4 ]
-        vvv <- subday$wattGLB[ subday$CSflag == 4 ]
+        vvv <- subday$GLB_strict[ subday$CSflag == 4 ]
         points(ddd, vvv,            pch = 8, col = kcols[4], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[4], cex = .2)
 
         ##  5.  Variability in the Shape of the irradiance Measurements (VSM)
         ddd <- subday$Date[    subday$CSflag == 5 ]
-        vvv <- subday$wattGLB[ subday$CSflag == 5 ]
+        vvv <- subday$GLB_strict[ subday$CSflag == 5 ]
         points(ddd, vvv,            pch = 8, col = kcols[5], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[5], cex = .2)
 
         ##  6. Low Direct Irradiance limit (LDI)
         ddd    <- subday$Date[    subday$CSflag == 6 ]
-        vvv    <- subday$wattGLB[ subday$CSflag == 6 ]
+        vvv    <- subday$GLB_strict[ subday$CSflag == 6 ]
         LDIcnt <- sum(subday$CSflag == 6, na.rm = T)
         points(ddd, vvv,            pch = 8, col = kcols[6], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[6], cex = .2)
@@ -1187,7 +1181,7 @@ for (yyyy in unique(year(dayslist))) {
 
         ##  7. Low Global Irradiance limit (LGI)
         ddd    <- subday$Date[    subday$CSflag == 7 ]
-        vvv    <- subday$wattGLB[ subday$CSflag == 7 ]
+        vvv    <- subday$GLB_strict[ subday$CSflag == 7 ]
         VGLcnt <- sum(subday$CSflag == 7, na.rm = T)
         points(ddd, vvv,            pch = 8, col = kcols[7], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[7], cex = .2)
@@ -1209,7 +1203,7 @@ for (yyyy in unique(year(dayslist))) {
         ##  the rest is clear
         if (any(have_glb)) {
             ddd       <- subday$Date[    sel ]
-            vvv       <- subday$wattGLB[ sel ]
+            vvv       <- subday$GLB_strict[ sel ]
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
         if (any(have_dir)) {
@@ -1453,11 +1447,11 @@ barplot(prop.table(table(strong$CSflag)),
 ## Evaluation of CS detection
 clear_sky <- strong$CSflag == 0
 
-RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky] )**2 , na.rm = T) ) /
-        mean(strong$wattGLB[clear_sky] , na.rm = T)
+RMSE <- sqrt(mean( ( strong$CS_ref[clear_sky] - strong$GLB_strict[clear_sky] )**2 , na.rm = T) ) /
+        mean(strong$GLB_strict[clear_sky] , na.rm = T)
 
-MBE  <- mean(strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) /
-        mean(strong$wattGLB[clear_sky] , na.rm = T)
+MBE  <- mean(strong$CS_ref[clear_sky] - strong$GLB_strict[clear_sky]  , na.rm = T) /
+        mean(strong$GLB_strict[clear_sky] , na.rm = T)
 
 
 #'
@@ -1466,7 +1460,7 @@ MBE  <- mean(strong$CS_ref[clear_sky] - strong$wattGLB[clear_sky]  , na.rm = T) 
 #' $$ f(a) = \dfrac{ \sum_{i=1}^{n} ( a \cdot {GHI}_i - {CSI}_i )^2 }
 #'                 { n } , \qquad a > 0 $$
 #'
-cost <- sum((( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T) /
+cost <- sum((( alpha * strong$GLB_strict[clear_sky] ) - strong$CS_ref[clear_sky] )**2 , na.rm = T) /
         sum(clear_sky, na.rm = T)
 
 
@@ -1482,8 +1476,8 @@ cost <- sum((( alpha * strong$wattGLB[clear_sky] ) - strong$CS_ref[clear_sky] )*
 # abline(v = MBE)
 
 # library(tdr)
-# tdStats(strong$[clear_sky], strong$wattGLB[clear_sky])
-# targetDiagram(tdStats(strong$CS_ref[clear_sky], strong$wattGLB[clear_sky]))
+# tdStats(strong$[clear_sky], strong$GLB_strict[clear_sky])
+# targetDiagram(tdStats(strong$CS_ref[clear_sky], strong$GLB_strict[clear_sky]))
 # targetDiagram(tafff)
 # text(tafff$cvrmse, tafff$mbe, labels=row.names(tafff), cex= 0.7, offset = 0)
 # plot(tafff$cvrmse, tafff$mbe)
