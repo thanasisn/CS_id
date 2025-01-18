@@ -109,7 +109,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-# TEST        <- TRUE
+TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -117,8 +117,8 @@ END_DAY     <- Sys.Date()
 
 if (TEST) {
     warning("Test is active")
-    START_DAY <- "2020-01-01"
-    END_DAY   <- "2020-12-31"
+    START_DAY <- "2016-01-01"
+    END_DAY   <- "2016-12-31"
 }
 
 ## load previous state have to override it for alpha to be used
@@ -137,9 +137,7 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
 
-
 par(mar = c(2, 4, 2, 1))
-
 
 
 #+ include=F, echo=F
@@ -148,7 +146,6 @@ source("/home/athan/BBand_LAP/parameters/theory/Air_mass_models.R")
 source("/home/athan/BBand_LAP/parameters/theory/Clear_sky_irradiance_models.R")
 source("/home/athan/BBand_LAP/parameters/theory/Linke_turbidity_models.R")
 #'
-
 
 
 #'
@@ -212,13 +209,14 @@ library(duckdb)
 library(dplyr)
 
 
+##  Load data from duckdb  -----------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
-## years in the data base
 strictdb <- tbl(con, "LAP")
 strict <- strictdb |>
     filter(Date >= START_DAY) |>
-    filter(Date <= END_DAY) |>
+    filter(Date <= END_DAY)   |>
+    filter(Elevat > -1)       |>
     select(Date,
            DIR_strict, GLB_strict,
            SZA,
@@ -1328,8 +1326,8 @@ for (yyyy in unique(year(dayslist))) {
 
 
         ## _ Keep Clear Sky values  --------------------------------------------
-        subday$CS_ref         <- CS_ref_safe
-        gather <- rbind(gather, subday, fill = TRUE)
+        subday$CS_ref <- CS_ref_safe
+        gather        <- rbind(gather, subday, fill = TRUE)
 
         strong$CSflag[sell]   <- subday$CSflag  ## old legacy flag?
         strong$CS_ref[sell]   <- CS_ref_safe

@@ -56,6 +56,7 @@ RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
 dp1: $(PDF)
 $(PDF): $(RMD)
 	@echo "Building: $@"
+	-Rscript $?
 	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
 
 
@@ -78,53 +79,6 @@ $(SLIDY): $(RMD)
 	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
 
 r1: $(RUNT)
-$(RUNT): $(RMD)
-	-Rscript $?
-
-
-
-
-
-TARGET := Clear_sky_id_Reno-Hansen_apply_v14
-RMD    := $(TARGET).R
-PDF    := $(TARGET).pdf
-SLIDY  := $(TARGET).html
-RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
-
-p3: $(PDF)
-$(PDF): $(RMD)
-	@echo "Building: $@"
-	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
-
-h3: $(SLIDY)
-$(SLIDY): $(RMD)
-	@echo "Building: $@"
-	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
-
-r3: $(RUNT)
-$(RUNT): $(RMD)
-	-Rscript $?
-
-
-
-
-TARGET := Clear_sky_id_Reno-Hansen_apply_v13.1
-RMD    := $(TARGET).R
-PDF    := $(TARGET).pdf
-SLIDY  := $(TARGET).html
-RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
-
-p4: $(PDF)
-$(PDF): $(RMD)
-	@echo "Building: $@"
-	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
-
-h4: $(SLIDY)
-$(SLIDY): $(RMD)
-	@echo "Building: $@"
-	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
-
-r4: $(RUNT)
 $(RUNT): $(RMD)
 	-Rscript $?
 
