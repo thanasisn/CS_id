@@ -1,6 +1,7 @@
 
-# Clear Sky of Cloud detection
+# Clear Sky or Cloud detection
 
-Identify periods of clear sky or cloudy sky from 
-radiometric measurements.
+**Migrated to BBand_LAP**
+
+Identify periods of clear sky or cloudy sky from radiometric measurements.
 

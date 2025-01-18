@@ -2,10 +2,9 @@
 
 .DEFAULT_GOAL := render
 
-# all:       clean_all pdf html rtim
+all:       dp1 dr1 p1 r1 upload
 render:    pdf
-pdf:       dp1 p1 d1  upload
-html:      h1
+pdf:       dp1 p1 d1 upload
 rtim:      r1
 
 ## use a script to upload all pdfs
@@ -22,11 +21,6 @@ p1: $(PDF)
 $(PDF): $(RMD)
 	@echo "Building: $@"
 	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
-
-h1: $(SLIDY)
-$(SLIDY): $(RMD)
-	@echo "Building: $@"
-	-Rscript -e "rmarkdown::render('$?', output_format='rmarkdown::html_document', output_file='$@')"
 
 r1: $(RUNT)
 $(RUNT): $(RMD)
@@ -56,8 +50,11 @@ RUNT   := ./REPORTS/RUNTIME/$(TARGET).pdf
 dp1: $(PDF)
 $(PDF): $(RMD)
 	@echo "Building: $@"
-	-Rscript $?
 	-Rscript -e "rmarkdown::render('$?', output_format='bookdown::pdf_document2', output_file='$@')"
+
+dr1: $(RUNT)
+$(RUNT): $(RMD)
+	-Rscript $?
 
 
 

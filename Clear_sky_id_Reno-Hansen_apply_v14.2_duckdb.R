@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/CS_id/Clear_sky_id_Reno-Hansen_apply_v14.2_duckdb.R"
+Script.Name <- "~/CS_id/Clear_sky_id_Reno-Hansen_apply_v14_2_duckdb.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
@@ -109,7 +109,7 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
-TEST        <- TRUE
+# TEST        <- TRUE
 
 SAMPLE_DAYS <- 1000  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
@@ -156,50 +156,50 @@ source("/home/athan/BBand_LAP/parameters/theory/Linke_turbidity_models.R")
 #+ include=T, echo=FALSE
 
 
-##  Load data from QCRad procedure   -------------------------------------------
-## The "strict" input files were used before
-strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
-                           pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
-                           full.names = TRUE ,
-                           recursive  = FALSE)
-strict_files <- sort(strict_files)
-
-
-if (TEST) {
-    gather <- c()
-    year(START_DAY):year(Sys.Date())
-    for (ay in year(START_DAY):year(END_DAY)) {
-        gather <- c(gather, grep(ay, strict_files, value = T))
-    }
-    strict_files <- gather
-}
-
-
-
-
-## build one data.frame
-strict <- data.table()
-for (in_f in strict_files) {
-    stctemp <- data.table(readRDS(in_f))
-
-    ## remove older system flags
-    stctemp$QCF_DIR <- NULL
-    stctemp$QCF_GLB <- NULL
-
-#     ##TODO we have setup filters with the assumption of good.
-#     ## have to check the logic of other filters
-#     allow   <- c( "good", "Possible Direct Obstruction (23)")
-#     stctemp <- stctemp[ QCF_DIR %in% allow | QCF_GLB %in% allow ]
-
-
-    ## some new columns from BB need to use fill=T
-    names(strict) %in% names(stctemp)
-    names(stctemp)[!names(stctemp) %in% names(strict)]
-
-    strict  <- rbind(strict, stctemp, fill = TRUE)
-    rm(stctemp)
-}
-strict_old <- strict
+# ##  Load data from QCRad procedure   -------------------------------------------
+# ## The "strict" input files were used before
+# strict_files <- list.files(path       = "/home/athan/DATA/Broad_Band/QCRad_LongShi/",
+#                            pattern    = "QCRad_LongShi_v8_apply_CM21_CHP1_[0-9]{4}.Rds",
+#                            full.names = TRUE ,
+#                            recursive  = FALSE)
+# strict_files <- sort(strict_files)
+#
+#
+# if (TEST) {
+#     gather <- c()
+#     year(START_DAY):year(Sys.Date())
+#     for (ay in year(START_DAY):year(END_DAY)) {
+#         gather <- c(gather, grep(ay, strict_files, value = T))
+#     }
+#     strict_files <- gather
+# }
+#
+#
+#
+#
+# ## build one data.frame
+# strict <- data.table()
+# for (in_f in strict_files) {
+#     stctemp <- data.table(readRDS(in_f))
+#
+#     ## remove older system flags
+#     stctemp$QCF_DIR <- NULL
+#     stctemp$QCF_GLB <- NULL
+#
+# #     ##TODO we have setup filters with the assumption of good.
+# #     ## have to check the logic of other filters
+# #     allow   <- c( "good", "Possible Direct Obstruction (23)")
+# #     stctemp <- stctemp[ QCF_DIR %in% allow | QCF_GLB %in% allow ]
+#
+#
+#     ## some new columns from BB need to use fill=T
+#     names(strict) %in% names(stctemp)
+#     names(stctemp)[!names(stctemp) %in% names(strict)]
+#
+#     strict  <- rbind(strict, stctemp, fill = TRUE)
+#     rm(stctemp)
+# }
+# strict_old <- strict
 
 
 ## use duck
@@ -218,7 +218,7 @@ strict <- strictdb |>
     filter(Date <= END_DAY)   |>
     filter(Elevat > -1)       |>
     select(Date,
-           DIR_strict, GLB_strict,
+           DIR_strict, GLB_strict, HOR_strict,
            SZA,
            TSI_TOA) |>
     rename(TSIextEARTH_comb = TSI_TOA) |>
@@ -374,7 +374,7 @@ strong$CSflag <- 99
 
 #### Exclude inversions ####
 warning("Disabled this for trends !!")
-# inverted <- strong$GLB_strict < strong$wattHOR
+# inverted <- strong$GLB_strict < strong$HOR_strict
 inverted <- 0
 
 #'
@@ -397,7 +397,7 @@ warning("Disabled this for trends !!")
 warning("Remove measurement without good quality code !!")
 warning("Disabled this for trends !!")
 # strong[QCF_DIR == FALSE, DIR_strict     := NA]
-# strong[QCF_DIR == FALSE, wattHOR     := NA]
+# strong[QCF_DIR == FALSE, HOR_strict     := NA]
 # strong[QCF_DIR == FALSE, DIR_strict_sds := NA]
 # strong[QCF_DIR == FALSE, wattDIF     := NA]
 # strong[QCF_GLB == FALSE, wattGLB     := NA]
@@ -1000,20 +1000,20 @@ for (yyyy in unique(year(dayslist))) {
             ## low direct and not "Possible Direct Obstruction (23)"
             ## probably we know sun was obscured
             subday[CSflag == 0 &
-                   wattHOR < MS$LDIlim &
+                   HOR_strict < MS$LDIlim &
                    QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
             subday[CSflag == 99 &
-                   wattHOR < MS$LDIlim &
+                   HOR_strict < MS$LDIlim &
                    QCF_DIR != "Possible Direct Obstruction (23)",
                    CSflag := Flag_key ]
 
-            subday[wattHOR < MS$LDIlim &
+            subday[HOR_strict < MS$LDIlim &
                    QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
 
-            subday[wattHOR < MS$LDIlim &
+            subday[HOR_strict < MS$LDIlim &
                    QCF_DIR != "Possible Direct Obstruction (23)",
                    paste0("CSflag_", Flag_key) := TRUE ]
         }
@@ -1034,12 +1034,12 @@ for (yyyy in unique(year(dayslist))) {
         #---- 11. Too low direct radiation (DsT) -----------------````----------
         if (DST_active & any(have_dir)) {
             Flag_key  <- 11
-            subday[(CSflag == 0 ) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+            subday[(CSflag == 0 ) & (HOR_strict < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
                    CSflag := Flag_key]
-            subday[(CSflag == 99) & (wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
+            subday[(CSflag == 99) & (HOR_strict < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100))),
                    CSflag := Flag_key]
 
-            subday[wattHOR < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
+            subday[HOR_strict < CS_ref_HOR * ( 1 - (MS$DIR_s_T_fact / 100)), paste0("CSflag_", Flag_key) := TRUE ]
         }
 
 
@@ -1112,7 +1112,7 @@ for (yyyy in unique(year(dayslist))) {
              xlab = "", xaxt = "n", lwd = 2 )
         abline(v = axis.POSIXct(1, at = pretty(subday$Date, n = 24, min.n = 24)), col = "lightgray", lty = "dotted", lwd = .5)
         ## plot direct measurements
-        lines(subday$Date, subday$wattHOR, "l", col = scales::alpha("blue", 0.8 ), lty = 1, lwd = 2 )
+        lines(subday$Date, subday$HOR_strict, "l", col = scales::alpha("blue", 0.8 ), lty = 1, lwd = 2 )
         # lines(subday$Date, subday$DIR_strict, "l", col = scales::alpha("blue", 0.8 ), lty = 2, lwd = 2 )
 
 
@@ -1187,7 +1187,7 @@ for (yyyy in unique(year(dayslist))) {
 
         ##  11. Too low direct radiation (DsT)
         ddd    <- subday$Date[    subday$CSflag_11 ]
-        vvv    <- subday$wattHOR[ subday$CSflag_11 ]
+        vvv    <- subday$HOR_strict[ subday$CSflag_11 ]
         DsTcnt <- sum(subday$CSflag_11, na.rm = T)
         points(ddd, vvv,            pch = 8, col = kcols[11], cex = .4)
         points(ddd, vvv - vvv - 15, pch = 8, col = kcols[11], cex = .2)
@@ -1206,7 +1206,7 @@ for (yyyy in unique(year(dayslist))) {
         }
         if (any(have_dir)) {
             ddd       <- subday$Date[    sel ]
-            vvv       <- subday$wattHOR[ sel ]
+            vvv       <- subday$HOR_strict[ sel ]
             points(ddd, vvv - vvv - 25, pch = 8, col = "green", cex = .2)
         }
 
@@ -1387,12 +1387,14 @@ for (yyyy in unique(year(dayslist))) {
         # sub("\\.R$", "", basename(Script.Name)), "_")
         write_RDS(object = export,
                   file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                                sub("\\.", "_", sub("\\.R$", "", basename(Script.Name))),
+                                "_", yyyy, ".Rds")
         )
 
         write_RDS(object = daily_stats,
                   file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                                sub("\\.", "_", sub("\\.R$", "", basename(Script.Name))),
+                                "_", yyyy)
         )
 
     })

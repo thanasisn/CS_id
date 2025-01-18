@@ -66,12 +66,10 @@ tic <- Sys.time()
 Script.Name <- "Clear_sky_id_Reno-Hansen_apply_v14_2.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
+    pdf(file = paste0("~/CS_id/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
 }
 
 options("width" = 130)
-
 
 
 library(RColorBrewer)
@@ -150,9 +148,7 @@ monthly_alphas  <- gather_results[gather_results$CS_models == model_selection,]
 plotsbase <- paste0("~/CS_id/REPORTS/DAILY/",
                     sub("\\.R$", "", basename(Script.Name)), "_")
 
-
 par(mar = c(2, 4, 2, 1))
-
 
 
 #+ include=F, echo=F
@@ -161,7 +157,6 @@ source("/home/athan/Aerosols/source_R/THEORY/Air_mass_models.R")
 source("/home/athan/Aerosols/source_R/THEORY/Clear_sky_irradiance_models.R")
 source("/home/athan/Aerosols/source_R/THEORY/Linke_turbidity_models.R")
 #'
-
 
 
 #'
@@ -1375,12 +1370,14 @@ for (yyyy in unique(year(dayslist))) {
         # sub("\\.R$", "", basename(Script.Name)), "_")
         write_RDS(object = export,
                   file = paste0("/home/athan/DATA/Broad_Band/CS_id/",
-                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                                sub("\\.", "_", sub("\\.R$", "", basename(Script.Name))),
+                                "_", yyyy, ".Rds")
         )
 
         write_RDS(object = daily_stats,
                   file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                                sub("\\.R$", "", basename(Script.Name)), "_", yyyy)
+                                sub("\\.", "_", sub("\\.R$", "", basename(Script.Name))),
+                                "_", yyyy)
         )
 
     })
